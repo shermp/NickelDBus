@@ -92,7 +92,11 @@ install:
 	# install -Dm644 res/doc $(DESTDIR)/mnt/onboard/.adds/nm/doc
 
 koboroot:
-	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" --transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," --transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," src/libndb.so res/readme.txt
+	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" \
+	--transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," \
+	--transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," \
+	--transform="s,res/local-shermp-nickeldb.conf,./etc/dbus-1/system.d/local-shermp-nickeldbus.conf," \
+	src/libndb.so res/readme.txt res/local-shermp-nickeldb.conf
 
 adapter: $(ADAPTERS)
 
