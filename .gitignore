@@ -1,0 +1,31 @@
+# make gitignore
+
+# KDevelop
+.kdev4/
+NickelMenu.kdev4
+.kateconfig
+
+# VSCode
+.vscode/
+
+# clangd
+compile_flags.txt
+
+# Build artifacts
+/KoboRoot.tgz
+/src/libndb.so
+/src/qtplugin.moc
+/src/nickel_dbus.moc
+/src/adapter/nickel_dbus_adapter.moc
+/src/failsafe.o
+/src/adapter/nickel_dbus_adapter.h
+/src/adapter/nickel_dbus_adapter.cc
+/src/adapter/local.shermp.nickeldbus.xml
+/src/qtplugin_moc.o
+/src/nickel_dbus_moc.o
+/src/adapter/nickel_dbus_adapter_moc.o
+
+/src/nm/failsafe.o
+
+/src/init.o
+/src/nickel_dbus.o
