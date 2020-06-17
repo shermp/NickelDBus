@@ -29,3 +29,4 @@ compile_flags.txt
 
 /src/init.o
 /src/nickel_dbus.o
+/src/adapter/nickel_dbus_adapter.o
