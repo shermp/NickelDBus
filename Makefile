@@ -6,6 +6,7 @@ PKG_CONFIG     = $(CROSS_COMPILE)pkg-config
 STRIP          = $(CROSS_COMPILE)strip
 
 DESTDIR =
+_ADAPTDIR := $(shell mkdir -p -m777 src/adapter)
 
 ifneq ($(if $(MAKECMDGOALS),$(if $(filter-out clean gitignore install koboroot,$(MAKECMDGOALS)),YES,NO),YES),YES)
  $(info -- Skipping configure)
@@ -96,13 +97,15 @@ override GENERATED += KoboRoot.tgz
 src/libndb.so: override CFLAGS   += $(PTHREAD_CFLAGS) -fvisibility=hidden -fPIC
 src/libndb.so: override CXXFLAGS += $(PTHREAD_CFLAGS) $(QT5CORE_CFLAGS) $(QT5WIDGETS_CFLAGS) $(QT5DBUS_CFLAGS) -fvisibility=hidden -fPIC
 src/libndb.so: override LDFLAGS  += $(PTHREAD_LIBS) $(QT5CORE_LIBS) $(QT5WIDGETS_LIBS) $(QT5DBUS_LIBS) -ldl -Wl,-soname,libndb.so
-src/libndb.so: src/qtplugin_moc.o src/nm/failsafe.o src/init.o
+src/libndb.so: src/qtplugin_moc.o src/nm/failsafe.o src/adapter/nickel_dbus_adapter_moc.o src/adapter/nickel_dbus_adapter.o src/nickel_dbus_moc.o src/nickel_dbus.o src/init.o
 
 override LIBRARIES += src/libndb.so
-override MOCS      += src/qtplugin.moc
+override MOCS      += src/qtplugin.moc src/nickel_dbus.moc src/adapter/nickel_dbus_adapter.moc
+override ADAPTERS  += src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus_adapter.cc
+override DBUS_IFACE += src/adapter/local.shermp.nickeldbus.xml
 
-define patw =
- $(foreach dir,src src/nm,$(dir)/*$(1))
+define patw = 
+ $(foreach dir,src src/nm src/adapter,$(dir)/*$(1))
 endef
 define rpatw =
  $(patsubst %$(1),%$(2),$(foreach w,$(call patw,$(1)),$(wildcard $(w))))
@@ -112,6 +115,10 @@ $(LIBRARIES): src/%.so:
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -o $@ $^ $(LDFLAGS)
 $(MOCS): %.moc: %.h
 	$(MOC) $< -o $@
+$(DBUS_IFACE): src/nickel_dbus.h
+	qdbuscpp2xml -S -M -o $@ $<
+$(ADAPTERS) &: $(DBUS_IFACE)
+	cd src/adapter && qdbusxml2cpp -c NickelDBusAdapter -a $(word 1, $(notdir $(ADAPTERS))):$(word 2, $(notdir $(ADAPTERS))) $(<F)
 $(patsubst %.moc,%_moc.o,$(MOCS)): %_moc.o: %.moc
 	$(CXX) -xc++ $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 $(call rpatw,.c,.o): %.o: %.c
@@ -119,4 +126,4 @@ $(call rpatw,.c,.o): %.o: %.c
 $(call rpatw,.cc,.o): %.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-override GENERATED += $(LIBRARIES) $(MOCS) src/failsafe.o $(patsubst %.moc,%_moc.o,$(MOCS)) $(call rpatw,.c,.o) $(call rpatw,.cc,.o)
+override GENERATED += $(LIBRARIES) $(MOCS) src/failsafe.o $(ADAPTERS) $(DBUS_IFACE) $(patsubst %.moc,%_moc.o,$(MOCS)) $(call rpatw,.c,.o) $(call rpatw,.cc,.o)
