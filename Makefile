@@ -70,6 +70,9 @@ compile_flags.txt
 endef
 export GITIGNORE_HEAD
 
+override ADAPTERS   += src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus_adapter.cc
+override DBUS_IFACE += src/adapter/local.shermp.nickeldbus.xml
+
 all: src/libndb.so
 
 strip: src/libndb.so
@@ -91,7 +94,9 @@ install:
 koboroot:
 	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" --transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," --transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," src/libndb.so res/readme.txt
 
-.PHONY: all strip clean gitignore install koboroot
+adapter: $(ADAPTERS)
+
+.PHONY: all strip clean gitignore install koboroot adapter
 override GENERATED += KoboRoot.tgz
 
 src/libndb.so: override CFLAGS   += $(PTHREAD_CFLAGS) -fvisibility=hidden -fPIC
@@ -101,8 +106,6 @@ src/libndb.so: src/qtplugin_moc.o src/nm/failsafe.o src/adapter/nickel_dbus_adap
 
 override LIBRARIES += src/libndb.so
 override MOCS      += src/qtplugin.moc src/nickel_dbus.moc src/adapter/nickel_dbus_adapter.moc
-override ADAPTERS  += src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus_adapter.cc
-override DBUS_IFACE += src/adapter/local.shermp.nickeldbus.xml
 
 define patw = 
  $(foreach dir,src src/nm src/adapter,$(dir)/*$(1))
