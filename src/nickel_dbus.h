@@ -13,7 +13,7 @@ class NickelDBus : public QObject {
         NickelDBus(QObject* parent);
         ~NickelDBus();
         // bool registerDBus();
-        bool connectSignals(char **err_out);
+        void connectSignals();
     Q_SIGNALS:
         void pfmDoneProccessing(bool done = true);
     

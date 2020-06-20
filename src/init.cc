@@ -65,12 +65,7 @@ __attribute__((constructor)) void ndb_init() {
         delete ndb;
         NDB_INIT_FS_STOP;
     }
-    if (!ndb->connectSignals(&err)) {
-        NM_LOG("init: could not connect all signals: %s", err);
-        free(err);
-        delete ndb;
-        NDB_INIT_FS_STOP;
-    }
+    ndb->connectSignals();
 
     NDB_INIT_FS_STOP;
 }

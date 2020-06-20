@@ -26,19 +26,16 @@ NickelDBus::~NickelDBus() {
     conn.unregisterObject("/nickeldbus");
 }
 
-bool NickelDBus::connectSignals(char **err_out) {
-    #define NM_ERR_RET false
-    //libnickel 4.13.12638 * _ZN19PlugWorkflowManager14sharedInstanceEv
+void NickelDBus::connectSignals() {
     PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
     reinterpret_cast<void*&>(PlugWorkflowManager_sharedInstance) = dlsym(this->libnickel, "_ZN19PlugWorkflowManager14sharedInstanceEv");
-    NM_ASSERT(PlugWorkflowManager_sharedInstance, "could not dlsym PlugWorkflowManager::sharedInstance");
-
-    PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
-    NM_ASSERT(wf, "could not get shared PlugWorkflowManager pointer");
-    NM_LOG("connecting PlugWorkflowManager::doneProcessing");
-    QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()));
-    NM_RETURN_OK(true);
-    #undef NM_ERR_RET
+    if (PlugWorkflowManager_sharedInstance) {
+        PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
+        if (wf) {
+            NM_LOG("connecting PlugWorkflowManager::doneProcessing");
+            QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()));
+        } else {NM_LOG("could not get shared PlugWorkflowManager pointer");}
+    } else {NM_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
 }
 
 QString NickelDBus::version() {
