@@ -34,7 +34,9 @@ void NickelDBus::connectSignals() {
         PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
         if (wf) {
             NDB_LOG("connecting PlugWorkflowManager::doneProcessing");
-            QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()));
+            if (!QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()))) {
+                NDB_LOG("PlugWorkflowManager::doneProcessing connection failed");
+            }
         } else {NDB_LOG("could not get shared PlugWorkflowManager pointer");}
     } else {NDB_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
 }
