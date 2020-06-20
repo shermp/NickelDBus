@@ -34,9 +34,9 @@ void NickelDBus::connectSignals() {
         PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
         if (wf) {
             NDB_LOG("connecting PlugWorkflowManager::doneProcessing");
-            if (!QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()))) {
-                NDB_LOG("PlugWorkflowManager::doneProcessing connection failed");
-            }
+            if (QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()))) {
+                connectedSignals.insert("pfmDoneProccessing");
+            } else {NDB_LOG("PlugWorkflowManager::doneProcessing connection failed");}
         } else {NDB_LOG("could not get shared PlugWorkflowManager pointer");}
     } else {NDB_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
 }
@@ -47,6 +47,10 @@ QString NickelDBus::version() {
 bool NickelDBus::testAssert(bool test) {
     NDB_ASSERT(false, false, test, "The test value was '%s'", (test ? "true" : "false"));
     return true;
+}
+
+bool NickelDBus::signalConnected(const QString &signal_name) {
+    return connectedSignals.contains(signal_name);
 }
 
 bool NickelDBus::pfmRescanBooksFull() {

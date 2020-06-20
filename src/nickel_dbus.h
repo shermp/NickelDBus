@@ -2,6 +2,7 @@
 #define NICKEL_DBUS_H
 #include <QObject>
 #include <QString>
+#include <QSet>
 #include <QtDBus>
 
 class NickelDBus : public QObject {
@@ -20,7 +21,10 @@ class NickelDBus : public QObject {
     
     public Q_SLOTS:
         QString version();
+        bool signalConnected(const QString &signal_name);
         bool pfmRescanBooksFull();
+    private:
+        QSet<QString> connectedSignals;
 };
 
 #endif
