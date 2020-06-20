@@ -2,7 +2,7 @@
 #include <QString>
 #include "nickel_dbus.h"
 #include "adapter/nickel_dbus_adapter.h"
-#include "nm/util.h"
+#include "util.h"
 
 typedef QObject PlugWorkflowManager;
 
@@ -11,11 +11,11 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
     this->dbusRegSucceeded = true;
     QDBusConnection conn = QDBusConnection::systemBus();
     if (!conn.registerObject("/nickeldbus", this)) {
-        NM_LOG("failed to register object on system bus");
+        NDB_LOG("failed to register object on system bus");
         this->dbusRegSucceeded = false;
     }
     if (!conn.registerService("local.shermp.nickeldbus")) {
-        NM_LOG("failed to register service on the system bus");
+        NDB_LOG("failed to register service on the system bus");
         this->dbusRegSucceeded = false;
     }
     this->libnickel = nullptr;
@@ -32,14 +32,18 @@ void NickelDBus::connectSignals() {
     if (PlugWorkflowManager_sharedInstance) {
         PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
         if (wf) {
-            NM_LOG("connecting PlugWorkflowManager::doneProcessing");
+            NDB_LOG("connecting PlugWorkflowManager::doneProcessing");
             QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()));
-        } else {NM_LOG("could not get shared PlugWorkflowManager pointer");}
-    } else {NM_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
+        } else {NDB_LOG("could not get shared PlugWorkflowManager pointer");}
+    } else {NDB_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
 }
 
 QString NickelDBus::version() {
     return QString("NickelDBus-0.0.0");
+}
+bool NickelDBus::testAssert(bool test) {
+    NDB_ASSERT(false, false, test, "The test value was '%s'", (test ? "true" : "false"));
+    return true;
 }
 
 bool NickelDBus::pfmRescanBooksFull() {

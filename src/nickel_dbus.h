@@ -14,6 +14,7 @@ class NickelDBus : public QObject {
         ~NickelDBus();
         // bool registerDBus();
         void connectSignals();
+        bool testAssert(bool test);
     Q_SIGNALS:
         void pfmDoneProccessing(bool done = true);
     
