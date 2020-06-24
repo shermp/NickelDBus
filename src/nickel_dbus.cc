@@ -54,45 +54,46 @@ bool NickelDBus::signalConnected(QString const &signal_name) {
     return connectedSignals.contains(signal_name);
 }
 
-void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
-    NDB_ASSERT(, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
+int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
+    NDB_ASSERT(ndb_err_inval_param, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
     MainWindowController *(*MainWindowController_sharedInstance)();
     void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
     //libnickel 4.6 * _ZN20MainWindowController14sharedInstanceEv
     reinterpret_cast<void*&>(MainWindowController_sharedInstance) = dlsym(libnickel, "_ZN20MainWindowController14sharedInstanceEv");
-    NDB_ASSERT(, MainWindowController_sharedInstance, "unsupported firmware: could not find MainWindowController::sharedInstance()");
+    NDB_ASSERT(ndb_err_dlsym, MainWindowController_sharedInstance, "unsupported firmware: could not find MainWindowController::sharedInstance()");
     //libnickel 4.6 * _ZN20MainWindowController5toastERK7QStringS2_i
     reinterpret_cast<void*&>(MainWindowController_toast) = dlsym(libnickel, "_ZN20MainWindowController5toastERK7QStringS2_i");
-    NDB_ASSERT(, MainWindowController_toast, "unsupported firmware: could not find MainWindowController::toast(QString const&, QString const&, int)");
+    NDB_ASSERT(ndb_err_dlsym, MainWindowController_toast, "unsupported firmware: could not find MainWindowController::toast(QString const&, QString const&, int)");
     MainWindowController *mwc = MainWindowController_sharedInstance();
-    NDB_ASSERT(, mwc, "could not get MainWindowController instance");
+    NDB_ASSERT(ndb_err_call, mwc, "could not get MainWindowController instance");
     MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
+    return ndb_err_ok;
 }
 
-bool NickelDBus::pfmRescanBooksFull() {
+int NickelDBus::pfmRescanBooksFull() {
     // The following code is more-or-less lifted straight from NickelMenu
 
     //libnickel 4.13.12638 * _ZN19PlugWorkflowManager14sharedInstanceEv
     PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
     reinterpret_cast<void*&>(PlugWorkflowManager_sharedInstance) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager14sharedInstanceEv");
-    NDB_ASSERT(false, PlugWorkflowManager_sharedInstance, "could not dlsym PlugWorkflowManager::sharedInstance");
+    NDB_ASSERT(ndb_err_dlsym, PlugWorkflowManager_sharedInstance, "could not dlsym PlugWorkflowManager::sharedInstance");
 
     // this is what is called by PlugWorkflowManager::plugged after confirmation
     //libnickel 4.13.12638 * _ZN19PlugWorkflowManager18onCancelAndConnectEv
     void (*PlugWorkflowManager_onCancelAndConnect)(PlugWorkflowManager*);
     reinterpret_cast<void*&>(PlugWorkflowManager_onCancelAndConnect) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager18onCancelAndConnectEv");
-    NDB_ASSERT(false, PlugWorkflowManager_onCancelAndConnect, "could not dlsym PlugWorkflowManager::onCancelAndConnect");
+    NDB_ASSERT(ndb_err_dlsym, PlugWorkflowManager_onCancelAndConnect, "could not dlsym PlugWorkflowManager::onCancelAndConnect");
 
     //libnickel 4.13.12638 * _ZN19PlugWorkflowManager9unpluggedEv
     void (*PlugWorkflowManager_unplugged)(PlugWorkflowManager*);
     reinterpret_cast<void*&>(PlugWorkflowManager_unplugged) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager9unpluggedEv");
-    NDB_ASSERT(false, PlugWorkflowManager_unplugged, "could not dlsym PlugWorkflowManager::unplugged");
+    NDB_ASSERT(ndb_err_dlsym, PlugWorkflowManager_unplugged, "could not dlsym PlugWorkflowManager::unplugged");
 
     PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
-    NDB_ASSERT(false, wf, "could not get shared PlugWorkflowManager pointer");
+    NDB_ASSERT(ndb_err_call, wf, "could not get shared PlugWorkflowManager pointer");
 
     PlugWorkflowManager_onCancelAndConnect(wf);
     sleep(1);
     PlugWorkflowManager_unplugged(wf);
-    return true;
+    return ndb_err_ok;
 }

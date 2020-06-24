@@ -5,6 +5,13 @@
 #include <QSet>
 #include <QtDBus>
 
+typedef enum ndb_err {
+    ndb_err_ok = 0,
+    ndb_err_inval_param = 1,
+    ndb_err_dlsym = 2,
+    ndb_err_call = 3
+} ndb_err;
+
 class NickelDBus : public QObject {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "local.shermp.nickeldbus")
@@ -22,8 +29,8 @@ class NickelDBus : public QObject {
     public Q_SLOTS:
         QString version();
         bool signalConnected(QString const &signal_name);
-        void showToast(int toast_duration, QString const &msg_main, QString const &msg_sub = QStringLiteral(""));
-        bool pfmRescanBooksFull();
+        int showToast(int toast_duration, QString const &msg_main, QString const &msg_sub = QStringLiteral(""));
+        int pfmRescanBooksFull();
     private:
         QSet<QString> connectedSignals;
 };
