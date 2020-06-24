@@ -21,7 +21,8 @@ class NickelDBus : public QObject {
     
     public Q_SLOTS:
         QString version();
-        bool signalConnected(const QString &signal_name);
+        bool signalConnected(QString const &signal_name);
+        void showToast(int toast_duration, QString const &msg_main, QString const &msg_sub = QStringLiteral(""));
         bool pfmRescanBooksFull();
     private:
         QSet<QString> connectedSignals;

@@ -6,6 +6,7 @@
 #include "util.h"
 
 typedef QObject PlugWorkflowManager;
+typedef void MainWindowController;
 
 NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
     new NickelDBusAdapter(this);
@@ -49,8 +50,23 @@ bool NickelDBus::testAssert(bool test) {
     return true;
 }
 
-bool NickelDBus::signalConnected(const QString &signal_name) {
+bool NickelDBus::signalConnected(QString const &signal_name) {
     return connectedSignals.contains(signal_name);
+}
+
+void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
+    NDB_ASSERT(, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
+    MainWindowController *(*MainWindowController_sharedInstance)();
+    void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
+    //libnickel 4.6 * _ZN20MainWindowController14sharedInstanceEv
+    reinterpret_cast<void*&>(MainWindowController_sharedInstance) = dlsym(libnickel, "_ZN20MainWindowController14sharedInstanceEv");
+    NDB_ASSERT(, MainWindowController_sharedInstance, "unsupported firmware: could not find MainWindowController::sharedInstance()");
+    //libnickel 4.6 * _ZN20MainWindowController5toastERK7QStringS2_i
+    reinterpret_cast<void*&>(MainWindowController_toast) = dlsym(libnickel, "_ZN20MainWindowController5toastERK7QStringS2_i");
+    NDB_ASSERT(, MainWindowController_toast, "unsupported firmware: could not find MainWindowController::toast(QString const&, QString const&, int)");
+    MainWindowController *mwc = MainWindowController_sharedInstance();
+    NDB_ASSERT(, mwc, "could not get MainWindowController instance");
+    MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
 }
 
 bool NickelDBus::pfmRescanBooksFull() {
