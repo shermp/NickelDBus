@@ -13,6 +13,6 @@
 #define NDB_LOG(fmt, ...) syslog(LOG_DEBUG, "(" NDB_LOG_NAME ") " fmt " (%s:%d)", ##__VA_ARGS__, __FILE__, __LINE__)
 
 // Log a message and return 'ret' if cond == fail
-#define NDB_ASSERT(ret, fail, cond, fmt, ...) if ((cond) == (fail)) { \
+#define NDB_ASSERT(ret, cond, fmt, ...) if (!(cond)) { \
     NDB_LOG(fmt, ##__VA_ARGS__); \
-    return (ret);}
+    return ret;}

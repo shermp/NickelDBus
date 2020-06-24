@@ -45,7 +45,7 @@ QString NickelDBus::version() {
     return QString("NickelDBus-0.0.0");
 }
 bool NickelDBus::testAssert(bool test) {
-    NDB_ASSERT(false, false, test, "The test value was '%s'", (test ? "true" : "false"));
+    NDB_ASSERT(false, test, "The test value was '%s'", (test ? "true" : "false"));
     return true;
 }
 
@@ -59,21 +59,21 @@ bool NickelDBus::pfmRescanBooksFull() {
     //libnickel 4.13.12638 * _ZN19PlugWorkflowManager14sharedInstanceEv
     PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
     reinterpret_cast<void*&>(PlugWorkflowManager_sharedInstance) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager14sharedInstanceEv");
-    NDB_ASSERT(false, nullptr, PlugWorkflowManager_sharedInstance, "could not dlsym PlugWorkflowManager::sharedInstance");
+    NDB_ASSERT(false, PlugWorkflowManager_sharedInstance, "could not dlsym PlugWorkflowManager::sharedInstance");
 
     // this is what is called by PlugWorkflowManager::plugged after confirmation
     //libnickel 4.13.12638 * _ZN19PlugWorkflowManager18onCancelAndConnectEv
     void (*PlugWorkflowManager_onCancelAndConnect)(PlugWorkflowManager*);
     reinterpret_cast<void*&>(PlugWorkflowManager_onCancelAndConnect) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager18onCancelAndConnectEv");
-    NDB_ASSERT(false, nullptr, PlugWorkflowManager_onCancelAndConnect, "could not dlsym PlugWorkflowManager::onCancelAndConnect");
+    NDB_ASSERT(false, PlugWorkflowManager_onCancelAndConnect, "could not dlsym PlugWorkflowManager::onCancelAndConnect");
 
     //libnickel 4.13.12638 * _ZN19PlugWorkflowManager9unpluggedEv
     void (*PlugWorkflowManager_unplugged)(PlugWorkflowManager*);
     reinterpret_cast<void*&>(PlugWorkflowManager_unplugged) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager9unpluggedEv");
-    NDB_ASSERT(false, nullptr, PlugWorkflowManager_unplugged, "could not dlsym PlugWorkflowManager::unplugged");
+    NDB_ASSERT(false, PlugWorkflowManager_unplugged, "could not dlsym PlugWorkflowManager::unplugged");
 
     PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
-    NDB_ASSERT(false, nullptr, wf, "could not get shared PlugWorkflowManager pointer");
+    NDB_ASSERT(false, wf, "could not get shared PlugWorkflowManager pointer");
 
     PlugWorkflowManager_onCancelAndConnect(wf);
     sleep(1);
