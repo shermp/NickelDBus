@@ -55,6 +55,7 @@ bool NickelDBus::signalConnected(QString const &signal_name) {
 }
 
 int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
+    // The following code has been adapted from NickelMenu
     NDB_ASSERT(ndb_err_inval_param, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
     MainWindowController *(*MainWindowController_sharedInstance)();
     void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
