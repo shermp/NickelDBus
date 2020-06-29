@@ -1,9 +1,9 @@
 #include <dlfcn.h>
 #include <QString>
 #include <unistd.h>
+#include "util.h"
 #include "nickel_dbus.h"
 #include "adapter/nickel_dbus_adapter.h"
-#include "util.h"
 
 typedef QObject PlugWorkflowManager;
 typedef void MainWindowController;
