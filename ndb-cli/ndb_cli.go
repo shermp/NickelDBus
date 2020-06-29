@@ -102,8 +102,9 @@ func main() {
 		}
 		methodName := methodCmd.Arg(0)
 		methodArgs := methodCmd.Args()[1:]
-		convArgs := make([]interface{}, 0)
+		var convArgs []interface{}
 		methodFound := false
+		invalidArgs := false
 		for _, m := range node.Interfaces[ifaceIndex].Methods {
 			if m.Name == methodName {
 				argCount := 0
@@ -120,15 +121,27 @@ func main() {
 							v, err := strToDBusType(a.Type, methodArgs[i])
 							if err != nil {
 								fmt.Printf("Could not convert argument '%s' to type %s\n", methodArgs[i], a.Type)
-								os.Exit(1)
+								invalidArgs = true
+								convArgs = nil
+								break
 							}
 							convArgs = append(convArgs, v)
 							i++
 						}
 					}
+					if i == argCount {
+						invalidArgs = false
+					}
+					if invalidArgs {
+						continue
+					}
 					methodFound = true
 				}
 			}
+		}
+		if invalidArgs {
+			fmt.Printf("invalid arguments\n")
+			os.Exit(1)
 		}
 		if !methodFound {
 			fmt.Printf("Method '%s' not found\n", methodName)
