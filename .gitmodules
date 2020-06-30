@@ -1,0 +1,3 @@
+[submodule "NickelMenu"]
+	path = NickelMenu
+	url = https://github.com/geek1011/NickelMenu.git

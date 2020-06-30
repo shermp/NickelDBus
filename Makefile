@@ -105,8 +105,8 @@ override GENERATED += KoboRoot.tgz
 
 src/libndb.so: override CFLAGS   += $(PTHREAD_CFLAGS) -fvisibility=hidden -fPIC
 src/libndb.so: override CXXFLAGS += $(PTHREAD_CFLAGS) $(QT5CORE_CFLAGS) $(QT5WIDGETS_CFLAGS) $(QT5DBUS_CFLAGS) -fvisibility=hidden -fPIC
-src/libndb.so: override LDFLAGS  += $(PTHREAD_LIBS) $(QT5CORE_LIBS) $(QT5WIDGETS_LIBS) $(QT5DBUS_LIBS) -ldl -Wl,-soname,libndb.so
-src/libndb.so: src/qtplugin_moc.o src/nm/failsafe.o src/adapter/nickel_dbus_adapter_moc.o src/adapter/nickel_dbus_adapter.o src/nickel_dbus_moc.o src/nickel_dbus.o src/init.o
+src/libndb.so: override LDFLAGS  += $(PTHREAD_LIBS) $(QT5CORE_LIBS) $(QT5WIDGETS_LIBS) $(QT5DBUS_LIBS) -ldl -Wl,-soname,libndb.so 
+src/libndb.so: src/qtplugin_moc.o NickelMenu/src/failsafe.o NickelMenu/src/action.o NickelMenu/src/action_c.o NickelMenu/src/action_cc.o NickelMenu/src/kfmon.o src/adapter/nickel_dbus_adapter_moc.o src/adapter/nickel_dbus_adapter.o src/nickel_dbus_moc.o src/nickel_dbus.o src/init.o
 
 override LIBRARIES += src/libndb.so
 override MOCS      += src/qtplugin.moc src/nickel_dbus.moc src/adapter/nickel_dbus_adapter.moc

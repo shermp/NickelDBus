@@ -9,7 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "nm/failsafe.h"
+#include "../NickelMenu/src/failsafe.h"
 // Because the failsafe uses it, we may as well too
 #include "nickel_dbus.h"
 #include "util.h"
