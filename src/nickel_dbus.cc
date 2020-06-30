@@ -1,6 +1,7 @@
 #include <dlfcn.h>
 #include <QString>
 #include <unistd.h>
+#include "../NickelMenu/src/action.h"
 #include "util.h"
 #include "nickel_dbus.h"
 #include "adapter/nickel_dbus_adapter.h"
@@ -72,29 +73,11 @@ int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString c
 }
 
 int NickelDBus::pfmRescanBooksFull() {
-    // The following code is more-or-less lifted straight from NickelMenu
-
-    //libnickel 4.13.12638 * _ZN19PlugWorkflowManager14sharedInstanceEv
-    PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
-    reinterpret_cast<void*&>(PlugWorkflowManager_sharedInstance) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager14sharedInstanceEv");
-    NDB_ASSERT(ndb_err_dlsym, PlugWorkflowManager_sharedInstance, "could not dlsym PlugWorkflowManager::sharedInstance");
-
-    // this is what is called by PlugWorkflowManager::plugged after confirmation
-    //libnickel 4.13.12638 * _ZN19PlugWorkflowManager18onCancelAndConnectEv
-    void (*PlugWorkflowManager_onCancelAndConnect)(PlugWorkflowManager*);
-    reinterpret_cast<void*&>(PlugWorkflowManager_onCancelAndConnect) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager18onCancelAndConnectEv");
-    NDB_ASSERT(ndb_err_dlsym, PlugWorkflowManager_onCancelAndConnect, "could not dlsym PlugWorkflowManager::onCancelAndConnect");
-
-    //libnickel 4.13.12638 * _ZN19PlugWorkflowManager9unpluggedEv
-    void (*PlugWorkflowManager_unplugged)(PlugWorkflowManager*);
-    reinterpret_cast<void*&>(PlugWorkflowManager_unplugged) = dlsym(RTLD_DEFAULT, "_ZN19PlugWorkflowManager9unpluggedEv");
-    NDB_ASSERT(ndb_err_dlsym, PlugWorkflowManager_unplugged, "could not dlsym PlugWorkflowManager::unplugged");
-
-    PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
-    NDB_ASSERT(ndb_err_call, wf, "could not get shared PlugWorkflowManager pointer");
-
-    PlugWorkflowManager_onCancelAndConnect(wf);
-    sleep(1);
-    PlugWorkflowManager_unplugged(wf);
+    char *err = NULL;
+    void *res = nm_action_nickel_misc("rescan_books_full", &err);
+    if (!res) {
+        free(err);
+        return ndb_err_call;
+    }
     return ndb_err_ok;
 }
