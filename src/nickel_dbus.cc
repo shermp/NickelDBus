@@ -74,10 +74,11 @@ int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString c
 
 int NickelDBus::pfmRescanBooksFull() {
     char *err = NULL;
-    void *res = nm_action_nickel_misc("rescan_books_full", &err);
+    nm_action_result_t *res = nm_action_nickel_misc("rescan_books_full", &err);
     if (!res) {
         free(err);
         return ndb_err_call;
     }
+    nm_action_result_free(res);
     return ndb_err_ok;
 }
