@@ -22,6 +22,7 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
         this->dbusRegSucceeded = false;
     }
     this->libnickel = nullptr;
+    this->methodsInhibited = false;
 }
 NickelDBus::~NickelDBus() {
     QDBusConnection conn = QDBusConnection::systemBus();
@@ -35,10 +36,24 @@ void NickelDBus::connectSignals() {
     if (PlugWorkflowManager_sharedInstance) {
         PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
         if (wf) {
+            NDB_LOG("connecting PlugWorkflowManager::aboutToConnect");
+            if (QObject::connect(wf, SIGNAL(aboutToConnect()), this, SIGNAL(pfmAboutToConnect()))) {
+                connectedSignals.insert("pfmAboutToConnect");
+            } else {NDB_LOG("PlugWorkflowManager::aboutToConnect connection failed");}
+            // This seems an appropriate signal to also use to inhibit calling actions while nickel is
+            // exporting a USBMS session
+            if (!QObject::connect(wf, SIGNAL(aboutToConnect()), this, SLOT(enableMethodInhibit()))) {
+                NDB_LOG("PlugWorkflowManager::aboutToConnect connection to enableMethodInhibit failed");
+            }
             NDB_LOG("connecting PlugWorkflowManager::doneProcessing");
             if (QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()))) {
                 connectedSignals.insert("pfmDoneProccessing");
             } else {NDB_LOG("PlugWorkflowManager::doneProcessing connection failed");}
+            // And it should be safe to allow calling actions after this signal
+            if (!QObject::connect(wf, SIGNAL(doneProcessing()), this, SLOT(disableMethodInhibit()))) {
+                NDB_LOG("PlugWorkflowManager::doneProcessing connection to disableMethodInhibit failed");
+            }
+
         } else {NDB_LOG("could not get shared PlugWorkflowManager pointer");}
     } else {NDB_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
 }
@@ -46,7 +61,17 @@ void NickelDBus::connectSignals() {
 QString NickelDBus::version() {
     return QString(NDB_VERSION);
 }
+
+void NickelDBus::enableMethodInhibit() {
+    this->methodsInhibited = true;
+}
+
+void NickelDBus::disableMethodInhibit() {
+    this->methodsInhibited = false;
+}
+
 QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
+    NDB_ASSERT(QString("ERROR: In USB session"), !this->methodsInhibited, "not calling method nickelClassDetails: in usbms session");
     typedef QMetaObject NickelMetaObject;
     NDB_ASSERT(QString("ERROR: not a valid staticMetaObject symbol"), static_metaobject_symbol.endsWith(QString("staticMetaObjectE")), "not a valid staticMetaObject symbol");
     QByteArray sym = static_metaobject_symbol.toLatin1();
@@ -94,6 +119,7 @@ bool NickelDBus::signalConnected(QString const &signal_name) {
 }
 
 int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method showToast: in usbms session");
     // The following code has been adapted from NickelMenu
     NDB_ASSERT(ndb_err_inval_param, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
     MainWindowController *(*MainWindowController_sharedInstance)();
@@ -111,6 +137,7 @@ int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString c
 }
 
 int NickelDBus::pfmRescanBooksFull() {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method pfmRescanBooksFull: in usbms session");
     char *err = NULL;
     nm_action_result_t *res = nm_action_nickel_misc("rescan_books_full", &err);
     if (!res) {
