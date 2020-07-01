@@ -9,6 +9,10 @@
 #endif
 #endif
 
+#ifndef NDB_VERSION
+    #define NDB_VERSION "dev"
+#endif
+
 // NDB_LOG writes a log message. Borrowed from NickelMenu
 #define NDB_LOG(fmt, ...) syslog(LOG_DEBUG, "(" NDB_LOG_NAME ") " fmt " (%s:%d)", ##__VA_ARGS__, __FILE__, __LINE__)
 

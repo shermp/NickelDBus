@@ -44,7 +44,7 @@ void NickelDBus::connectSignals() {
 }
 
 QString NickelDBus::version() {
-    return QString("NickelDBus-0.0.0");
+    return QString(NDB_VERSION);
 }
 QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
     typedef QMetaObject NickelMetaObject;
@@ -82,7 +82,6 @@ QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) 
         }
         str.append(QString("\t%1 :: %2 %3\n").arg(method_type).arg(method.typeName()).arg(method.methodSignature().constData()));
     }
-    str.append("\n");
     return str;
 }
 bool NickelDBus::testAssert(bool test) {

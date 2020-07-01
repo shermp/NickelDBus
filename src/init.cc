@@ -14,9 +14,6 @@
 #include "nickel_dbus.h"
 #include "util.h"
 
-#ifndef NDB_VERSION
-    #define NDB_VERSION "dev"
-#endif
 #ifndef NM_CONFIG_DIR
     #define NM_CONFIG_DIR "/mnt/onboard/.adds/ndb"
 #endif
