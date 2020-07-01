@@ -28,8 +28,9 @@ class NickelDBus : public QObject {
     
     public Q_SLOTS:
         QString version();
-        bool signalConnected(QString const &signal_name);
-        int showToast(int toast_duration, QString const &msg_main, QString const &msg_sub = QStringLiteral(""));
+        QString nickelClassDetails(QString const& static_metaobject_symbol);
+        bool signalConnected(QString const& signal_name);
+        int showToast(int toast_duration, QString const& msg_main, QString const& msg_sub = QStringLiteral(""));
         int pfmRescanBooksFull();
     private:
         QSet<QString> connectedSignals;

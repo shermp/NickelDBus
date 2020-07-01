@@ -46,6 +46,45 @@ void NickelDBus::connectSignals() {
 QString NickelDBus::version() {
     return QString("NickelDBus-0.0.0");
 }
+QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
+    typedef QMetaObject NickelMetaObject;
+    NDB_ASSERT(QString("ERROR: not a valid staticMetaObject symbol"), static_metaobject_symbol.endsWith(QString("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    QByteArray sym = static_metaobject_symbol.toLatin1();
+    NickelMetaObject *nmo;
+    reinterpret_cast<void*&>(nmo) = dlsym(this->libnickel, sym.constData());
+    NDB_ASSERT(QString("ERROR: DLSYM"), nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
+    QString str = QString("");
+    str.append(QString("Showing meta information for Nickel class %1 : \n").arg(nmo->className()));
+    str.append("Properties : \n");
+    for (int i = nmo->propertyOffset(); i < nmo->propertyCount(); ++i) {
+        QMetaProperty prop = nmo->property(i);
+        str.append(QString("\t%1 %2 :: readable: %3 :: writeable: %4\n").arg(prop.typeName()).arg(prop.name()).arg(prop.isReadable()).arg(prop.isWritable())); 
+    }
+    str.append("Methods : \n");
+    for (int i = nmo->methodOffset(); i < nmo->methodCount(); ++i) {
+        QMetaMethod method = nmo->method(i);
+        const char *method_type;
+        switch (method.methodType()) {
+            case QMetaMethod::Signal:
+                method_type = "SIGNAL";
+                break;
+            case QMetaMethod::Slot:
+                method_type = "SLOT";
+                break;
+            case QMetaMethod::Method:
+                method_type = "METHOD";
+                break;
+            case QMetaMethod::Constructor:
+                method_type = "CONSTRUCTOR";
+                break;
+            default:
+                method_type = "UNKOWN";
+        }
+        str.append(QString("\t%1 :: %2 %3\n").arg(method_type).arg(method.typeName()).arg(method.methodSignature().constData()));
+    }
+    str.append("\n");
+    return str;
+}
 bool NickelDBus::testAssert(bool test) {
     NDB_ASSERT(false, test, "The test value was '%s'", (test ? "true" : "false"));
     return true;
