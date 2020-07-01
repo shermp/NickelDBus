@@ -46,7 +46,7 @@ void NickelDBus::connectSignals() {
                 NDB_LOG("PlugWorkflowManager::aboutToConnect connection to enableMethodInhibit failed");
             }
             NDB_LOG("connecting PlugWorkflowManager::doneProcessing");
-            if (QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProccessing()))) {
+            if (QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProcessing()))) {
                 connectedSignals.insert("pfmDoneProccessing");
             } else {NDB_LOG("PlugWorkflowManager::doneProcessing connection failed");}
             // And it should be safe to allow calling actions after this signal

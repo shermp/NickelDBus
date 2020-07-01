@@ -25,7 +25,7 @@ class NickelDBus : public QObject {
         void connectSignals();
         bool testAssert(bool test);
     Q_SIGNALS:
-        void pfmDoneProccessing(bool done = true);
+        void pfmDoneProcessing(bool done = true);
         void pfmAboutToConnect();    
     public Q_SLOTS:
         QString version();
