@@ -194,6 +194,7 @@ int NickelDBus::pfmRescanBooksFull() {
     char *err = NULL;
     nm_action_result_t *res = nm_action_nickel_misc("rescan_books_full", &err);
     if (!res) {
+        NDB_LOG("pfmRescanBooksFull failed with error: %s", err);
         free(err);
         return ndb_err_call;
     }
@@ -230,10 +231,13 @@ int NickelDBus::ndbWireless(enum wireless_conn_option opt) {
     case DISABLE:
         arg = "disable";
         break;
+    default:
+        arg = "toggle"; // keep compiler happy
     }
-    char *err = NULL;
+    char *err;
     nm_action_result_t *res = nm_action_nickel_wifi(arg, &err);
     if (!res) {
+        NDB_LOG("ndbWireless failed with error: %s", err);
         free(err);
         return ndb_err_call;
     }
@@ -241,3 +245,36 @@ int NickelDBus::ndbWireless(enum wireless_conn_option opt) {
     return ndb_err_ok;
 }
 
+int NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method bwmOpenBrowser: in usbms session");
+    QString qarg = QString("");
+    if (modal || !url.isEmpty() || !css.isEmpty()) {
+        if (modal) {
+            qarg.append("modal");
+            if (!url.isEmpty() || !css.isEmpty()) {
+                qarg.append(":");
+            }
+        }
+        if (!url.isEmpty()) {
+            qarg.append(QString("%1 ").arg(url));
+        }
+        if (!css.isEmpty()) {
+            qarg.append(css);
+        }
+    }
+    QByteArray qb_arg;
+    if (!qarg.isEmpty()) {
+        qb_arg = qarg.toUtf8();
+    } else {
+        qb_arg = QByteArray();
+    }
+    char *err = NULL;
+    nm_action_result_t *res = nm_action_nickel_browser((qb_arg.isEmpty() ? NULL : qb_arg.constData()), &err);
+    if (!res) {
+        NDB_LOG("bwmOpenBrowser failed with error: %s", err);
+        free(err);
+        return ndb_err_call;
+    }
+    nm_action_result_free(res);
+    return ndb_err_ok;
+}

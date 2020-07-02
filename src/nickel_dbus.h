@@ -53,6 +53,8 @@ class NickelDBus : public QObject {
         int wfmConnectWireless();
         int wfmConnectWirelessSilently();
         int wfmSetAirplaneMode(bool enabled);
+        // Web Browser (BrowserWorkflowManager)
+        int bwmOpenBrowser(bool modal = false, QString const& url = QString(), QString const& css = QString());
     protected Q_SLOTS:
         void enableMethodInhibit();
         void disableMethodInhibit();
