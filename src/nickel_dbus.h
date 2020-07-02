@@ -52,18 +52,25 @@ class NickelDBus : public QObject {
         // Wireless methods (WirelessFlowManager)
         int wfmConnectWireless();
         int wfmConnectWirelessSilently();
-        int wfmSetAirplaneMode(bool enabled);
+        int wfmSetAirplaneMode(QString const& action);
         // Web Browser (BrowserWorkflowManager)
         int bwmOpenBrowser(bool modal = false, QString const& url = QString(), QString const& css = QString());
+        // Nickel Settings
+        int nsInvert(QString const& action);
+        int nsLockscreen(QString const& action);
+        int nsScreenshots(QString const& action);
+        int nsForceWifi(QString const& action);
     protected Q_SLOTS:
         void enableMethodInhibit();
         void disableMethodInhibit();
     private:
-        enum wireless_conn_option {AUTO, AUTO_SILENT, ENABLE, DISABLE};
+        enum nm_action {NM_ACT_AUTO, NM_ACT_AUTO_SILENT, NM_ACT_ENABLE, NM_ACT_DISABLE, NM_ACT_TOGGLE, NM_ACT_ERR};
         bool methodsInhibited;
         QSet<QString> connectedSignals;
 
-        int ndbWireless(enum wireless_conn_option);
+        enum nm_action parseActionStr(QString const& actStr);
+        int ndbWireless(enum nm_action act);
+        int ndbSettings(QString const& action, QString const& setting);
 };
 
 #endif
