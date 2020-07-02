@@ -200,3 +200,44 @@ int NickelDBus::pfmRescanBooksFull() {
     nm_action_result_free(res);
     return ndb_err_ok;
 }
+
+int NickelDBus::wfmConnectWireless() {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method wfmConnectWireless: in usbms session");
+    return ndbWireless(AUTO);
+}
+int NickelDBus::wfmConnectWirelessSilently() {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method wfmConnectWirelessSilently: in usbms session");
+    return ndbWireless(AUTO_SILENT);
+}
+int NickelDBus::wfmSetAirplaneMode(bool enabled) {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method wfmSetAirplaneMode: in usbms session");
+    enum wireless_conn_option opt = enabled ? ENABLE : DISABLE;
+    return ndbWireless(opt);
+}
+
+int NickelDBus::ndbWireless(enum wireless_conn_option opt) {
+    const char *arg;
+    switch (opt) {
+    case AUTO: 
+        arg = "autoconnect"; 
+        break;
+    case AUTO_SILENT:
+        arg = "autoconnect_silent";
+        break;
+    case ENABLE:
+        arg = "enable";
+        break;
+    case DISABLE:
+        arg = "disable";
+        break;
+    }
+    char *err = NULL;
+    nm_action_result_t *res = nm_action_nickel_wifi(arg, &err);
+    if (!res) {
+        free(err);
+        return ndb_err_call;
+    }
+    nm_action_result_free(res);
+    return ndb_err_ok;
+}
+
