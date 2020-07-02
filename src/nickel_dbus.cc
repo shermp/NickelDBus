@@ -188,13 +188,26 @@ int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString c
     MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
     return ndb_err_ok;
 }
+int NickelDBus::goHome() {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method goHome: in usbms session");
+    return ndbNickelMisc("home");
+}
+
+int NickelDBus::pfmRescanBooks() {
+    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method pfmRescanBooks: in usbms session");
+    return ndbNickelMisc("rescan_books");
+}
 
 int NickelDBus::pfmRescanBooksFull() {
     NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method pfmRescanBooksFull: in usbms session");
+    return ndbNickelMisc("rescan_books_full");
+}
+
+int NickelDBus::ndbNickelMisc(const char *action) {
     char *err = NULL;
-    nm_action_result_t *res = nm_action_nickel_misc("rescan_books_full", &err);
+    nm_action_result_t *res = nm_action_nickel_misc(action, &err);
     if (!res) {
-        NDB_LOG("pfmRescanBooksFull failed with error: %s", err);
+        NDB_LOG("nm_action_nickel_misc failed with error: %s", err);
         free(err);
         return ndb_err_call;
     }

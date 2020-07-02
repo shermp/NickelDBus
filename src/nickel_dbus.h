@@ -47,7 +47,9 @@ class NickelDBus : public QObject {
         // misc
         bool signalConnected(QString const& signal_name);
         int showToast(int toast_duration, QString const& msg_main, QString const& msg_sub = QStringLiteral(""));
+        int goHome();
         // PlugworkFlowManager
+        int pfmRescanBooks();
         int pfmRescanBooksFull();
         // Wireless methods (WirelessFlowManager)
         int wfmConnectWireless();
@@ -71,6 +73,7 @@ class NickelDBus : public QObject {
         enum nm_action parseActionStr(QString const& actStr);
         int ndbWireless(enum nm_action act);
         int ndbSettings(QString const& action, QString const& setting);
+        int ndbNickelMisc(const char *action);
 };
 
 #endif
