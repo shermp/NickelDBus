@@ -7,6 +7,7 @@
 #include "adapter/nickel_dbus_adapter.h"
 
 typedef QObject PlugWorkflowManager;
+typedef QObject WirelessManager;
 typedef void MainWindowController;
 
 NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
@@ -53,9 +54,61 @@ void NickelDBus::connectSignals() {
             if (!QObject::connect(wf, SIGNAL(doneProcessing()), this, SLOT(disableMethodInhibit()))) {
                 NDB_LOG("PlugWorkflowManager::doneProcessing connection to disableMethodInhibit failed");
             }
-
         } else {NDB_LOG("could not get shared PlugWorkflowManager pointer");}
     } else {NDB_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
+
+    WirelessManager *(*WirelesManager_sharedInstance)();
+    reinterpret_cast<void*&>(WirelesManager_sharedInstance) = dlsym(this->libnickel, "_ZN15WirelessManager14sharedInstanceEv");
+    if (WirelesManager_sharedInstance) {
+        WirelessManager *wm = WirelesManager_sharedInstance();
+        if (wm) {
+            NDB_LOG("connecting WirelessManager::tryingToConnect()");
+            if (QObject::connect(wm, SIGNAL(tryingToConnect()), this, SIGNAL(wmTryingToConnect()))) {
+                connectedSignals.insert("wmTryingToConnect");
+            } else {NDB_LOG("WirelessManager::tryingToConnect() connection failed");}
+            NDB_LOG("connecting WirelessManager::networkConnected()");
+            if (QObject::connect(wm, SIGNAL(networkConnected()), this, SIGNAL(wmNetworkConnected()))) {
+                connectedSignals.insert("wmNetworkConnected");
+            } else {NDB_LOG("WirelessManager::networkConnected() connection failed");}
+            NDB_LOG("connecting WirelessManager::networkDisconnected()");
+            if (QObject::connect(wm, SIGNAL(networkDisconnected()), this, SIGNAL(wmNetworkDisconnected()))) {
+                connectedSignals.insert("wmNetworkDisconnected");
+            } else {NDB_LOG("WirelessManager::networkDisconnected() connection failed");}
+            NDB_LOG("connecting WirelessManager::networkForgotten()");
+            if (QObject::connect(wm, SIGNAL(networkForgotten()), this, SIGNAL(wmNetworkForgotten()))) {
+                connectedSignals.insert("wmNetworkForgotten");
+            } else {NDB_LOG("WirelessManager::networkForgotten() connection failed");}
+            NDB_LOG("connecting WirelessManager::networkFailedToConnect()");
+            if (QObject::connect(wm, SIGNAL(networkFailedToConnect()), this, SIGNAL(wmNetworkFailedToConnect()))) {
+                connectedSignals.insert("wmNetworkFailedToConnect");
+            } else {NDB_LOG("WirelessManager::networkFailedToConnect() connection failed");}
+            NDB_LOG("connecting WirelessManager::scanningStarted()");
+            if (QObject::connect(wm, SIGNAL(scanningStarted()), this, SIGNAL(wmScanningStarted()))) {
+                connectedSignals.insert("wmScanningStarted");
+            } else {NDB_LOG("WirelessManager::scanningStarted() connection failed");}
+            NDB_LOG("connecting WirelessManager::scanningFinished()");
+            if (QObject::connect(wm, SIGNAL(scanningFinished()), this, SIGNAL(wmScanningFinished()))) {
+                connectedSignals.insert("wmScanningFinished");
+            } else {NDB_LOG("WirelessManager::scanningFinished() connection failed");}
+            NDB_LOG("connecting WirelessManager::scanningAborted()");
+            if (QObject::connect(wm, SIGNAL(scanningAborted()), this, SIGNAL(wmScanningAborted()))) {
+                connectedSignals.insert("wmScanningAborted");
+            } else {NDB_LOG("WirelessManager::scanningAborted() connection failed");}
+            NDB_LOG("connecting WirelessManager::wifiEnabled()");
+            if (QObject::connect(wm, SIGNAL(wifiEnabled(bool)), this, SIGNAL(wmWifiEnabled(bool)))) {
+                connectedSignals.insert("wmWifiEnabled");
+            } else {NDB_LOG("WirelessManager::wifiEnabled() connection failed");}
+            NDB_LOG("connecting WirelessManager::linkQualityForConnectedNetwork()");
+            if (QObject::connect(wm, SIGNAL(linkQualityForConnectedNetwork(double)), this, SIGNAL(wmLinkQualityForConnectedNetwork(double)))) {
+                connectedSignals.insert("wmLinkQualityForConnectedNetwork");
+            } else {NDB_LOG("WirelessManager::linkQualityForConnectedNetwork() connection failed");}
+            NDB_LOG("connecting WirelessManager::macAddressAvailable()");
+            if (QObject::connect(wm, SIGNAL(macAddressAvailable(QString)), this, SIGNAL(wmMacAddressAvailable(QString)))) {
+                connectedSignals.insert("wmMacAddressAvailable");
+            } else {NDB_LOG("WirelessManager::macAddressAvailable() connection failed");}
+
+        }
+    }
 }
 
 QString NickelDBus::version() {

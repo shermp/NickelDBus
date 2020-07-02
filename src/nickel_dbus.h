@@ -25,8 +25,22 @@ class NickelDBus : public QObject {
         void connectSignals();
         bool testAssert(bool test);
     Q_SIGNALS:
-        void pfmDoneProcessing(bool done = true);
-        void pfmAboutToConnect();    
+        // PlugworkFlowManager signals
+        void pfmDoneProcessing();
+        void pfmAboutToConnect();
+        // WirelessManager signals
+        void wmTryingToConnect();
+        void wmNetworkConnected();
+        void wmNetworkDisconnected();
+        void wmNetworkForgotten();
+        void wmNetworkFailedToConnect();
+        void wmScanningStarted();
+        void wmScanningFinished();
+        void wmScanningAborted();
+        void wmWifiEnabled(bool enabled);
+        void wmLinkQualityForConnectedNetwork(double quality);
+        void wmMacAddressAvailable(QString mac);
+
     public Q_SLOTS:
         QString version();
         QString nickelClassDetails(QString const& static_metaobject_symbol);
