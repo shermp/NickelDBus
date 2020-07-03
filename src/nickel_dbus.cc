@@ -116,7 +116,7 @@ void NickelDBus::connectSignals() {
 }
 
 QString NickelDBus::version() {
-    return QString(NDB_VERSION);
+    return QStringLiteral(NDB_VERSION);
 }
 
 bool NickelDBus::ndbInUSBMS() {
@@ -124,14 +124,14 @@ bool NickelDBus::ndbInUSBMS() {
 }
 
 QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
-    NDB_ASSERT(QString("ERROR: In USB session"), !ndbInUSBMS(), "not calling method nickelClassDetails: in usbms session");
+    NDB_ASSERT(QStringLiteral("ERROR: In USB session"), !ndbInUSBMS(), "not calling method nickelClassDetails: in usbms session");
     typedef QMetaObject NickelMetaObject;
-    NDB_ASSERT(QString("ERROR: not a valid staticMetaObject symbol"), static_metaobject_symbol.endsWith(QString("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    NDB_ASSERT(QStringLiteral("ERROR: not a valid staticMetaObject symbol"), static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
     QByteArray sym = static_metaobject_symbol.toLatin1();
     NickelMetaObject *nmo;
     reinterpret_cast<void*&>(nmo) = dlsym(this->libnickel, sym.constData());
-    NDB_ASSERT(QString("ERROR: DLSYM"), nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
-    QString str = QString("");
+    NDB_ASSERT(QStringLiteral("ERROR: DLSYM"), nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
+    QString str = QStringLiteral("");
     str.append(QString("Showing meta information for Nickel class %1 : \n").arg(nmo->className()));
     str.append("Properties : \n");
     for (int i = nmo->propertyOffset(); i < nmo->propertyCount(); ++i) {
@@ -248,7 +248,7 @@ int NickelDBus::ndbWireless(const char *act) {
 
 int NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method bwmOpenBrowser: in usbms session");
-    QString qarg = QString("");
+    QString qarg = QStringLiteral("");
     if (modal || !url.isEmpty() || !css.isEmpty()) {
         if (modal) {
             qarg.append("modal");
