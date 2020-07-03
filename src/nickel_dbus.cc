@@ -6,31 +6,39 @@
 #include "nickel_dbus.h"
 #include "adapter/nickel_dbus_adapter.h"
 
-typedef QObject PlugWorkflowManager;
-typedef QObject WirelessManager;
-typedef void MainWindowController;
-
 NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
     new NickelDBusAdapter(this);
-    this->dbusRegSucceeded = true;
+    this->initSucceeded = true;
     QDBusConnection conn = QDBusConnection::systemBus();
     if (!conn.registerObject("/nickeldbus", this)) {
-        NDB_LOG("failed to register object on system bus");
-        this->dbusRegSucceeded = false;
+        NDB_LOG("NickelDBus: failed to register object on system bus");
+        this->initSucceeded = false;
     }
     if (!conn.registerService("local.shermp.nickeldbus")) {
-        NDB_LOG("failed to register service on the system bus");
-        this->dbusRegSucceeded = false;
+        NDB_LOG("NickelDBus: failed to register service on the system bus");
+        this->initSucceeded = false;
     }
-    this->libnickel = nullptr;
-    this->methodsInhibited = false;
+    this->libnickel = dlopen("libnickel.so.1.0.0", RTLD_LAZY|RTLD_NODELETE);
+    if (!this->libnickel) {
+        NDB_LOG("NickelDBus: could not dlopen libnickel");
+        initSucceeded = false;
+    }
+    reinterpret_cast<void*&>(this->PlugManager__sharedInstance) = dlsym(this->libnickel, "_ZN11PlugManager14sharedInstanceEv");
+    if (!this->PlugManager__sharedInstance) {
+        NDB_LOG("NickelDBus: could not dlsym PlugManager::sharedInstance");
+        initSucceeded = false;
+    }
+    reinterpret_cast<void*&>(this->PlugManager__gadgetMode) = dlsym(this->libnickel, "_ZNK11PlugManager10gadgetModeEv");
+    if (!this->PlugManager__gadgetMode) {
+        NDB_LOG("NickelDBus: could not dlsym PlugManager::gadgetMode");
+        initSucceeded = false;
+    }
 }
 NickelDBus::~NickelDBus() {
     QDBusConnection conn = QDBusConnection::systemBus();
     conn.unregisterService("local.shermp.nickeldbus");
     conn.unregisterObject("/nickeldbus");
 }
-
 void NickelDBus::connectSignals() {
     PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
     reinterpret_cast<void*&>(PlugWorkflowManager_sharedInstance) = dlsym(this->libnickel, "_ZN19PlugWorkflowManager14sharedInstanceEv");
@@ -115,16 +123,12 @@ QString NickelDBus::version() {
     return QString(NDB_VERSION);
 }
 
-void NickelDBus::enableMethodInhibit() {
-    this->methodsInhibited = true;
-}
-
-void NickelDBus::disableMethodInhibit() {
-    this->methodsInhibited = false;
+bool NickelDBus::ndbInUSBMS() {
+    return this->PlugManager__gadgetMode(PlugManager__sharedInstance());
 }
 
 QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
-    NDB_ASSERT(QString("ERROR: In USB session"), !this->methodsInhibited, "not calling method nickelClassDetails: in usbms session");
+    NDB_ASSERT(QString("ERROR: In USB session"), !ndbInUSBMS(), "not calling method nickelClassDetails: in usbms session");
     typedef QMetaObject NickelMetaObject;
     NDB_ASSERT(QString("ERROR: not a valid staticMetaObject symbol"), static_metaobject_symbol.endsWith(QString("staticMetaObjectE")), "not a valid staticMetaObject symbol");
     QByteArray sym = static_metaobject_symbol.toLatin1();
@@ -172,7 +176,7 @@ bool NickelDBus::signalConnected(QString const &signal_name) {
 }
 
 int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method showToast: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method showToast: in usbms session");
     // The following code has been adapted from NickelMenu
     NDB_ASSERT(ndb_err_inval_param, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
     MainWindowController *(*MainWindowController_sharedInstance)();
@@ -189,17 +193,17 @@ int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString c
     return ndb_err_ok;
 }
 int NickelDBus::goHome() {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method goHome: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method goHome: in usbms session");
     return ndbNickelMisc("home");
 }
 
 int NickelDBus::pfmRescanBooks() {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method pfmRescanBooks: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method pfmRescanBooks: in usbms session");
     return ndbNickelMisc("rescan_books");
 }
 
 int NickelDBus::pfmRescanBooksFull() {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method pfmRescanBooksFull: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method pfmRescanBooksFull: in usbms session");
     return ndbNickelMisc("rescan_books_full");
 }
 
@@ -225,15 +229,15 @@ NickelDBus::nm_action NickelDBus::parseActionStr(QString const& actStr) {
 }
 
 int NickelDBus::wfmConnectWireless() {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method wfmConnectWireless: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmConnectWireless: in usbms session");
     return ndbWireless(NM_ACT_AUTO);
 }
 int NickelDBus::wfmConnectWirelessSilently() {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method wfmConnectWirelessSilently: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmConnectWirelessSilently: in usbms session");
     return ndbWireless(NM_ACT_AUTO_SILENT);
 }
 int NickelDBus::wfmSetAirplaneMode(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method wfmSetAirplaneMode: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmSetAirplaneMode: in usbms session");
     NickelDBus::nm_action act = parseActionStr(action);
     NDB_ASSERT(ndb_err_inval_param, act != NM_ACT_ERR, "invalid action name");
     //enum wireless_conn_option opt = enabled ? ENABLE : DISABLE;
@@ -273,7 +277,7 @@ int NickelDBus::ndbWireless(enum nm_action act) {
 }
 
 int NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method bwmOpenBrowser: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method bwmOpenBrowser: in usbms session");
     QString qarg = QString("");
     if (modal || !url.isEmpty() || !css.isEmpty()) {
         if (modal) {
@@ -307,19 +311,19 @@ int NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& cs
 }
 
 int NickelDBus::nsInvert(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method nsInvert: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsInvert: in usbms session");
     return ndbSettings(action, QString("invert"));
 }
 int NickelDBus::nsLockscreen(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method nsLockscreen: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsLockscreen: in usbms session");
     return ndbSettings(action, QString("lockscreen"));
 }
 int NickelDBus::nsScreenshots(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method nsScreenshots: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsScreenshots: in usbms session");
     return ndbSettings(action, QString("screenshots"));
 }
 int NickelDBus::nsForceWifi(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !this->methodsInhibited, "not calling method nsForceWifi: in usbms session");
+    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsForceWifi: in usbms session");
     return ndbSettings(action, QString("force_wifi"));
 }
 int NickelDBus::ndbSettings(QString const& action, QString const& setting) {

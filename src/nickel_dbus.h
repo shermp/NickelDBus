@@ -5,6 +5,11 @@
 #include <QSet>
 #include <QtDBus>
 
+typedef void PlugManager;
+typedef QObject PlugWorkflowManager;
+typedef QObject WirelessManager;
+typedef void MainWindowController;
+
 typedef enum ndb_err {
     ndb_err_ok = 0,
     ndb_err_inval_param = 1,
@@ -18,7 +23,7 @@ class NickelDBus : public QObject {
     Q_CLASSINFO("D-Bus Interface", "local.shermp.nickeldbus")
     public:
         void *libnickel;
-        bool dbusRegSucceeded;
+        bool initSucceeded;
         NickelDBus(QObject* parent);
         ~NickelDBus();
         // bool registerDBus();
@@ -62,14 +67,12 @@ class NickelDBus : public QObject {
         int nsLockscreen(QString const& action);
         int nsScreenshots(QString const& action);
         int nsForceWifi(QString const& action);
-    protected Q_SLOTS:
-        void enableMethodInhibit();
-        void disableMethodInhibit();
     private:
         enum nm_action {NM_ACT_AUTO, NM_ACT_AUTO_SILENT, NM_ACT_ENABLE, NM_ACT_DISABLE, NM_ACT_TOGGLE, NM_ACT_ERR};
-        bool methodsInhibited;
         QSet<QString> connectedSignals;
-
+        bool *(*PlugManager__gadgetMode)(PlugManager*);
+        PlugManager *(*PlugManager__sharedInstance)();
+        bool ndbInUSBMS();
         enum nm_action parseActionStr(QString const& actStr);
         int ndbWireless(enum nm_action act);
         int ndbSettings(QString const& action, QString const& setting);

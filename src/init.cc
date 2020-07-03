@@ -45,19 +45,8 @@ __attribute__((constructor)) void ndb_init() {
         NDB_INIT_STOP;
     }
     ndb = new NickelDBus(nullptr);
-    if (!ndb->dbusRegSucceeded) {
-        NDB_LOG("init: failed to register with dbus");
-        delete ndb;
-        NDB_INIT_FS_STOP;
-    }
-    // if (!ndb->registerDBus()) {
-    //     NM_LOG("init: error registering dbus service");
-    //     delete ndb;
-    //     NDB_INIT_FS_STOP;
-    // }
-    ndb->libnickel = dlopen("libnickel.so.1.0.0", RTLD_LAZY|RTLD_NODELETE);
-    if (!ndb->libnickel) {
-        NDB_LOG("init: could not dlopen libnickel");
+    if (!ndb->initSucceeded) {
+        NDB_LOG("init: failed to init NickelDBus object");
         delete ndb;
         NDB_INIT_FS_STOP;
     }
