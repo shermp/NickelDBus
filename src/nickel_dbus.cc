@@ -215,54 +215,28 @@ int NickelDBus::ndbNickelMisc(const char *action) {
     return ndb_err_ok;
 }
 
-NickelDBus::nm_action NickelDBus::parseActionStr(QString const& actStr) {
-    NickelDBus::nm_action act;
-    if (!actStr.compare("enable", Qt::CaseInsensitive)) {act = NM_ACT_ENABLE;} 
-    else if (!actStr.compare("disable", Qt::CaseInsensitive)) {act = NM_ACT_DISABLE;}
-    else if (!actStr.compare("toggle", Qt::CaseInsensitive)) {act = NM_ACT_TOGGLE;}
-    else {act = NM_ACT_ERR;}
-    return act;
+bool NickelDBus::ndbActionStrValid(QString const& actStr) {
+    return (!actStr.compare("enable") || !actStr.compare("disable") || !actStr.compare("toggle"));
 }
 
 int NickelDBus::wfmConnectWireless() {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmConnectWireless: in usbms session");
-    return ndbWireless(NM_ACT_AUTO);
+    return ndbWireless("autoconnect");
 }
 int NickelDBus::wfmConnectWirelessSilently() {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmConnectWirelessSilently: in usbms session");
-    return ndbWireless(NM_ACT_AUTO_SILENT);
+    return ndbWireless("autoconnect_silent");
 }
 int NickelDBus::wfmSetAirplaneMode(QString const& action) {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmSetAirplaneMode: in usbms session");
-    NickelDBus::nm_action act = parseActionStr(action);
-    NDB_ASSERT(ndb_err_inval_param, act != NM_ACT_ERR, "invalid action name");
-    //enum wireless_conn_option opt = enabled ? ENABLE : DISABLE;
-    return ndbWireless(act);
+    NDB_ASSERT(ndb_err_inval_param, ndbActionStrValid(action), "invalid action name");
+    QByteArray actBytes = action.toUtf8();
+    return ndbWireless(actBytes.constData());
 }
 
-int NickelDBus::ndbWireless(enum nm_action act) {
-    const char *arg;
-    switch (act) {
-    case NM_ACT_AUTO: 
-        arg = "autoconnect"; 
-        break;
-    case NM_ACT_AUTO_SILENT:
-        arg = "autoconnect_silent";
-        break;
-    case NM_ACT_ENABLE:
-        arg = "enable";
-        break;
-    case NM_ACT_DISABLE:
-        arg = "disable";
-        break;
-    case NM_ACT_TOGGLE:
-        arg = "toggle";
-        break;
-    default:
-        return ndb_err_inval_param; // keep GCC happy
-    }
+int NickelDBus::ndbWireless(const char *act) {
     char *err;
-    nm_action_result_t *res = nm_action_nickel_wifi(arg, &err);
+    nm_action_result_t *res = nm_action_nickel_wifi(act, &err);
     if (!res) {
         NDB_LOG("ndbWireless failed with error: %s", err);
         free(err);
@@ -308,38 +282,23 @@ int NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& cs
 
 int NickelDBus::nsInvert(QString const& action) {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsInvert: in usbms session");
-    return ndbSettings(action, QString("invert"));
+    return ndbSettings(action, "invert");
 }
 int NickelDBus::nsLockscreen(QString const& action) {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsLockscreen: in usbms session");
-    return ndbSettings(action, QString("lockscreen"));
+    return ndbSettings(action, "lockscreen");
 }
 int NickelDBus::nsScreenshots(QString const& action) {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsScreenshots: in usbms session");
-    return ndbSettings(action, QString("screenshots"));
+    return ndbSettings(action, "screenshots");
 }
 int NickelDBus::nsForceWifi(QString const& action) {
     NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsForceWifi: in usbms session");
-    return ndbSettings(action, QString("force_wifi"));
+    return ndbSettings(action, "force_wifi");
 }
-int NickelDBus::ndbSettings(QString const& action, QString const& setting) {
-    NickelDBus::nm_action act = parseActionStr(action);
-    NDB_ASSERT(ndb_err_inval_param, act != NM_ACT_ERR, "invalid action name");
-    QString nm_action;
-    switch (act) {
-    case NM_ACT_ENABLE:
-        nm_action = QString("enable");
-        break;
-    case NM_ACT_DISABLE:
-        nm_action = QString("disable");
-        break;
-    case NM_ACT_TOGGLE:
-        nm_action = QString("toggle");
-        break;
-    default:
-        return ndb_err_inval_param; // keep GCC happy
-    }
-    QByteArray qarg = QString("%1:%2").arg(nm_action, setting).toLatin1();
+int NickelDBus::ndbSettings(QString const& action, const char* setting) {
+    NDB_ASSERT(ndb_err_inval_param, ndbActionStrValid(action), "invalid action name");
+    QByteArray qarg = QString("%1:%2").arg(action).arg(setting).toUtf8();
     char *err;
     nm_action_result_t *res = nm_action_nickel_setting(qarg.constData(), &err);
     if (!res) {

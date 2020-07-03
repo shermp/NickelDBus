@@ -68,14 +68,13 @@ class NickelDBus : public QObject {
         int nsScreenshots(QString const& action);
         int nsForceWifi(QString const& action);
     private:
-        enum nm_action {NM_ACT_AUTO, NM_ACT_AUTO_SILENT, NM_ACT_ENABLE, NM_ACT_DISABLE, NM_ACT_TOGGLE, NM_ACT_ERR};
         QSet<QString> connectedSignals;
         bool *(*PlugManager__gadgetMode)(PlugManager*);
         PlugManager *(*PlugManager__sharedInstance)();
         bool ndbInUSBMS();
-        enum nm_action parseActionStr(QString const& actStr);
-        int ndbWireless(enum nm_action act);
-        int ndbSettings(QString const& action, QString const& setting);
+        bool ndbActionStrValid(QString const& actStr);
+        int ndbWireless(const char *act);
+        int ndbSettings(QString const& action, const char* setting);
         int ndbNickelMisc(const char *action);
 };
 
