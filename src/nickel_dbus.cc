@@ -10,12 +10,12 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
     new NickelDBusAdapter(this);
     this->initSucceeded = true;
     QDBusConnection conn = QDBusConnection::systemBus();
-    if (!conn.registerObject("/nickeldbus", this)) {
+    if (!conn.registerObject(NDB_DBUS_OBJECT_PATH, this)) {
         NDB_LOG("NickelDBus: failed to register object on system bus");
         this->initSucceeded = false;
         return;
     }
-    if (!conn.registerService("local.shermp.nickeldbus")) {
+    if (!conn.registerService(NDB_DBUS_IFACE_NAME)) {
         NDB_LOG("NickelDBus: failed to register service on the system bus");
         this->initSucceeded = false;
         return;
@@ -41,8 +41,8 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
 }
 NickelDBus::~NickelDBus() {
     QDBusConnection conn = QDBusConnection::systemBus();
-    conn.unregisterService("local.shermp.nickeldbus");
-    conn.unregisterObject("/nickeldbus");
+    conn.unregisterService(NDB_DBUS_IFACE_NAME);
+    conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
 }
 void NickelDBus::connectSignals() {
     PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();

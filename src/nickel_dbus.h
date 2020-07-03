@@ -18,9 +18,15 @@ typedef enum ndb_err {
     ndb_err_usb = 4
 } ndb_err;
 
+#ifndef NDB_DBUS_IFACE_NAME
+    #define NDB_DBUS_IFACE_NAME "local.shermp.nickeldbus"
+#endif
+#ifndef NDB_DBUS_OBJECT_PATH
+    #define NDB_DBUS_OBJECT_PATH "/nickeldbus"
+#endif
 class NickelDBus : public QObject {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "local.shermp.nickeldbus")
+    Q_CLASSINFO("D-Bus Interface", NDB_DBUS_IFACE_NAME)
     public:
         void *libnickel;
         bool initSucceeded;
