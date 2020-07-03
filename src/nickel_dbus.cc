@@ -54,19 +54,10 @@ void NickelDBus::connectSignals() {
             if (QObject::connect(wf, SIGNAL(aboutToConnect()), this, SIGNAL(pfmAboutToConnect()))) {
                 connectedSignals.insert("pfmAboutToConnect");
             } else {NDB_LOG("PlugWorkflowManager::aboutToConnect connection failed");}
-            // This seems an appropriate signal to also use to inhibit calling actions while nickel is
-            // exporting a USBMS session
-            if (!QObject::connect(wf, SIGNAL(aboutToConnect()), this, SLOT(enableMethodInhibit()))) {
-                NDB_LOG("PlugWorkflowManager::aboutToConnect connection to enableMethodInhibit failed");
-            }
             NDB_LOG("connecting PlugWorkflowManager::doneProcessing");
             if (QObject::connect(wf, SIGNAL(doneProcessing()), this, SIGNAL(pfmDoneProcessing()))) {
                 connectedSignals.insert("pfmDoneProccessing");
             } else {NDB_LOG("PlugWorkflowManager::doneProcessing connection failed");}
-            // And it should be safe to allow calling actions after this signal
-            if (!QObject::connect(wf, SIGNAL(doneProcessing()), this, SLOT(disableMethodInhibit()))) {
-                NDB_LOG("PlugWorkflowManager::doneProcessing connection to disableMethodInhibit failed");
-            }
         } else {NDB_LOG("could not get shared PlugWorkflowManager pointer");}
     } else {NDB_LOG("could not dlsym PlugWorkflowManager::sharedInstance");}
 
