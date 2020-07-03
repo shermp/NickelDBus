@@ -11,6 +11,9 @@ NickelMenu.kdev4
 # clangd
 compile_flags.txt
 
+# CLI binary
+ndb-cli/ndb-cli
+
 # Build artifacts
 /KoboRoot.tgz
 /src/libndb.so
@@ -25,7 +28,7 @@ compile_flags.txt
 /src/nickel_dbus_moc.o
 /src/adapter/nickel_dbus_adapter_moc.o
 
-/src/nm/failsafe.o
+
 
 /src/init.o
 /src/nickel_dbus.o

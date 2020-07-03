@@ -66,6 +66,9 @@ NickelMenu.kdev4
 # clangd
 compile_flags.txt
 
+# CLI binary
+ndb-cli/ndb-cli
+
 # Build artifacts
 endef
 export GITIGNORE_HEAD
