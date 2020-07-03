@@ -13,25 +13,30 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
     if (!conn.registerObject("/nickeldbus", this)) {
         NDB_LOG("NickelDBus: failed to register object on system bus");
         this->initSucceeded = false;
+        return;
     }
     if (!conn.registerService("local.shermp.nickeldbus")) {
         NDB_LOG("NickelDBus: failed to register service on the system bus");
         this->initSucceeded = false;
+        return;
     }
     this->libnickel = dlopen("libnickel.so.1.0.0", RTLD_LAZY|RTLD_NODELETE);
     if (!this->libnickel) {
         NDB_LOG("NickelDBus: could not dlopen libnickel");
         initSucceeded = false;
+        return;
     }
     reinterpret_cast<void*&>(this->PlugManager__sharedInstance) = dlsym(this->libnickel, "_ZN11PlugManager14sharedInstanceEv");
     if (!this->PlugManager__sharedInstance) {
         NDB_LOG("NickelDBus: could not dlsym PlugManager::sharedInstance");
         initSucceeded = false;
+        return;
     }
     reinterpret_cast<void*&>(this->PlugManager__gadgetMode) = dlsym(this->libnickel, "_ZNK11PlugManager10gadgetModeEv");
     if (!this->PlugManager__gadgetMode) {
         NDB_LOG("NickelDBus: could not dlsym PlugManager::gadgetMode");
         initSucceeded = false;
+        return;
     }
 }
 NickelDBus::~NickelDBus() {
