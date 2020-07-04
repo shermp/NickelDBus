@@ -4,19 +4,12 @@
 #include <QString>
 #include <QSet>
 #include <QtDBus>
+#include <QDBusContext>
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
 typedef QObject WirelessManager;
 typedef void MainWindowController;
-
-typedef enum ndb_err {
-    ndb_err_ok = 0,
-    ndb_err_inval_param = 1,
-    ndb_err_dlsym = 2,
-    ndb_err_call = 3,
-    ndb_err_usb = 4
-} ndb_err;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "local.shermp.nickeldbus"
@@ -24,9 +17,11 @@ typedef enum ndb_err {
 #ifndef NDB_DBUS_OBJECT_PATH
     #define NDB_DBUS_OBJECT_PATH "/nickeldbus"
 #endif
-class NickelDBus : public QObject {
+class NickelDBus : public QObject, protected QDBusContext {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", NDB_DBUS_IFACE_NAME)
+
+    QDBusConnection conn = QDBusConnection::systemBus();
     public:
         void *libnickel;
         bool initSucceeded;

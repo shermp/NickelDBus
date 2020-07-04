@@ -7,10 +7,9 @@
 #include "nickel_dbus.h"
 #include "adapter/nickel_dbus_adapter.h"
 
-NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
+NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
     new NickelDBusAdapter(this);
     this->initSucceeded = true;
-    QDBusConnection conn = QDBusConnection::systemBus();
     if (!conn.registerObject(NDB_DBUS_OBJECT_PATH, this)) {
         NDB_LOG("NickelDBus: failed to register object on system bus");
         this->initSucceeded = false;
@@ -41,7 +40,6 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent) {
     }
 }
 NickelDBus::~NickelDBus() {
-    QDBusConnection conn = QDBusConnection::systemBus();
     conn.unregisterService(NDB_DBUS_IFACE_NAME);
     conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
 }
