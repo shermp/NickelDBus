@@ -22,6 +22,7 @@ class NickelDBus : public QObject, protected QDBusContext {
     Q_CLASSINFO("D-Bus Interface", NDB_DBUS_IFACE_NAME)
 
     QDBusConnection conn = QDBusConnection::systemBus();
+    
     public:
         void *libnickel;
         bool initSucceeded;
@@ -30,6 +31,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         // bool registerDBus();
         void connectSignals();
         bool testAssert(bool test);
+
     Q_SIGNALS:
         // PlugworkFlowManager signals
         void pfmDoneProcessing();
@@ -68,6 +70,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         void nsLockscreen(QString const& action);
         void nsScreenshots(QString const& action);
         void nsForceWifi(QString const& action);
+
     private:
         QSet<QString> connectedSignals;
         bool *(*PlugManager__gadgetMode)(PlugManager*);

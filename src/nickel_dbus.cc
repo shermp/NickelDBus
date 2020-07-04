@@ -39,6 +39,7 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
         return;
     }
 }
+
 NickelDBus::~NickelDBus() {
     conn.unregisterService(NDB_DBUS_IFACE_NAME);
     conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
@@ -55,6 +56,7 @@ void NickelDBus::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *
         NDB_LOG("failed to connect %s to %s", srcSignal, dest);
     }
 }
+
 void NickelDBus::connectSignals() {
     PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
     reinterpret_cast<void*&>(PlugWorkflowManager_sharedInstance) = dlsym(this->libnickel, "_ZN19PlugWorkflowManager14sharedInstanceEv");
@@ -142,6 +144,7 @@ QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) 
     return str;
     #undef NDB_DBUS_RETERR
 }
+
 bool NickelDBus::testAssert(bool test) {
     NDB_ASSERT(false, test, "The test value was '%s'", (test ? "true" : "false"));
     return true;
@@ -169,6 +172,7 @@ void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString 
     MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
     #undef NDB_DBUS_RETERR
 }
+
 void NickelDBus::goHome() {
     #define NDB_DBUS_RETERR
     NDB_DBUS_USB_ASSERT("goHome");
@@ -212,12 +216,14 @@ void NickelDBus::wfmConnectWireless() {
     return ndbWireless("autoconnect");
     #undef NDB_DBUS_RETERR
 }
+
 void NickelDBus::wfmConnectWirelessSilently() {
     #define NDB_DBUS_RETERR
     NDB_DBUS_USB_ASSERT("wfmConnectWirelessSilently");
     return ndbWireless("autoconnect_silent");
     #undef NDB_DBUS_RETERR
 }
+
 void NickelDBus::wfmSetAirplaneMode(QString const& action) {
     #define NDB_DBUS_RETERR
     NDB_DBUS_USB_ASSERT("wfmSetAirplaneMode");
@@ -281,24 +287,28 @@ void NickelDBus::nsInvert(QString const& action) {
     return ndbSettings(action, "invert");
     #undef NDB_DBUS_RETERR
 }
+
 void NickelDBus::nsLockscreen(QString const& action) {
     #define NDB_DBUS_RETERR
     NDB_DBUS_USB_ASSERT("nsLockscreen");
     return ndbSettings(action, "lockscreen");
     #undef NDB_DBUS_RETERR
 }
+
 void NickelDBus::nsScreenshots(QString const& action) {
     #define NDB_DBUS_RETERR
     NDB_DBUS_USB_ASSERT("nsScreenshots");
     return ndbSettings(action, "screenshots");
     #undef NDB_DBUS_RETERR
 }
+
 void NickelDBus::nsForceWifi(QString const& action) {
     #define NDB_DBUS_RETERR
     NDB_DBUS_USB_ASSERT("nsForceWifi");
     return ndbSettings(action, "force_wifi");
     #undef NDB_DBUS_RETERR
 }
+
 void NickelDBus::ndbSettings(QString const& action, const char* setting) {
     #define NDB_DBUS_RETERR
     NDB_DBUS_ASSERT(QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
