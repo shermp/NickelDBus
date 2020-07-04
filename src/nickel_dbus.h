@@ -82,6 +82,9 @@ class NickelDBus : public QObject {
         int ndbWireless(const char *act);
         int ndbSettings(QString const& action, const char* setting);
         int ndbNickelMisc(const char *action);
+
+        template <typename T>
+        void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
 };
 
 #endif
