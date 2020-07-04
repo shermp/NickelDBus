@@ -1,0 +1,40 @@
+name: Build
+on: [push, pull_request]
+
+jobs:
+  build_libndb:
+    name: libndb
+    runs-on: ubuntu-latest
+    container: docker.io/geek1011/nickeltc:1.0
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+        with:
+          submodules: recursive
+    - name: Build
+      run: make all koboroot
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: NickelDBus
+        path: KoboRoot.tgz
+  build_ndbcli:
+    name: ndb-cli
+    runs-on: ubuntu-latest
+    container: 
+      image: docker.io/golang:1.14
+      env: 
+        GOOS: linux
+        GOARCH: arm
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cd ./ndb-cli/
+        go build
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: ndb-cli
+        path: ./ndb-cli/ndb-cli
