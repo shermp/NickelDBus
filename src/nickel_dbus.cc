@@ -102,13 +102,14 @@ bool NickelDBus::ndbInUSBMS() {
 }
 
 QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
-    NDB_ASSERT(QStringLiteral("ERROR: In USB session"), !ndbInUSBMS(), "not calling method nickelClassDetails: in usbms session");
+    #define NDB_DBUS_RETERR (QString(""))
+    NDB_DBUS_USB_ASSERT("nickelClassDetails");
     typedef QMetaObject NickelMetaObject;
-    NDB_ASSERT(QStringLiteral("ERROR: not a valid staticMetaObject symbol"), static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
     QByteArray sym = static_metaobject_symbol.toLatin1();
     NickelMetaObject *nmo;
     reinterpret_cast<void*&>(nmo) = dlsym(this->libnickel, sym.constData());
-    NDB_ASSERT(QStringLiteral("ERROR: DLSYM"), nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
+    NDB_DBUS_ASSERT(QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
     QString str = QStringLiteral("");
     str.append(QString("Showing meta information for Nickel class %1 : \n").arg(nmo->className()));
     str.append("Properties : \n");
@@ -139,6 +140,7 @@ QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) 
         str.append(QString("\t%1 :: %2 %3\n").arg(method_type).arg(method.typeName()).arg(method.methodSignature().constData()));
     }
     return str;
+    #undef NDB_DBUS_RETERR
 }
 bool NickelDBus::testAssert(bool test) {
     NDB_ASSERT(false, test, "The test value was '%s'", (test ? "true" : "false"));
@@ -149,83 +151,97 @@ bool NickelDBus::signalConnected(QString const &signal_name) {
     return connectedSignals.contains(signal_name);
 }
 
-int NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method showToast: in usbms session");
+void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("showToast");
     // The following code has been adapted from NickelMenu
-    NDB_ASSERT(ndb_err_inval_param, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
+    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
     MainWindowController *(*MainWindowController_sharedInstance)();
     void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
     //libnickel 4.6 * _ZN20MainWindowController14sharedInstanceEv
     reinterpret_cast<void*&>(MainWindowController_sharedInstance) = dlsym(libnickel, "_ZN20MainWindowController14sharedInstanceEv");
-    NDB_ASSERT(ndb_err_dlsym, MainWindowController_sharedInstance, "unsupported firmware: could not find MainWindowController::sharedInstance()");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, MainWindowController_sharedInstance, "unsupported firmware: could not find MainWindowController::sharedInstance()");
     //libnickel 4.6 * _ZN20MainWindowController5toastERK7QStringS2_i
     reinterpret_cast<void*&>(MainWindowController_toast) = dlsym(libnickel, "_ZN20MainWindowController5toastERK7QStringS2_i");
-    NDB_ASSERT(ndb_err_dlsym, MainWindowController_toast, "unsupported firmware: could not find MainWindowController::toast(QString const&, QString const&, int)");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, MainWindowController_toast, "unsupported firmware: could not find MainWindowController::toast(QString const&, QString const&, int)");
     MainWindowController *mwc = MainWindowController_sharedInstance();
-    NDB_ASSERT(ndb_err_call, mwc, "could not get MainWindowController instance");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, mwc, "could not get MainWindowController instance");
     MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
-    return ndb_err_ok;
+    #undef NDB_DBUS_RETERR
 }
-int NickelDBus::goHome() {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method goHome: in usbms session");
+void NickelDBus::goHome() {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("goHome");
     return ndbNickelMisc("home");
+    #undef NDB_DBUS_RETERR
 }
 
-int NickelDBus::pfmRescanBooks() {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method pfmRescanBooks: in usbms session");
+void NickelDBus::pfmRescanBooks() {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("pfmRescanBooks");
     return ndbNickelMisc("rescan_books");
+    #undef NDB_DBUS_RETERR
 }
 
-int NickelDBus::pfmRescanBooksFull() {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method pfmRescanBooksFull: in usbms session");
+void NickelDBus::pfmRescanBooksFull() {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("pfmRescanBooksFull");
     return ndbNickelMisc("rescan_books_full");
+    #undef NDB_DBUS_RETERR
 }
 
-int NickelDBus::ndbNickelMisc(const char *action) {
+void NickelDBus::ndbNickelMisc(const char *action) {
     char *err = NULL;
     nm_action_result_t *res = nm_action_nickel_misc(action, &err);
     if (!res) {
         NDB_LOG("nm_action_nickel_misc failed with error: %s", err);
+        sendErrorReply(QDBusError::InternalError, QString("nm_action_nickel_misc failed with error: %1").arg(err));
         free(err);
-        return ndb_err_call;
+        return;
     }
     nm_action_result_free(res);
-    return ndb_err_ok;
 }
 
 bool NickelDBus::ndbActionStrValid(QString const& actStr) {
     return (!actStr.compare("enable") || !actStr.compare("disable") || !actStr.compare("toggle"));
 }
 
-int NickelDBus::wfmConnectWireless() {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmConnectWireless: in usbms session");
+void NickelDBus::wfmConnectWireless() {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("wfmConnectWireless");
     return ndbWireless("autoconnect");
+    #undef NDB_DBUS_RETERR
 }
-int NickelDBus::wfmConnectWirelessSilently() {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmConnectWirelessSilently: in usbms session");
+void NickelDBus::wfmConnectWirelessSilently() {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("wfmConnectWirelessSilently");
     return ndbWireless("autoconnect_silent");
+    #undef NDB_DBUS_RETERR
 }
-int NickelDBus::wfmSetAirplaneMode(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method wfmSetAirplaneMode: in usbms session");
-    NDB_ASSERT(ndb_err_inval_param, ndbActionStrValid(action), "invalid action name");
+void NickelDBus::wfmSetAirplaneMode(QString const& action) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("wfmSetAirplaneMode");
+    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray actBytes = action.toUtf8();
     return ndbWireless(actBytes.constData());
+    #undef NDB_DBUS_RETERR
 }
 
-int NickelDBus::ndbWireless(const char *act) {
+void NickelDBus::ndbWireless(const char *act) {
     char *err;
     nm_action_result_t *res = nm_action_nickel_wifi(act, &err);
     if (!res) {
         NDB_LOG("ndbWireless failed with error: %s", err);
+        sendErrorReply(QDBusError::InternalError, QString("ndbWireless failed with error: %1").arg(err));
         free(err);
-        return ndb_err_call;
+        return;
     }
     nm_action_result_free(res);
-    return ndb_err_ok;
 }
 
-int NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method bwmOpenBrowser: in usbms session");
+void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("bwmOpenBrowser");
     QString qarg = QStringLiteral("");
     if (modal || !url.isEmpty() || !css.isEmpty()) {
         if (modal) {
@@ -251,39 +267,49 @@ int NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& cs
     nm_action_result_t *res = nm_action_nickel_browser((qb_arg.isEmpty() ? NULL : qb_arg.constData()), &err);
     if (!res) {
         NDB_LOG("bwmOpenBrowser failed with error: %s", err);
+        sendErrorReply(QDBusError::InternalError, QString("bwmOpenBrowser failed with error: %1").arg(err));
         free(err);
-        return ndb_err_call;
+        return;
     }
     nm_action_result_free(res);
-    return ndb_err_ok;
+    #undef NDB_DBUS_RETERR
 }
 
-int NickelDBus::nsInvert(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsInvert: in usbms session");
+void NickelDBus::nsInvert(QString const& action) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("nsInvert");
     return ndbSettings(action, "invert");
+    #undef NDB_DBUS_RETERR
 }
-int NickelDBus::nsLockscreen(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsLockscreen: in usbms session");
+void NickelDBus::nsLockscreen(QString const& action) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("nsLockscreen");
     return ndbSettings(action, "lockscreen");
+    #undef NDB_DBUS_RETERR
 }
-int NickelDBus::nsScreenshots(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsScreenshots: in usbms session");
+void NickelDBus::nsScreenshots(QString const& action) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("nsScreenshots");
     return ndbSettings(action, "screenshots");
+    #undef NDB_DBUS_RETERR
 }
-int NickelDBus::nsForceWifi(QString const& action) {
-    NDB_ASSERT(ndb_err_usb, !ndbInUSBMS(), "not calling method nsForceWifi: in usbms session");
+void NickelDBus::nsForceWifi(QString const& action) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_USB_ASSERT("nsForceWifi");
     return ndbSettings(action, "force_wifi");
+    #undef NDB_DBUS_RETERR
 }
-int NickelDBus::ndbSettings(QString const& action, const char* setting) {
-    NDB_ASSERT(ndb_err_inval_param, ndbActionStrValid(action), "invalid action name");
+void NickelDBus::ndbSettings(QString const& action, const char* setting) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray qarg = QString("%1:%2").arg(action).arg(setting).toUtf8();
     char *err;
     nm_action_result_t *res = nm_action_nickel_setting(qarg.constData(), &err);
     if (!res) {
         NDB_LOG("ndbSettings failed with error: %s", err);
         free(err);
-        return ndb_err_call;
+        return;
     }
     nm_action_result_free(res);
-    return ndb_err_ok;
+    #undef NDB_DBUS_RETERR
 }

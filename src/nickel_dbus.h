@@ -52,31 +52,32 @@ class NickelDBus : public QObject, protected QDBusContext {
         QString nickelClassDetails(QString const& static_metaobject_symbol);
         // misc
         bool signalConnected(QString const& signal_name);
-        int showToast(int toast_duration, QString const& msg_main, QString const& msg_sub = QStringLiteral(""));
-        int goHome();
+        void showToast(int toast_duration, QString const& msg_main, QString const& msg_sub = QStringLiteral(""));
+        void goHome();
         // PlugworkFlowManager
-        int pfmRescanBooks();
-        int pfmRescanBooksFull();
+        void pfmRescanBooks();
+        void pfmRescanBooksFull();
         // Wireless methods (WirelessFlowManager)
-        int wfmConnectWireless();
-        int wfmConnectWirelessSilently();
-        int wfmSetAirplaneMode(QString const& action);
+        void wfmConnectWireless();
+        void wfmConnectWirelessSilently();
+        void wfmSetAirplaneMode(QString const& action);
         // Web Browser (BrowserWorkflowManager)
-        int bwmOpenBrowser(bool modal = false, QString const& url = QString(), QString const& css = QString());
+        void bwmOpenBrowser(bool modal = false, QString const& url = QString(), QString const& css = QString());
         // Nickel Settings
-        int nsInvert(QString const& action);
-        int nsLockscreen(QString const& action);
-        int nsScreenshots(QString const& action);
-        int nsForceWifi(QString const& action);
+        void nsInvert(QString const& action);
+        void nsLockscreen(QString const& action);
+        void nsScreenshots(QString const& action);
+        void nsForceWifi(QString const& action);
     private:
         QSet<QString> connectedSignals;
         bool *(*PlugManager__gadgetMode)(PlugManager*);
         PlugManager *(*PlugManager__sharedInstance)();
+
         bool ndbInUSBMS();
         bool ndbActionStrValid(QString const& actStr);
-        int ndbWireless(const char *act);
-        int ndbSettings(QString const& action, const char* setting);
-        int ndbNickelMisc(const char *action);
+        void ndbWireless(const char *act);
+        void ndbSettings(QString const& action, const char* setting);
+        void ndbNickelMisc(const char *action);
 
         template <typename T>
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
