@@ -45,6 +45,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         void wmScanningStarted();
         void wmScanningFinished();
         void wmScanningAborted();
+        
         void wmWifiEnabled(bool enabled);
         void wmLinkQualityForConnectedNetwork(double quality);
         void wmMacAddressAvailable(QString mac);

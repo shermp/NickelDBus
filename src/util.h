@@ -33,4 +33,4 @@
 }
 
 // Shorthand for the common USBMS assertion
-#define NDB_DBUS_USB_ASSERT(method_name) NDB_DBUS_ASSERT(QDBusError::InternalError, !ndbInUSBMS(), "not calling method %s: in usbms session", (method_name))
+#define NDB_DBUS_USB_ASSERT() NDB_DBUS_ASSERT(QDBusError::InternalError, !ndbInUSBMS(), "not calling method %s: in usbms session", __func__)

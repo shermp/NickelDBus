@@ -105,7 +105,7 @@ bool NickelDBus::ndbInUSBMS() {
 
 QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
     #define NDB_DBUS_RETERR (QString(""))
-    NDB_DBUS_USB_ASSERT("nickelClassDetails");
+    NDB_DBUS_USB_ASSERT();
     typedef QMetaObject NickelMetaObject;
     NDB_DBUS_ASSERT(QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
     QByteArray sym = static_metaobject_symbol.toLatin1();
@@ -156,7 +156,7 @@ bool NickelDBus::signalConnected(QString const &signal_name) {
 
 void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("showToast");
+    NDB_DBUS_USB_ASSERT();
     // The following code has been adapted from NickelMenu
     NDB_DBUS_ASSERT(QDBusError::InvalidArgs, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
     MainWindowController *(*MainWindowController_sharedInstance)();
@@ -175,21 +175,21 @@ void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString 
 
 void NickelDBus::goHome() {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("goHome");
+    NDB_DBUS_USB_ASSERT();
     return ndbNickelMisc("home");
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::pfmRescanBooks() {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("pfmRescanBooks");
+    NDB_DBUS_USB_ASSERT();
     return ndbNickelMisc("rescan_books");
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::pfmRescanBooksFull() {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("pfmRescanBooksFull");
+    NDB_DBUS_USB_ASSERT();
     return ndbNickelMisc("rescan_books_full");
     #undef NDB_DBUS_RETERR
 }
@@ -212,21 +212,21 @@ bool NickelDBus::ndbActionStrValid(QString const& actStr) {
 
 void NickelDBus::wfmConnectWireless() {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("wfmConnectWireless");
+    NDB_DBUS_USB_ASSERT();
     return ndbWireless("autoconnect");
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::wfmConnectWirelessSilently() {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("wfmConnectWirelessSilently");
+    NDB_DBUS_USB_ASSERT();
     return ndbWireless("autoconnect_silent");
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::wfmSetAirplaneMode(QString const& action) {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("wfmSetAirplaneMode");
+    NDB_DBUS_USB_ASSERT();
     NDB_DBUS_ASSERT(QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray actBytes = action.toUtf8();
     return ndbWireless(actBytes.constData());
@@ -247,7 +247,7 @@ void NickelDBus::ndbWireless(const char *act) {
 
 void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("bwmOpenBrowser");
+    NDB_DBUS_USB_ASSERT();
     QString qarg = QStringLiteral("");
     if (modal || !url.isEmpty() || !css.isEmpty()) {
         if (modal) {
@@ -283,28 +283,28 @@ void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& c
 
 void NickelDBus::nsInvert(QString const& action) {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("nsInvert");
+    NDB_DBUS_USB_ASSERT();
     return ndbSettings(action, "invert");
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::nsLockscreen(QString const& action) {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("nsLockscreen");
+    NDB_DBUS_USB_ASSERT();
     return ndbSettings(action, "lockscreen");
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::nsScreenshots(QString const& action) {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("nsScreenshots");
+    NDB_DBUS_USB_ASSERT();
     return ndbSettings(action, "screenshots");
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::nsForceWifi(QString const& action) {
     #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT("nsForceWifi");
+    NDB_DBUS_USB_ASSERT();
     return ndbSettings(action, "force_wifi");
     #undef NDB_DBUS_RETERR
 }
