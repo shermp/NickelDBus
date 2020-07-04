@@ -14,8 +14,8 @@
 #include "nickel_dbus.h"
 #include "util.h"
 
-#ifndef NM_CONFIG_DIR
-    #define NM_CONFIG_DIR "/mnt/onboard/.adds/ndb"
+#ifndef NDB_CONFIG_DIR
+    #define NDB_CONFIG_DIR "/mnt/onboard/.adds/ndb"
 #endif
 
 NickelDBus *ndb;
@@ -27,7 +27,7 @@ NickelDBus *ndb;
 __attribute__((constructor)) void ndb_init() {
     char *err;
     NDB_LOG("version: " NDB_VERSION);
-    NDB_LOG("config dir: %s", NM_CONFIG_DIR);
+    NDB_LOG("config dir: %s", NDB_CONFIG_DIR);
 
     NDB_LOG("init: creating failsafe");
     nm_failsafe_t *fs;
@@ -38,10 +38,10 @@ __attribute__((constructor)) void ndb_init() {
     }
 
     NDB_LOG("init: checking for uninstall flag");
-    if (!access(NM_CONFIG_DIR "/uninstall", F_OK)) {
+    if (!access(NDB_CONFIG_DIR "/uninstall", F_OK)) {
         NDB_LOG("init: flag found, uninstalling");
         nm_failsafe_uninstall(fs);
-        unlink(NM_CONFIG_DIR "/uninstall");
+        unlink(NDB_CONFIG_DIR "/uninstall");
         NDB_INIT_STOP;
     }
     ndb = new NickelDBus(nullptr);

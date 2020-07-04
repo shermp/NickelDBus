@@ -57,7 +57,7 @@ define GITIGNORE_HEAD
 
 # KDevelop
 .kdev4/
-NickelMenu.kdev4
+NickelDBus.kdev4
 .kateconfig
 
 # VSCode
