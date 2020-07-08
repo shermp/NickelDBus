@@ -76,6 +76,13 @@ export GITIGNORE_HEAD
 override ADAPTERS   += src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus_adapter.cc
 override DBUS_IFACE += src/adapter/local.shermp.nickeldbus.xml
 
+override TAR_TRANSFORM_LIB := --transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," \
+	--transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," \
+	--transform="s,res/local-shermp-nickeldb.conf,./etc/dbus-1/system.d/local-shermp-nickeldbus.conf,"
+override TAR_FILES_LIB := src/libndb.so res/readme.txt res/local-shermp-nickeldb.conf
+override TAR_TRANSFORM := $(TAR_TRANSFORM_LIB) --transform="s,ndb-cli/ndb-cli,./mnt/onboard/.adds/ndb/bin/ndb-cli,"
+override TAR_FILES := $(TAR_FILES_LIB) ndb-cli/ndb-cli
+
 all: src/libndb.so
 
 strip: src/libndb.so
@@ -95,15 +102,14 @@ install:
 	# install -Dm644 res/doc $(DESTDIR)/mnt/onboard/.adds/nm/doc
 
 koboroot:
-	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" \
-	--transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," \
-	--transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," \
-	--transform="s,res/local-shermp-nickeldb.conf,./etc/dbus-1/system.d/local-shermp-nickeldbus.conf," \
-	src/libndb.so res/readme.txt res/local-shermp-nickeldb.conf
+	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" $(TAR_TRANSFORM) $(TAR_FILES)
+
+koborootlib:
+	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" $(TAR_TRANSFORM_LIB) $(TAR_FILES_LIB)
 
 adapter: $(ADAPTERS)
 
-.PHONY: all strip clean gitignore install koboroot adapter
+.PHONY: all strip clean gitignore install koboroot koborootlib adapter
 override GENERATED += KoboRoot.tgz
 
 src/libndb.so: override CFLAGS   += $(PTHREAD_CFLAGS) -fvisibility=hidden -fPIC
