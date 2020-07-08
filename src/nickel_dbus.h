@@ -165,6 +165,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * 
          */
         void goHome();
+        QString okConfirmationDialog();
         // PlugworkFlowManager
         /*!
          * \brief Begin an abbreviated book rescan. Same as 'rescan_books' from NickelMenu

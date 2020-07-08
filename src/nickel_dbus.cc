@@ -148,6 +148,17 @@ QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) 
     return getNickelMetaObjectDetails((const NickelMetaObject*)nmo);
     #undef NDB_DBUS_RETERR
 }
+
+QString NickelDBus::okConfirmationDialog() {
+    #define NDB_DBUS_RETERR (QString(""))
+    NDB_DBUS_USB_ASSERT();
+    typedef QObject ConfirmationDialog;
+    ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
+    reinterpret_cast<void*&>(ConfirmationDialogFactory_getConfirmationDialog) = dlsym(this->libnickel, "_ZN25ConfirmationDialogFactory21getConfirmationDialogEP7QWidget");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialogFactory_getConfirmationDialog, "could not dlsym ConfirmationDialogFactory_getConfirmationDialog");
+    ConfirmationDialog *dlg = ConfirmationDialogFactory_getConfirmationDialog(nullptr);
+    NDB_DBUS_ASSERT(QDBusError::InternalError, dlg, "error getting confirmation dialog");
+    return getNickelMetaObjectDetails(dlg->metaObject());
     #undef NDB_DBUS_RETERR
 }
 
