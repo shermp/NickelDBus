@@ -76,6 +76,7 @@ export GITIGNORE_HEAD
 override ADAPTERS   += src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus_adapter.cc
 override DBUS_IFACE += src/adapter/local.shermp.nickeldbus.xml
 
+override TAR_COMMON := tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX"
 override TAR_TRANSFORM_LIB := --transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," \
 	--transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," \
 	--transform="s,res/local-shermp-nickeldb.conf,./etc/dbus-1/system.d/local-shermp-nickeldbus.conf,"
@@ -102,10 +103,10 @@ install:
 	# install -Dm644 res/doc $(DESTDIR)/mnt/onboard/.adds/nm/doc
 
 koboroot:
-	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" $(TAR_TRANSFORM) $(TAR_FILES)
+	$(TAR_COMMON) $(TAR_TRANSFORM) $(TAR_FILES)
 
 koborootlib:
-	tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX" $(TAR_TRANSFORM_LIB) $(TAR_FILES_LIB)
+	$(TAR_COMMON) $(TAR_TRANSFORM_LIB) $(TAR_FILES_LIB)
 
 adapter: $(ADAPTERS)
 
