@@ -37,7 +37,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: ndb-cli
-        path: ./ndb-cli/ndb-cli
+        path: ./ndb-cli
     - name: Build
       run: make all
     - name: KoboRoot with ndb-cli
