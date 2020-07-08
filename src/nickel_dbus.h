@@ -73,6 +73,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         void nsForceWifi(QString const& action);
 
     private:
+        void *libnickel;
         QSet<QString> connectedSignals;
         bool *(*PlugManager__gadgetMode)(PlugManager*);
         PlugManager *(*PlugManager__sharedInstance)();
@@ -82,7 +83,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         void ndbWireless(const char *act);
         void ndbSettings(QString const& action, const char* setting);
         void ndbNickelMisc(const char *action);
-
+        QString getNickelMetaObjectDetails(const QMetaObject* nmo);
         template <typename T>
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
 };

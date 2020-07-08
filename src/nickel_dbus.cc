@@ -103,15 +103,7 @@ bool NickelDBus::ndbInUSBMS() {
     return this->PlugManager__gadgetMode(PlugManager__sharedInstance());
 }
 
-QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
-    #define NDB_DBUS_RETERR (QString(""))
-    NDB_DBUS_USB_ASSERT();
-    typedef QMetaObject NickelMetaObject;
-    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
-    QByteArray sym = static_metaobject_symbol.toLatin1();
-    NickelMetaObject *nmo;
-    reinterpret_cast<void*&>(nmo) = dlsym(this->libnickel, sym.constData());
-    NDB_DBUS_ASSERT(QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
+QString NickelDBus::getNickelMetaObjectDetails(const QMetaObject* nmo) {
     QString str = QStringLiteral("");
     str.append(QString("Showing meta information for Nickel class %1 : \n").arg(nmo->className()));
     str.append("Properties : \n");
@@ -142,6 +134,20 @@ QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) 
         str.append(QString("\t%1 :: %2 %3\n").arg(method_type).arg(method.typeName()).arg(method.methodSignature().constData()));
     }
     return str;
+}
+
+QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
+    #define NDB_DBUS_RETERR (QString(""))
+    NDB_DBUS_USB_ASSERT();
+    typedef QMetaObject NickelMetaObject;
+    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    QByteArray sym = static_metaobject_symbol.toLatin1();
+    NickelMetaObject *nmo;
+    reinterpret_cast<void*&>(nmo) = dlsym(this->libnickel, sym.constData());
+    NDB_DBUS_ASSERT(QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
+    return getNickelMetaObjectDetails((const NickelMetaObject*)nmo);
+    #undef NDB_DBUS_RETERR
+}
     #undef NDB_DBUS_RETERR
 }
 
