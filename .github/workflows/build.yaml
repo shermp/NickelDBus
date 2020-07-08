@@ -38,6 +38,8 @@ jobs:
       with:
         name: ndb-cli
         path: ./ndb-cli
+    - name: Set executable bit on ndb-cli
+      run: chmod +x ./ndb-cli/ndb-cli
     - name: Build
       run: make all
     - name: KoboRoot with ndb-cli
