@@ -210,11 +210,6 @@ void NickelDBus::showConfirmDlgAcceptReject(QString const& title, QString const&
     return showConfirmationDialog(title, body, acceptText, rejectText);
 }
 
-bool NickelDBus::testAssert(bool test) {
-    NDB_ASSERT(false, test, "The test value was '%s'", (test ? "true" : "false"));
-    return true;
-}
-
 bool NickelDBus::signalConnected(QString const &signal_name) {
     return connectedSignals.contains(signal_name);
 }

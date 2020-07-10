@@ -48,7 +48,6 @@ class NickelDBus : public QObject, protected QDBusContext {
          * to syslog. 
          */
         void connectSignals();
-        bool testAssert(bool test);
 
     Q_SIGNALS:
         /*!

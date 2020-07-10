@@ -50,10 +50,6 @@ __attribute__((constructor)) void ndb_init() {
         delete ndb;
         NDB_INIT_FS_STOP;
     }
-    // Test assertion code
-    if (ndb->testAssert(false)) {
-        NDB_LOG("The test assert failed");
-    }
     ndb->connectSignals();
 
     NDB_INIT_FS_STOP;
