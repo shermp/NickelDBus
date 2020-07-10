@@ -1,5 +1,6 @@
 #include <dlfcn.h>
 #include <QString>
+#include <QDialog>
 #include <unistd.h>
 #include <string.h>
 #include "../NickelMenu/src/action.h"
@@ -149,17 +150,64 @@ QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) 
     #undef NDB_DBUS_RETERR
 }
 
-QString NickelDBus::okConfirmationDialog() {
-    #define NDB_DBUS_RETERR (QString(""))
+void NickelDBus::allowDialog() {
+    this->allowDlg = true;
+}
+
+void NickelDBus::showConfirmationDialog(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
+    #define NDB_DBUS_RETERR
+    NDB_DBUS_ASSERT(QDBusError::AccessDenied, allowDlg, "dialog already showing");
+    this->allowDlg = false;
     NDB_DBUS_USB_ASSERT();
-    typedef QObject ConfirmationDialog;
+    typedef QDialog ConfirmationDialog;
     ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
+    void (*ConfirmationDialog__setTitle)(ConfirmationDialog* _this, QString const&);
+    void (*ConfirmationDialog__setText)(ConfirmationDialog* _this, QString const&);
+    void (*ConfirmationDialog__setAcceptButtonText)(ConfirmationDialog* _this, QString const&);
+    void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
+
     reinterpret_cast<void*&>(ConfirmationDialogFactory_getConfirmationDialog) = dlsym(this->libnickel, "_ZN25ConfirmationDialogFactory21getConfirmationDialogEP7QWidget");
     NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialogFactory_getConfirmationDialog, "could not dlsym ConfirmationDialogFactory_getConfirmationDialog");
+    reinterpret_cast<void*&>(ConfirmationDialog__setTitle) = dlsym(this->libnickel, "_ZN18ConfirmationDialog8setTitleERK7QString");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setTitle, "could not dlsym ConfirmationDialog__setTitle");
+    reinterpret_cast<void*&>(ConfirmationDialog__setText) = dlsym(this->libnickel, "_ZN18ConfirmationDialog7setTextERK7QString");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setText, "could not dlsym ConfirmationDialog__setText");
+    reinterpret_cast<void*&>(ConfirmationDialog__setAcceptButtonText) = dlsym(this->libnickel, "_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setAcceptButtonText, "could not dlsym ConfirmationDialog__setAcceptButtonText");
+    reinterpret_cast<void*&>(ConfirmationDialog__setRejectButtonText) = dlsym(this->libnickel, "_ZN18ConfirmationDialog19setRejectButtonTextERK7QString");
+    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setRejectButtonText, "could not dlsym ConfirmationDialog__setRejectButtonText");
+
     ConfirmationDialog *dlg = ConfirmationDialogFactory_getConfirmationDialog(nullptr);
     NDB_DBUS_ASSERT(QDBusError::InternalError, dlg, "error getting confirmation dialog");
-    return getNickelMetaObjectDetails(dlg->metaObject());
+    
+    ConfirmationDialog__setTitle(dlg, title);
+    ConfirmationDialog__setText(dlg, body);
+
+    if (!acceptText.isEmpty()) { ConfirmationDialog__setAcceptButtonText(dlg, acceptText); }
+    if (!rejectText.isEmpty()) { ConfirmationDialog__setRejectButtonText(dlg, rejectText); }
+
+    dlg->setModal(true);
+    QObject::connect(dlg, &QDialog::finished, this, &NickelDBus::confirmDlgResult);
+    QObject::connect(dlg, &QDialog::finished, this, &NickelDBus::allowDialog);
+    QObject::connect(dlg, &QDialog::finished, dlg, &QDialog::deleteLater);
+    dlg->open();
     #undef NDB_DBUS_RETERR
+}
+
+void NickelDBus::showConfirmDlgNoBtns(QString const& title, QString const& body) {
+    return showConfirmationDialog(title, body, QString(""), QString(""));
+}
+
+void NickelDBus::showConfirmDlgAccept(QString const& title, QString const& body, QString const& acceptText) {
+    return showConfirmationDialog(title, body, acceptText, QString(""));
+}
+
+void NickelDBus::showConfirmDlgReject(QString const& title, QString const& body, QString const& rejectText) {
+    return showConfirmationDialog(title, body, QString(""), rejectText);
+}
+
+void NickelDBus::showConfirmDlgAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
+    return showConfirmationDialog(title, body, acceptText, rejectText);
 }
 
 bool NickelDBus::testAssert(bool test) {
