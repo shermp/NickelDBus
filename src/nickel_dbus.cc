@@ -96,7 +96,7 @@ void NickelDBus::connectSignals() {
     }
 }
 
-QString NickelDBus::version() {
+QString NickelDBus::ndbVersion() {
     return QStringLiteral(NDB_VERSION);
 }
 

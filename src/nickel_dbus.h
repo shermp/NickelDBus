@@ -137,7 +137,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * 
          * \return QString 
          */
-        QString version();
+        QString ndbVersion();
         /*!
          * \brief Print available details from nickel classes
          * 
