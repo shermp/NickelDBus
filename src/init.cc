@@ -17,6 +17,9 @@
 #ifndef NDB_CONFIG_DIR
     #define NDB_CONFIG_DIR "/mnt/onboard/.adds/ndb"
 #endif
+#ifndef NDB_DBUS_CFG_PATH
+    #define NDB_DBUS_CFG_PATH "/etc/dbus-1/system.d/local-shermp-nickeldbus.conf"
+#endif
 
 NickelDBus *ndb;
 
@@ -42,6 +45,11 @@ __attribute__((constructor)) void ndb_init() {
         NDB_LOG("init: flag found, uninstalling");
         nm_failsafe_uninstall(fs);
         unlink(NDB_CONFIG_DIR "/uninstall");
+        unlink(NDB_CONFIG_DIR "/bin/ndb-cli");
+        unlink(NDB_CONFIG_DIR "/readme.txt");
+        rmdir(NDB_CONFIG_DIR "/bin");
+        rmdir(NDB_CONFIG_DIR);
+        unlink(NDB_DBUS_CFG_PATH);
         NDB_INIT_STOP;
     }
     ndb = new NickelDBus(nullptr);

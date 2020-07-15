@@ -55,6 +55,10 @@ ifdef NDB_VERSION
 endif
 # Set the log prefix:
 override CPPFLAGS += -DNM_LOG_NAME='"NickelDBus"'
+# Set the D-Bus interface name and object path
+override CPPFLAGS += -DNDB_DBUS_IFACE_NAME='"$(DBUS_IFACE_NAME)"' -DNDB_DBUS_OBJECT_PATH='"/nickeldbus"'
+# Set the D-Bus config file path for uninstallation purposes
+override CPPFLAGS += -DNDB_DBUS_CFG_PATH='"$(DBUS_IFACE_CFG_DEST)"'
 
 endif
 define GITIGNORE_HEAD
