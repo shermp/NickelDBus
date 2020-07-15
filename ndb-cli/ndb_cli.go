@@ -3,13 +3,31 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/godbus/dbus/v5"
 	"github.com/godbus/dbus/v5/introspect"
 )
+
+type signals map[string]struct{}
+
+func (s signals) String() string {
+	return ""
+}
+
+func (s signals) Set(sigName string) error {
+	s[sigName] = struct{}{}
+	return nil
+}
+
+func (s signals) Exists(signal string) bool {
+	_, ok := s[signal]
+	return ok
+}
 
 type dbusCLI struct {
 	conn       *dbus.Conn
@@ -42,7 +60,7 @@ func (d *dbusCLI) initDBus() error {
 	}
 	return nil
 }
-func (d *dbusCLI) callMethod(methodName string, methodArgs []string, waitForSig string, sigTimeout int) error {
+func (d *dbusCLI) callMethod(methodName string, methodArgs []string, sigNames signals, sigTimeout int) error {
 	var convArgs []interface{}
 	methodFound := false
 	invalidArgs := false
@@ -89,8 +107,8 @@ func (d *dbusCLI) callMethod(methodName string, methodArgs []string, waitForSig 
 
 	obj := d.conn.Object(d.dbusIface, d.dbusPath)
 	serr := make(chan error)
-	if waitForSig != "" {
-		go d.waitForSignal(waitForSig, sigTimeout, serr)
+	if len(sigNames) > 0 {
+		go d.waitForSignal(sigNames, sigTimeout, serr)
 	}
 	call := obj.Call(fmt.Sprintf("%s.%s", d.dbusIface, methodName), 0, convArgs...)
 	if call.Err != nil {
@@ -100,48 +118,52 @@ func (d *dbusCLI) callMethod(methodName string, methodArgs []string, waitForSig 
 		fmt.Printf("%v", r)
 	}
 	fmt.Printf("\n")
-	if waitForSig != "" {
+	if len(sigNames) > 0 {
 		if err := <-serr; err != nil {
 			return fmt.Errorf("error waiting for signal after method call: %w", err)
 		}
 	}
 	return nil
 }
-func (d *dbusCLI) waitForSignal(sigName string, sigTimeout int, err chan<- error) {
+func (d *dbusCLI) waitForSignal(sigNames signals, sigTimeout int, err chan<- error) {
 	var serr error
-	sigFound := false
+	sigFound := 0
 	for _, s := range d.node.Interfaces[d.ifaceIndex].Signals {
-		if s.Name == sigName {
-			sigFound = true
+		if sigNames.Exists(s.Name) {
+			sigFound++
 		}
 	}
-	if !sigFound {
-		err <- fmt.Errorf("signal '%s' not found", sigName)
+	if sigFound != len(sigNames) {
+		err <- fmt.Errorf("one or more signals not found")
 		return
 	}
 	if serr = d.conn.AddMatchSignal(
 		dbus.WithMatchObjectPath(d.dbusPath),
 		dbus.WithMatchInterface(d.dbusIface),
-		dbus.WithMatchMember(sigName),
 	); serr != nil {
 		err <- fmt.Errorf("error adding match signal: %w", serr)
 		return
 	}
 	c := make(chan *dbus.Signal)
 	d.conn.Signal(c)
-	if sigTimeout == 0 {
-		v := <-c
-		printSignal(v)
-	} else {
+	timeout := time.Duration(sigTimeout) * time.Second
+	if timeout == 0 {
+		timeout = time.Duration(math.MaxInt64)
+	}
+	for {
 		select {
 		case v := <-c:
-			printSignal(v)
-		case <-time.After(time.Duration(sigTimeout) * time.Second):
+			name := v.Name[strings.LastIndex(v.Name, ".")+1:]
+			if sigNames.Exists(name) {
+				printSignal(v)
+				err <- nil
+				return
+			}
+		case <-time.After(timeout):
 			err <- fmt.Errorf("timeout after %ds", sigTimeout)
 			return
 		}
 	}
-	err <- nil
 }
 
 func printSignal(v *dbus.Signal) {
@@ -224,8 +246,9 @@ func main() {
 	defer d.conn.Close()
 	switch os.Args[1] {
 	case "method":
-		waitForSig := methodFlags.String("wait-for-signal", "", "Wait for named signal after calling method.")
-		sigTimeout := methodFlags.Int("signal-timeout", 0, "When used with '--wait-for-signal', sets the time to wait for signal before timing out. 0 (default) disables timeout.")
+		sigNames := make(signals)
+		methodFlags.Var(&sigNames, "signal", "Wait for named signal after calling method.")
+		sigTimeout := methodFlags.Int("signal-timeout", 0, "When used with '--signal', sets the time to wait for signal before timing out. 0 (default) disables timeout.")
 		methodFlags.Parse(os.Args[2:])
 		if methodFlags.NArg() < 1 {
 			fmt.Printf("Expected method name\n")
@@ -233,7 +256,7 @@ func main() {
 		}
 		methodName := methodFlags.Arg(0)
 		methodArgs := methodFlags.Args()[1:]
-		if err = d.callMethod(methodName, methodArgs, *waitForSig, *sigTimeout); err != nil {
+		if err = d.callMethod(methodName, methodArgs, sigNames, *sigTimeout); err != nil {
 			fmt.Printf("Error calling method: %s\n", err.Error())
 			os.Exit(1)
 		}
@@ -243,9 +266,12 @@ func main() {
 		if signalFlags.NArg() < 1 {
 			fmt.Printf("Expected signal name\n")
 		}
-		sigName := signalFlags.Arg(0)
+		sigNames := make(signals)
+		for i := 0; i < signalFlags.NArg(); i++ {
+			sigNames[signalFlags.Arg(i)] = struct{}{}
+		}
 		serr := make(chan error)
-		go d.waitForSignal(sigName, *sigTimeout, serr)
+		go d.waitForSignal(sigNames, *sigTimeout, serr)
 		if err = <-serr; err != nil {
 			fmt.Printf("Error waiting for signal: %s\n", err.Error())
 			os.Exit(1)
