@@ -8,6 +8,11 @@ STRIP          = $(CROSS_COMPILE)strip
 DESTDIR =
 _ADAPTDIR := $(shell mkdir -p -m777 src/adapter)
 
+# Set D-Bus interface name and path
+override DBUS_IFACE_NAME := local.shermp.nickeldbus
+override DBUS_IFACE_CFG_NAME := $(subst .,-,$(DBUS_IFACE_NAME)).conf
+override DBUS_IFACE_CFG_DEST := /etc/dbus-1/system.d/$(DBUS_IFACE_CFG_NAME)
+
 ifneq ($(if $(MAKECMDGOALS),$(if $(filter-out clean gitignore install koboroot,$(MAKECMDGOALS)),YES,NO),YES),YES)
  $(info -- Skipping configure)
 else
@@ -73,14 +78,14 @@ ndb-cli/ndb-cli
 endef
 export GITIGNORE_HEAD
 
-override ADAPTERS   += src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus_adapter.cc
-override DBUS_IFACE += src/adapter/local.shermp.nickeldbus.xml
+override ADAPTERS   := src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus_adapter.cc
+override DBUS_IFACE := src/adapter/$(DBUS_IFACE_NAME).xml
 
 override TAR_COMMON := tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX"
 override TAR_TRANSFORM_LIB := --transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," \
 	--transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," \
-	--transform="s,res/local-shermp-nickeldb.conf,./etc/dbus-1/system.d/local-shermp-nickeldbus.conf,"
-override TAR_FILES_LIB := src/libndb.so res/readme.txt res/local-shermp-nickeldb.conf
+	--transform="s,res/$(DBUS_IFACE_CFG_NAME),.$(DBUS_IFACE_CFG_DEST),"
+override TAR_FILES_LIB := src/libndb.so res/readme.txt res/$(DBUS_IFACE_CFG_NAME)
 override TAR_TRANSFORM := $(TAR_TRANSFORM_LIB) --transform="s,ndb-cli/ndb-cli,./mnt/onboard/.adds/ndb/bin/ndb-cli,"
 override TAR_FILES := $(TAR_FILES_LIB) ndb-cli/ndb-cli
 
@@ -110,7 +115,10 @@ koborootlib:
 
 adapter: $(ADAPTERS)
 
-.PHONY: all strip clean gitignore install koboroot koborootlib adapter
+dbuscfg:
+	script/make-dbus-conf.sh res/$(DBUS_IFACE_CFG_NAME) $(DBUS_IFACE_NAME)
+
+.PHONY: all strip clean gitignore install koboroot koborootlib adapter dbuscfg
 override GENERATED += KoboRoot.tgz
 
 src/libndb.so: override CFLAGS   += $(PTHREAD_CFLAGS) -fvisibility=hidden -fPIC
