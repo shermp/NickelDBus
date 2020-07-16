@@ -114,10 +114,12 @@ func (d *dbusCLI) callMethod(methodName string, methodArgs []string, sigNames si
 	if call.Err != nil {
 		return fmt.Errorf("error calling %s : %w", methodName, call.Err)
 	}
-	for _, r := range call.Body {
-		fmt.Printf("%v", r)
+	if len(call.Body) > 0 {
+		for _, r := range call.Body {
+			fmt.Printf("%v", r)
+		}
+		fmt.Printf("\n")
 	}
-	fmt.Printf("\n")
 	if len(sigNames) > 0 {
 		if err := <-serr; err != nil {
 			return fmt.Errorf("error waiting for signal after method call: %w", err)
@@ -155,7 +157,7 @@ func (d *dbusCLI) waitForSignal(sigNames signals, sigTimeout int, err chan<- err
 		case v := <-c:
 			name := v.Name[strings.LastIndex(v.Name, ".")+1:]
 			if sigNames.Exists(name) {
-				printSignal(v)
+				printSignal(v.Body, name)
 				err <- nil
 				return
 			}
@@ -166,9 +168,10 @@ func (d *dbusCLI) waitForSignal(sigNames signals, sigTimeout int, err chan<- err
 	}
 }
 
-func printSignal(v *dbus.Signal) {
-	for _, s := range v.Body {
-		fmt.Printf("%v", s)
+func printSignal(val []interface{}, name string) {
+	fmt.Printf("%s ", name)
+	for _, s := range val {
+		fmt.Printf("%v ", s)
 	}
 	fmt.Printf("\n")
 }
