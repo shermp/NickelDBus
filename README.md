@@ -29,7 +29,7 @@ Call a method
 ```
 ndb-cli method <method_name> <method_args>
 ```
-Wait indefinitely for a signal
+Wait indefinitely for a signal. The signal name and any of its outputs will be printed to stdout (space delimited)
 ```
 ndb-cli signal <signal_name>
 ```
@@ -39,7 +39,15 @@ ndb-cli signal --timeout 10 <signal_name>
 ```
 Call a method, then wait for a signal, and timeout after 10s
 ```
-ndb-cli method --wait-for-signal <signal_name> --signal-timeout 10 <method_name> <method_args>
+ndb-cli method --signal <signal_name> --signal-timeout 10 <method_name> <method_args>
+```
+It's possible to listen for multiple signals. The first signal that is recieved that matches one of the desired signals is output.
+```
+ndb-cli signal <signal_name1> <signal_name2> ...
+```
+And yes, this also works for waiting for signal in method calls
+```
+ndb-cli method --signal <signal_name1> --signal <signal_name2> <method_name> <method_args>
 ```
 
 `ndb-cli` returns 0 on success, or 1 otherwise.
