@@ -86,10 +86,12 @@ override ADAPTERS   := src/adapter/nickel_dbus_adapter.h src/adapter/nickel_dbus
 override DBUS_IFACE := src/adapter/$(DBUS_IFACE_NAME).xml
 
 override TAR_COMMON := tar cvzf KoboRoot.tgz --show-transformed --owner=root --group=root --mode="u=rwX,go=rX"
-override TAR_TRANSFORM_LIB := --transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.so," \
+override TAR_TRANSFORM_LIB := --transform="s,src/libndb.so,./usr/local/ndb/lib/libndb.$(NDB_VERSION).so," \
+	--transform="s,res/ndb-install.sh,./usr/local/ndb/bin/ndb-install.sh," \
+	--transform="s,res/89-ndb.rules,./etc/udev/rules.d/89-ndb.rules," \
 	--transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," \
 	--transform="s,res/$(DBUS_IFACE_CFG_NAME),.$(DBUS_IFACE_CFG_DEST),"
-override TAR_FILES_LIB := src/libndb.so res/readme.txt res/$(DBUS_IFACE_CFG_NAME)
+override TAR_FILES_LIB := src/libndb.so res/readme.txt res/$(DBUS_IFACE_CFG_NAME) res/ndb-install.sh res/89-ndb.rules
 override TAR_TRANSFORM := $(TAR_TRANSFORM_LIB) --transform="s,ndb-cli/ndb-cli,./mnt/onboard/.adds/ndb/bin/ndb-cli,"
 override TAR_FILES := $(TAR_FILES_LIB) ndb-cli/ndb-cli
 
