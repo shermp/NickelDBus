@@ -1,2 +1,0 @@
-# Run script to install or upgrade NickelDBus
-KERNEL=="loop0", RUN+="/usr/local/ndb/bin/ndb-install.sh"
