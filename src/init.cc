@@ -1,6 +1,7 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE // program_invocation_short_name
 #endif
+#include <ctype.h>
 #include <dirent.h>
 #include <dlfcn.h>
 #include <errno.h> // program_invocation_short_name
@@ -34,19 +35,22 @@ static const char ndb_failsafe_ext[] = ".failsafe";
 #define NDB_INIT_FS_STOP NDB_LOG("init: destroying failsafe"); nm_failsafe_destroy(fs, 5); NDB_LOG("init: done"); return
 
 static char* ndb_extract_semver_from_fn(const char* fn, char* semver, size_t semver_size) {
-    while (*fn) {
-        if (*fn >= '0' && *fn <= '9') {
+    const char *sv_start = fn;
+    while (*sv_start) {
+        if (isdigit(*sv_start)) {
             break;
         }
-        fn++;
+        sv_start++;
     }
     // No digits were found, no valid semver in here
-    if (*fn <= '0' || *fn >= '9') {
+    if (!isdigit(*sv_start)) {
+        NDB_LOG("semver_extract: no digits found");
         return nullptr;
     }
-    if (strlen(fn) < semver_size) {
-        strcpy(semver, fn);
+    if (strlen(sv_start) < semver_size) {
+        strcpy(semver, sv_start);
     } else {
+        NDB_LOG("semver_extract: dest buffer too small");
         return nullptr;
     }
     // get rid of those pesky file extensions...
@@ -103,6 +107,7 @@ __attribute__((constructor)) void ndb_init() {
     }
     while ((de = readdir(dir)) != nullptr) {
         if (de->d_type == DT_REG && !(strncmp(libndb_pre, de->d_name, sizeof(libndb_pre) - 1))) {
+            NDB_LOG("init: checking version of %s", de->d_name);
             if ((sv = ndb_extract_semver_from_fn(de->d_name, semver_buff, sizeof(semver_buff)))) {
                 if (semver_parse(sv, &comp_vers) != 0) {
                     NDB_LOG("error: %s does not contain a valid semantic version", de->d_name);
@@ -116,6 +121,8 @@ __attribute__((constructor)) void ndb_init() {
                     NDB_LOG("init: current version (%s) is greater than, or equal to (%s)", ndb_version, sv);
                 }
             }
+        } else {
+            NDB_LOG("init: version: %s is not a regular file, or does not have '%s' prefix", de->d_name, libndb_pre);
         }
     }
     closedir(dir);
