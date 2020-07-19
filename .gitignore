@@ -21,6 +21,7 @@ ndb-cli/ndb-cli
 /src/nickel_dbus.moc
 /src/adapter/nickel_dbus_adapter.moc
 /src/failsafe.o
+/src/semver_c/semver.o
 /src/adapter/nickel_dbus_adapter.h
 /src/adapter/nickel_dbus_adapter.cc
 /src/adapter/local.shermp.nickeldbus.xml

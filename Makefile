@@ -48,7 +48,8 @@ override CFLAGS   += -std=gnu11 -Wall -Wextra -Werror
 override CXXFLAGS += -std=gnu++11 -Wall -Wextra -Werror
 override LDFLAGS  += -Wl,--no-undefined -Wl,-rpath,/usr/local/Kobo -Wl,-rpath,/usr/local/Qt-5.2.1-arm/lib
 
-NDB_VERSION := $(shell git describe --tags --always --dirty)
+# Create a semver comaptible string from git describe
+NDB_VERSION := $(shell git describe --tags --always --dirty | sed 's/^v\(.+\)/\1/' | sed 's/-\(g[a-z0-9]\{7\}\)/.\1/' | sed 's/-dirty/.dirty/')
 # Only use it if we got something useful out of git describe...
 ifdef NDB_VERSION
  override CPPFLAGS += -DNDB_VERSION='"$(NDB_VERSION)"'
@@ -89,7 +90,7 @@ override TAR_COMMON := tar cvzf KoboRoot.tgz --show-transformed --owner=root --g
 override TAR_TRANSFORM_LIB := --transform="s,src/libndb.so,./usr/local/Kobo/imageformats/libndb.$(NDB_VERSION).so," \
 	--transform="s,res/readme.txt,./mnt/onboard/.adds/ndb/readme.txt," \
 	--transform="s,res/$(DBUS_IFACE_CFG_NAME),.$(DBUS_IFACE_CFG_DEST),"
-override TAR_FILES_LIB := src/libndb.so res/readme.txt res/$(DBUS_IFACE_CFG_NAME) res/ndb-install.sh res/89-ndb.rules
+override TAR_FILES_LIB := src/libndb.so res/readme.txt res/$(DBUS_IFACE_CFG_NAME)
 override TAR_TRANSFORM := $(TAR_TRANSFORM_LIB) --transform="s,ndb-cli/ndb-cli,./mnt/onboard/.adds/ndb/bin/ndb-cli,"
 override TAR_FILES := $(TAR_FILES_LIB) ndb-cli/ndb-cli
 
@@ -128,7 +129,7 @@ override GENERATED += KoboRoot.tgz
 src/libndb.so: override CFLAGS   += $(PTHREAD_CFLAGS) -fvisibility=hidden -fPIC
 src/libndb.so: override CXXFLAGS += $(PTHREAD_CFLAGS) $(QT5CORE_CFLAGS) $(QT5WIDGETS_CFLAGS) $(QT5DBUS_CFLAGS) -fvisibility=hidden -fPIC
 src/libndb.so: override LDFLAGS  += $(PTHREAD_LIBS) $(QT5CORE_LIBS) $(QT5WIDGETS_LIBS) $(QT5DBUS_LIBS) -ldl -Wl,-soname,libndb.so 
-src/libndb.so: src/qtplugin_moc.o NickelMenu/src/failsafe.o NickelMenu/src/action.o NickelMenu/src/action_c.o NickelMenu/src/action_cc.o NickelMenu/src/kfmon.o src/adapter/nickel_dbus_adapter_moc.o src/adapter/nickel_dbus_adapter.o src/nickel_dbus_moc.o src/nickel_dbus.o src/init.o
+src/libndb.so: src/qtplugin_moc.o NickelMenu/src/failsafe.o NickelMenu/src/action.o NickelMenu/src/action_c.o NickelMenu/src/action_cc.o NickelMenu/src/kfmon.o src/adapter/nickel_dbus_adapter_moc.o src/adapter/nickel_dbus_adapter.o src/nickel_dbus_moc.o src/nickel_dbus.o src/semver_c/semver.o src/init.o
 
 override LIBRARIES += src/libndb.so
 override MOCS      += src/qtplugin.moc src/nickel_dbus.moc src/adapter/nickel_dbus_adapter.moc
@@ -155,4 +156,4 @@ $(call rpatw,.c,.o): %.o: %.c
 $(call rpatw,.cc,.o): %.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-override GENERATED += $(LIBRARIES) $(MOCS) src/failsafe.o $(ADAPTERS) $(DBUS_IFACE) $(patsubst %.moc,%_moc.o,$(MOCS)) $(call rpatw,.c,.o) $(call rpatw,.cc,.o)
+override GENERATED += $(LIBRARIES) $(MOCS) src/failsafe.o src/semver_c/semver.o $(ADAPTERS) $(DBUS_IFACE) $(patsubst %.moc,%_moc.o,$(MOCS)) $(call rpatw,.c,.o) $(call rpatw,.cc,.o)
