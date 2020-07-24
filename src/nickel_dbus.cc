@@ -145,16 +145,14 @@ QString NickelDBus::getNickelMetaObjectDetails(const QMetaObject* nmo) {
 }
 
 QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
-    #define NDB_DBUS_RETERR (QString(""))
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT(QString(""));
     typedef QMetaObject NickelMetaObject;
-    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
     QByteArray sym = static_metaobject_symbol.toLatin1();
     NickelMetaObject *nmo;
     reinterpret_cast<void*&>(nmo) = dlsym(libnickel, sym.constData());
-    NDB_DBUS_ASSERT(QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
+    NDB_DBUS_ASSERT(QString(""), QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
     return getNickelMetaObjectDetails((const NickelMetaObject*)nmo);
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::allowDialog() {
@@ -162,14 +160,13 @@ void NickelDBus::allowDialog() {
 }
 
 void NickelDBus::showConfirmationDialog(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_ASSERT(QDBusError::AccessDenied, allowDlg, "dialog already showing");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
     allowDlg = false;
-    NDB_DBUS_USB_ASSERT();
-    NDB_DBUS_SYM_ASSERT(nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
         nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__setAcceptButtonText && nSym.ConfirmationDialog__setRejectButtonText);
     ConfirmationDialog *dlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
-    NDB_DBUS_ASSERT(QDBusError::InternalError, dlg, "error getting confirmation dialog");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, dlg, "error getting confirmation dialog");
     
     nSym.ConfirmationDialog__setTitle(dlg, title);
     nSym.ConfirmationDialog__setText(dlg, body);
@@ -182,7 +179,6 @@ void NickelDBus::showConfirmationDialog(QString const& title, QString const& bod
     QObject::connect(dlg, &QDialog::finished, this, &NickelDBus::allowDialog);
     QObject::connect(dlg, &QDialog::finished, dlg, &QDialog::deleteLater);
     dlg->open();
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::showConfirmDlgNoBtns(QString const& title, QString const& body) {
@@ -206,36 +202,28 @@ bool NickelDBus::signalConnected(QString const &signal_name) {
 }
 
 void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     // The following code has been adapted from NickelMenu
-    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
-    NDB_DBUS_SYM_ASSERT(nSym.MainWindowController_sharedInstance && nSym.MainWindowController_toast);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
+    NDB_DBUS_SYM_ASSERT((void) 0, nSym.MainWindowController_sharedInstance && nSym.MainWindowController_toast);
     MainWindowController *mwc = nSym.MainWindowController_sharedInstance();
-    NDB_DBUS_ASSERT(QDBusError::InternalError, mwc, "could not get MainWindowController instance");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, mwc, "could not get MainWindowController instance");
     nSym.MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::goHome() {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("home");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::pfmRescanBooks() {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("rescan_books");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::pfmRescanBooksFull() {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("rescan_books_full");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::ndbNickelMisc(const char *action) {
@@ -255,26 +243,20 @@ bool NickelDBus::ndbActionStrValid(QString const& actStr) {
 }
 
 void NickelDBus::wfmConnectWireless() {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbWireless("autoconnect");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::wfmConnectWirelessSilently() {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbWireless("autoconnect_silent");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::wfmSetAirplaneMode(QString const& action) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
-    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray actBytes = action.toUtf8();
     return ndbWireless(actBytes.constData());
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::ndbWireless(const char *act) {
@@ -290,8 +272,7 @@ void NickelDBus::ndbWireless(const char *act) {
 }
 
 void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     QString qarg = QStringLiteral("");
     if (modal || !url.isEmpty() || !css.isEmpty()) {
         if (modal) {
@@ -322,40 +303,30 @@ void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& c
         return;
     }
     nm_action_result_free(res);
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::nsInvert(QString const& action) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "invert");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::nsLockscreen(QString const& action) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "lockscreen");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::nsScreenshots(QString const& action) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "screenshots");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::nsForceWifi(QString const& action) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_USB_ASSERT();
+    NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "force_wifi");
-    #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::ndbSettings(QString const& action, const char* setting) {
-    #define NDB_DBUS_RETERR
-    NDB_DBUS_ASSERT(QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray qarg = QString("%1:%2").arg(action).arg(setting).toUtf8();
     char *err;
     nm_action_result_t *res = nm_action_nickel_setting(qarg.constData(), &err);
@@ -365,5 +336,4 @@ void NickelDBus::ndbSettings(QString const& action, const char* setting) {
         return;
     }
     nm_action_result_free(res);
-    #undef NDB_DBUS_RETERR
 }
