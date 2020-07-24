@@ -10,19 +10,19 @@
 
 NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
     new NickelDBusAdapter(this);
-    this->initSucceeded = true;
+    initSucceeded = true;
     if (!conn.registerObject(NDB_DBUS_OBJECT_PATH, this)) {
         nh_log("NickelDBus: failed to register object on system bus");
-        this->initSucceeded = false;
+        initSucceeded = false;
         return;
     }
     if (!conn.registerService(NDB_DBUS_IFACE_NAME)) {
         nh_log("NickelDBus: failed to register service on the system bus");
-        this->initSucceeded = false;
+        initSucceeded = false;
         return;
     }
-    this->libnickel = dlopen("libnickel.so.1.0.0", RTLD_LAZY|RTLD_NODELETE);
-    if (!this->libnickel) {
+    libnickel = dlopen("libnickel.so.1.0.0", RTLD_LAZY|RTLD_NODELETE);
+    if (!libnickel) {
         nh_log("NickelDBus: could not dlopen libnickel");
         initSucceeded = false;
         return;
@@ -151,20 +151,20 @@ QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) 
     NDB_DBUS_ASSERT(QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
     QByteArray sym = static_metaobject_symbol.toLatin1();
     NickelMetaObject *nmo;
-    reinterpret_cast<void*&>(nmo) = dlsym(this->libnickel, sym.constData());
+    reinterpret_cast<void*&>(nmo) = dlsym(libnickel, sym.constData());
     NDB_DBUS_ASSERT(QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
     return getNickelMetaObjectDetails((const NickelMetaObject*)nmo);
     #undef NDB_DBUS_RETERR
 }
 
 void NickelDBus::allowDialog() {
-    this->allowDlg = true;
+    allowDlg = true;
 }
 
 void NickelDBus::showConfirmationDialog(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     #define NDB_DBUS_RETERR
     NDB_DBUS_ASSERT(QDBusError::AccessDenied, allowDlg, "dialog already showing");
-    this->allowDlg = false;
+    allowDlg = false;
     NDB_DBUS_USB_ASSERT();
     NDB_DBUS_SYM_ASSERT(nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
         nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__setAcceptButtonText && nSym.ConfirmationDialog__setRejectButtonText);
