@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <unistd.h>
 #include <string.h>
+#include <NickelHook.h>
 #include "../NickelMenu/src/action.h"
 #include "util.h"
 #include "nickel_dbus.h"
@@ -12,30 +13,30 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
     new NickelDBusAdapter(this);
     this->initSucceeded = true;
     if (!conn.registerObject(NDB_DBUS_OBJECT_PATH, this)) {
-        NDB_LOG("NickelDBus: failed to register object on system bus");
+        nh_log("NickelDBus: failed to register object on system bus");
         this->initSucceeded = false;
         return;
     }
     if (!conn.registerService(NDB_DBUS_IFACE_NAME)) {
-        NDB_LOG("NickelDBus: failed to register service on the system bus");
+        nh_log("NickelDBus: failed to register service on the system bus");
         this->initSucceeded = false;
         return;
     }
     this->libnickel = dlopen("libnickel.so.1.0.0", RTLD_LAZY|RTLD_NODELETE);
     if (!this->libnickel) {
-        NDB_LOG("NickelDBus: could not dlopen libnickel");
+        nh_log("NickelDBus: could not dlopen libnickel");
         initSucceeded = false;
         return;
     }
     reinterpret_cast<void*&>(this->PlugManager__sharedInstance) = dlsym(this->libnickel, "_ZN11PlugManager14sharedInstanceEv");
     if (!this->PlugManager__sharedInstance) {
-        NDB_LOG("NickelDBus: could not dlsym PlugManager::sharedInstance");
+        nh_log("NickelDBus: could not dlsym PlugManager::sharedInstance");
         initSucceeded = false;
         return;
     }
     reinterpret_cast<void*&>(this->PlugManager__gadgetMode) = dlsym(this->libnickel, "_ZNK11PlugManager10gadgetModeEv");
     if (!this->PlugManager__gadgetMode) {
-        NDB_LOG("NickelDBus: could not dlsym PlugManager::gadgetMode");
+        nh_log("NickelDBus: could not dlsym PlugManager::gadgetMode");
         initSucceeded = false;
         return;
     }
@@ -50,11 +51,11 @@ template <typename T>
 void NickelDBus::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest) {
     const char *dest_start = dest + 1;
     const char *dest_end = strchr(dest_start, '(');
-    NDB_LOG("connecting %s to %s", srcSignal, dest);
+    nh_log("connecting %s to %s", srcSignal, dest);
     if (QObject::connect(srcObj, srcSignal, this, dest)) {
         connectedSignals.insert(QString::fromLatin1(dest_start, dest_end - dest_start));
     } else {
-        NDB_LOG("failed to connect %s to %s", srcSignal, dest);
+        nh_log("failed to connect %s to %s", srcSignal, dest);
     }
 }
 
@@ -67,10 +68,10 @@ void NickelDBus::connectSignals() {
             ndbConnectSignal<PlugWorkflowManager>(wf, SIGNAL(aboutToConnect()), SIGNAL(pfmAboutToConnect()));
             ndbConnectSignal<PlugWorkflowManager>(wf, SIGNAL(doneProcessing()), SIGNAL(pfmDoneProcessing()));
         } else {
-            NDB_LOG("could not get shared PlugWorkflowManager pointer");
+            nh_log("could not get shared PlugWorkflowManager pointer");
         }
     } else {
-        NDB_LOG("could not dlsym PlugWorkflowManager::sharedInstance");
+        nh_log("could not dlsym PlugWorkflowManager::sharedInstance");
     }
     WirelessManager *(*WirelesManager_sharedInstance)();
     reinterpret_cast<void*&>(WirelesManager_sharedInstance) = dlsym(this->libnickel, "_ZN15WirelessManager14sharedInstanceEv");
@@ -89,15 +90,15 @@ void NickelDBus::connectSignals() {
             ndbConnectSignal<WirelessManager>(wm, SIGNAL(linkQualityForConnectedNetwork(double)), SIGNAL(wmLinkQualityForConnectedNetwork(double)));
             ndbConnectSignal<WirelessManager>(wm, SIGNAL(macAddressAvailable(QString)), SIGNAL(wmMacAddressAvailable(QString)));
         } else {
-            NDB_LOG("could not get shared WirelessManager pointer");
+            nh_log("could not get shared WirelessManager pointer");
         }
     } else {
-        NDB_LOG("could not dlsym WirelessManager::sharedInstance");
+        nh_log("could not dlsym WirelessManager::sharedInstance");
     }
 }
 
 QString NickelDBus::ndbVersion() {
-    return QStringLiteral(NDB_VERSION);
+    return QStringLiteral(NH_VERSION);
 }
 
 bool NickelDBus::ndbInUSBMS() {
@@ -258,7 +259,7 @@ void NickelDBus::ndbNickelMisc(const char *action) {
     char *err = NULL;
     nm_action_result_t *res = nm_action_nickel_misc(action, &err);
     if (!res) {
-        NDB_LOG("nm_action_nickel_misc failed with error: %s", err);
+        nh_log("nm_action_nickel_misc failed with error: %s", err);
         sendErrorReply(QDBusError::InternalError, QString("nm_action_nickel_misc failed with error: %1").arg(err));
         free(err);
         return;
@@ -297,7 +298,7 @@ void NickelDBus::ndbWireless(const char *act) {
     char *err;
     nm_action_result_t *res = nm_action_nickel_wifi(act, &err);
     if (!res) {
-        NDB_LOG("ndbWireless failed with error: %s", err);
+        nh_log("ndbWireless failed with error: %s", err);
         sendErrorReply(QDBusError::InternalError, QString("ndbWireless failed with error: %1").arg(err));
         free(err);
         return;
@@ -332,7 +333,7 @@ void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& c
     char *err = NULL;
     nm_action_result_t *res = nm_action_nickel_browser((qb_arg.isEmpty() ? NULL : qb_arg.constData()), &err);
     if (!res) {
-        NDB_LOG("bwmOpenBrowser failed with error: %s", err);
+        nh_log("bwmOpenBrowser failed with error: %s", err);
         sendErrorReply(QDBusError::InternalError, QString("bwmOpenBrowser failed with error: %1").arg(err));
         free(err);
         return;
@@ -376,7 +377,7 @@ void NickelDBus::ndbSettings(QString const& action, const char* setting) {
     char *err;
     nm_action_result_t *res = nm_action_nickel_setting(qarg.constData(), &err);
     if (!res) {
-        NDB_LOG("ndbSettings failed with error: %s", err);
+        nh_log("ndbSettings failed with error: %s", err);
         free(err);
         return;
     }
