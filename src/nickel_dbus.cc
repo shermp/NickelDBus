@@ -1,6 +1,5 @@
 #include <dlfcn.h>
 #include <QString>
-#include <QDialog>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
@@ -28,23 +27,38 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
         initSucceeded = false;
         return;
     }
-    reinterpret_cast<void*&>(this->PlugManager__sharedInstance) = dlsym(this->libnickel, "_ZN11PlugManager14sharedInstanceEv");
-    if (!this->PlugManager__sharedInstance) {
-        nh_log("NickelDBus: could not dlsym PlugManager::sharedInstance");
+    // The following symbols are required. If they can't be resolved, bail out
+    ndbResolveSymbol("_ZN11PlugManager14sharedInstanceEv", nh_symoutptr(nSym.PlugManager__sharedInstance));
+    ndbResolveSymbol("_ZNK11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
+    if (!nSym.PlugManager__sharedInstance || !nSym.PlugManager__gadgetMode) {
         initSucceeded = false;
         return;
     }
-    reinterpret_cast<void*&>(this->PlugManager__gadgetMode) = dlsym(this->libnickel, "_ZNK11PlugManager10gadgetModeEv");
-    if (!this->PlugManager__gadgetMode) {
-        nh_log("NickelDBus: could not dlsym PlugManager::gadgetMode");
-        initSucceeded = false;
-        return;
-    }
+    // Resolve the rest of the Nickel symbols up-front
+    // PlugworkFlowManager
+    ndbResolveSymbol("_ZN19PlugWorkflowManager14sharedInstanceEv", nh_symoutptr(nSym.PlugWorkflowManager_sharedInstance));
+    // WirelessManager
+    ndbResolveSymbol("_ZN15WirelessManager14sharedInstanceEv", nh_symoutptr(nSym.WirelesManager_sharedInstance));
+    // Confirmation Dialog
+    ndbResolveSymbol("_ZN25ConfirmationDialogFactory21getConfirmationDialogEP7QWidget", nh_symoutptr(nSym.ConfirmationDialogFactory_getConfirmationDialog));
+    ndbResolveSymbol("_ZN18ConfirmationDialog8setTitleERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setTitle));
+    ndbResolveSymbol("_ZN18ConfirmationDialog7setTextERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setText));
+    ndbResolveSymbol("_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setAcceptButtonText));
+    ndbResolveSymbol("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setRejectButtonText));
+    // Toast
+    ndbResolveSymbol("_ZN20MainWindowController14sharedInstanceEv", nh_symoutptr(nSym.MainWindowController_sharedInstance));
+    ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
 }
 
 NickelDBus::~NickelDBus() {
     conn.unregisterService(NDB_DBUS_IFACE_NAME);
     conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
+}
+
+void NickelDBus::ndbResolveSymbol(const char *name, void **fn) {
+    if (!(*fn = dlsym(libnickel, name))) {
+        nh_log("info... could not load %s", name);
+    }
 }
 
 template <typename T>
@@ -60,23 +74,17 @@ void NickelDBus::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *
 }
 
 void NickelDBus::connectSignals() {
-    PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
-    reinterpret_cast<void*&>(PlugWorkflowManager_sharedInstance) = dlsym(this->libnickel, "_ZN19PlugWorkflowManager14sharedInstanceEv");
-    if (PlugWorkflowManager_sharedInstance) {
-        PlugWorkflowManager *wf = PlugWorkflowManager_sharedInstance();
+    if (nSym.PlugWorkflowManager_sharedInstance) {
+        PlugWorkflowManager *wf = nSym.PlugWorkflowManager_sharedInstance();
         if (wf) {
             ndbConnectSignal<PlugWorkflowManager>(wf, SIGNAL(aboutToConnect()), SIGNAL(pfmAboutToConnect()));
             ndbConnectSignal<PlugWorkflowManager>(wf, SIGNAL(doneProcessing()), SIGNAL(pfmDoneProcessing()));
         } else {
             nh_log("could not get shared PlugWorkflowManager pointer");
         }
-    } else {
-        nh_log("could not dlsym PlugWorkflowManager::sharedInstance");
     }
-    WirelessManager *(*WirelesManager_sharedInstance)();
-    reinterpret_cast<void*&>(WirelesManager_sharedInstance) = dlsym(this->libnickel, "_ZN15WirelessManager14sharedInstanceEv");
-    if (WirelesManager_sharedInstance) {
-        WirelessManager *wm = WirelesManager_sharedInstance();
+    if (nSym.WirelesManager_sharedInstance) {
+        WirelessManager *wm = nSym.WirelesManager_sharedInstance();
         if (wm) {
             ndbConnectSignal<WirelessManager>(wm, SIGNAL(tryingToConnect()), SIGNAL(wmTryingToConnect()));
             ndbConnectSignal<WirelessManager>(wm, SIGNAL(networkConnected()), SIGNAL(wmNetworkConnected()));
@@ -92,8 +100,6 @@ void NickelDBus::connectSignals() {
         } else {
             nh_log("could not get shared WirelessManager pointer");
         }
-    } else {
-        nh_log("could not dlsym WirelessManager::sharedInstance");
     }
 }
 
@@ -102,7 +108,7 @@ QString NickelDBus::ndbVersion() {
 }
 
 bool NickelDBus::ndbInUSBMS() {
-    return this->PlugManager__gadgetMode(PlugManager__sharedInstance());
+    return nSym.PlugManager__gadgetMode(nSym.PlugManager__sharedInstance());
 }
 
 QString NickelDBus::getNickelMetaObjectDetails(const QMetaObject* nmo) {
@@ -160,32 +166,16 @@ void NickelDBus::showConfirmationDialog(QString const& title, QString const& bod
     NDB_DBUS_ASSERT(QDBusError::AccessDenied, allowDlg, "dialog already showing");
     this->allowDlg = false;
     NDB_DBUS_USB_ASSERT();
-    typedef QDialog ConfirmationDialog;
-    ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
-    void (*ConfirmationDialog__setTitle)(ConfirmationDialog* _this, QString const&);
-    void (*ConfirmationDialog__setText)(ConfirmationDialog* _this, QString const&);
-    void (*ConfirmationDialog__setAcceptButtonText)(ConfirmationDialog* _this, QString const&);
-    void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
-
-    reinterpret_cast<void*&>(ConfirmationDialogFactory_getConfirmationDialog) = dlsym(this->libnickel, "_ZN25ConfirmationDialogFactory21getConfirmationDialogEP7QWidget");
-    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialogFactory_getConfirmationDialog, "could not dlsym ConfirmationDialogFactory_getConfirmationDialog");
-    reinterpret_cast<void*&>(ConfirmationDialog__setTitle) = dlsym(this->libnickel, "_ZN18ConfirmationDialog8setTitleERK7QString");
-    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setTitle, "could not dlsym ConfirmationDialog__setTitle");
-    reinterpret_cast<void*&>(ConfirmationDialog__setText) = dlsym(this->libnickel, "_ZN18ConfirmationDialog7setTextERK7QString");
-    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setText, "could not dlsym ConfirmationDialog__setText");
-    reinterpret_cast<void*&>(ConfirmationDialog__setAcceptButtonText) = dlsym(this->libnickel, "_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString");
-    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setAcceptButtonText, "could not dlsym ConfirmationDialog__setAcceptButtonText");
-    reinterpret_cast<void*&>(ConfirmationDialog__setRejectButtonText) = dlsym(this->libnickel, "_ZN18ConfirmationDialog19setRejectButtonTextERK7QString");
-    NDB_DBUS_ASSERT(QDBusError::InternalError, ConfirmationDialog__setRejectButtonText, "could not dlsym ConfirmationDialog__setRejectButtonText");
-
-    ConfirmationDialog *dlg = ConfirmationDialogFactory_getConfirmationDialog(nullptr);
+    NDB_DBUS_SYM_ASSERT(nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
+        nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__setAcceptButtonText && nSym.ConfirmationDialog__setRejectButtonText);
+    ConfirmationDialog *dlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
     NDB_DBUS_ASSERT(QDBusError::InternalError, dlg, "error getting confirmation dialog");
     
-    ConfirmationDialog__setTitle(dlg, title);
-    ConfirmationDialog__setText(dlg, body);
+    nSym.ConfirmationDialog__setTitle(dlg, title);
+    nSym.ConfirmationDialog__setText(dlg, body);
 
-    if (!acceptText.isEmpty()) { ConfirmationDialog__setAcceptButtonText(dlg, acceptText); }
-    if (!rejectText.isEmpty()) { ConfirmationDialog__setRejectButtonText(dlg, rejectText); }
+    if (!acceptText.isEmpty()) { nSym.ConfirmationDialog__setAcceptButtonText(dlg, acceptText); }
+    if (!rejectText.isEmpty()) { nSym.ConfirmationDialog__setRejectButtonText(dlg, rejectText); }
 
     dlg->setModal(true);
     QObject::connect(dlg, &QDialog::finished, this, &NickelDBus::confirmDlgResult);
@@ -220,17 +210,10 @@ void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString 
     NDB_DBUS_USB_ASSERT();
     // The following code has been adapted from NickelMenu
     NDB_DBUS_ASSERT(QDBusError::InvalidArgs, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
-    MainWindowController *(*MainWindowController_sharedInstance)();
-    void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
-    //libnickel 4.6 * _ZN20MainWindowController14sharedInstanceEv
-    reinterpret_cast<void*&>(MainWindowController_sharedInstance) = dlsym(libnickel, "_ZN20MainWindowController14sharedInstanceEv");
-    NDB_DBUS_ASSERT(QDBusError::InternalError, MainWindowController_sharedInstance, "unsupported firmware: could not find MainWindowController::sharedInstance()");
-    //libnickel 4.6 * _ZN20MainWindowController5toastERK7QStringS2_i
-    reinterpret_cast<void*&>(MainWindowController_toast) = dlsym(libnickel, "_ZN20MainWindowController5toastERK7QStringS2_i");
-    NDB_DBUS_ASSERT(QDBusError::InternalError, MainWindowController_toast, "unsupported firmware: could not find MainWindowController::toast(QString const&, QString const&, int)");
-    MainWindowController *mwc = MainWindowController_sharedInstance();
+    NDB_DBUS_SYM_ASSERT(nSym.MainWindowController_sharedInstance && nSym.MainWindowController_toast);
+    MainWindowController *mwc = nSym.MainWindowController_sharedInstance();
     NDB_DBUS_ASSERT(QDBusError::InternalError, mwc, "could not get MainWindowController instance");
-    MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
+    nSym.MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
     #undef NDB_DBUS_RETERR
 }
 

@@ -1,5 +1,6 @@
 #ifndef NICKEL_DBUS_H
 #define NICKEL_DBUS_H
+#include <QDialog>
 #include <QObject>
 #include <QString>
 #include <QSet>
@@ -10,6 +11,7 @@ typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
 typedef QObject WirelessManager;
 typedef void MainWindowController;
+typedef QDialog ConfirmationDialog;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "local.shermp.nickeldbus"
@@ -279,9 +281,22 @@ class NickelDBus : public QObject, protected QDBusContext {
         void *libnickel;
         bool allowDlg = true;
         QSet<QString> connectedSignals;
-        bool *(*PlugManager__gadgetMode)(PlugManager*);
-        PlugManager *(*PlugManager__sharedInstance)();
+        
+        struct {
+            bool *(*PlugManager__gadgetMode)(PlugManager*);
+            PlugManager *(*PlugManager__sharedInstance)();
+            PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
+            WirelessManager *(*WirelesManager_sharedInstance)();
+            ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
+            void (*ConfirmationDialog__setTitle)(ConfirmationDialog* _this, QString const&);
+            void (*ConfirmationDialog__setText)(ConfirmationDialog* _this, QString const&);
+            void (*ConfirmationDialog__setAcceptButtonText)(ConfirmationDialog* _this, QString const&);
+            void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
+            MainWindowController *(*MainWindowController_sharedInstance)();
+            void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
+        } nSym;
 
+        void ndbResolveSymbol(const char *name, void** sym);
         bool ndbInUSBMS();
         bool ndbActionStrValid(QString const& actStr);
         void ndbWireless(const char *act);

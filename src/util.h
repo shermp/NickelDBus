@@ -23,3 +23,5 @@
 
 // Shorthand for the common USBMS assertion
 #define NDB_DBUS_USB_ASSERT() NDB_DBUS_ASSERT(QDBusError::InternalError, !ndbInUSBMS(), "not calling method %s: in usbms session", __func__)
+// Shorthand for the common nickel symbol resolve assertion
+#define NDB_DBUS_SYM_ASSERT(cond) NDB_DBUS_ASSERT(QDBusError::InternalError, (cond), "%s: required symbol(s) not resolved", __func__)

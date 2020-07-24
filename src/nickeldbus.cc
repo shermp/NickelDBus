@@ -21,7 +21,6 @@ static struct nh_info NickelDBusInfo = {
     .name           = "NickelDBus",
     .desc           = "Observe and control Nickel over D-Bus",
     .uninstall_flag = "/mnt/onboard/.adds/ndb/ndb_uninstall",
-    .uninstall_xflag = "/mnt/onboard/.adds/ndb",
 };
 
 static struct nh_hook NickelDBusHook[] = {
