@@ -41,7 +41,7 @@ jobs:
     - name: Set executable bit on ndb-cli
       run: chmod +x ./ndb-cli/ndb-cli
     - name: Build
-      run: make all
+      run: make clean && make
     - name: KoboRoot with ndb-cli
       run: make koboroot
     - name: Upload KoboRoot with ndb-cli
@@ -50,7 +50,7 @@ jobs:
         name: NickelDBus-with-cli
         path: KoboRoot.tgz
     - name: KoboRoot library only
-      run: make koborootlib
+      run: NDB_EXCLUDE_CLI=1 make koboroot
     - name: Upload KoboRoot library only
       uses: actions/upload-artifact@v2
       with:
