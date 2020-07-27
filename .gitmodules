@@ -1,3 +1,6 @@
 [submodule "NickelMenu"]
 	path = NickelMenu
 	url = https://github.com/geek1011/NickelMenu.git
+[submodule "NickelHook"]
+	path = NickelHook
+	url = https://github.com/pgaskin/NickelHook.git

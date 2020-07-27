@@ -1,35 +1,26 @@
 # make gitignore
-
-# KDevelop
-.kdev4/
-NickelDBus.kdev4
-.kateconfig
-
-# VSCode
-.vscode/
-
-# clangd
-compile_flags.txt
-
-# CLI binary
 ndb-cli/ndb-cli
-
-# Build artifacts
+.kdev4/
+*.kdev4
+.kateconfig
+.vscode/
+.idea/
+.clangd/
+.cache/
+compile_commands.json
+/src/adapter/nickel_dbus_adapter.h
+/src/adapter/nickel_dbus_adapter.cpp
+/src/adapter/local.shermp.nickeldbus.xml
 /KoboRoot.tgz
-/src/libndb.so
-/src/qtplugin.moc
+/libndb.so
+/NickelMenu/src/action.o
+/NickelMenu/src/action_c.o
+/NickelMenu/src/kfmon.o
+/src/nickeldbus.o
+/src/nickel_dbus.o
+/NickelMenu/src/action_cc.o
+/src/adapter/nickel_dbus_adapter.o
 /src/nickel_dbus.moc
 /src/adapter/nickel_dbus_adapter.moc
-/src/failsafe.o
-/src/adapter/nickel_dbus_adapter.h
-/src/adapter/nickel_dbus_adapter.cc
-/src/adapter/local.shermp.nickeldbus.xml
-/src/qtplugin_moc.o
-/src/nickel_dbus_moc.o
-/src/adapter/nickel_dbus_adapter_moc.o
-
-
-
-/src/init.o
-/src/nickel_dbus.o
-/src/adapter/nickel_dbus_adapter.o
+/src/nickel_dbus.moc.o
+/src/adapter/nickel_dbus_adapter.moc.o
