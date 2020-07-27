@@ -4,6 +4,7 @@
 #include <string.h>
 #include <NickelHook.h>
 #include "../NickelMenu/src/action.h"
+#include "../NickelMenu/src/util.h"
 #include "util.h"
 #include "nickel_dbus.h"
 #include "adapter/nickel_dbus_adapter.h"
@@ -227,12 +228,10 @@ void NickelDBus::pfmRescanBooksFull() {
 }
 
 void NickelDBus::ndbNickelMisc(const char *action) {
-    char *err = NULL;
-    nm_action_result_t *res = nm_action_nickel_misc(action, &err);
+    nm_action_result_t *res = nm_action_nickel_misc(action);
     if (!res) {
-        nh_log("nm_action_nickel_misc failed with error: %s", err);
-        sendErrorReply(QDBusError::InternalError, QString("nm_action_nickel_misc failed with error: %1").arg(err));
-        free(err);
+        nh_log("nm_action_nickel_misc failed with error: %s", nm_err_peek());
+        sendErrorReply(QDBusError::InternalError, QString("nm_action_nickel_misc failed with error: %1").arg(nm_err()));
         return;
     }
     nm_action_result_free(res);
@@ -260,12 +259,10 @@ void NickelDBus::wfmSetAirplaneMode(QString const& action) {
 }
 
 void NickelDBus::ndbWireless(const char *act) {
-    char *err;
-    nm_action_result_t *res = nm_action_nickel_wifi(act, &err);
+    nm_action_result_t *res = nm_action_nickel_wifi(act);
     if (!res) {
-        nh_log("ndbWireless failed with error: %s", err);
-        sendErrorReply(QDBusError::InternalError, QString("ndbWireless failed with error: %1").arg(err));
-        free(err);
+        nh_log("ndbWireless failed with error: %s", nm_err_peek());
+        sendErrorReply(QDBusError::InternalError, QString("ndbWireless failed with error: %1").arg(nm_err()));
         return;
     }
     nm_action_result_free(res);
@@ -294,12 +291,10 @@ void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& c
     } else {
         qb_arg = QByteArray();
     }
-    char *err = NULL;
-    nm_action_result_t *res = nm_action_nickel_browser((qb_arg.isEmpty() ? NULL : qb_arg.constData()), &err);
+    nm_action_result_t *res = nm_action_nickel_browser((qb_arg.isEmpty() ? NULL : qb_arg.constData()));
     if (!res) {
-        nh_log("bwmOpenBrowser failed with error: %s", err);
-        sendErrorReply(QDBusError::InternalError, QString("bwmOpenBrowser failed with error: %1").arg(err));
-        free(err);
+        nh_log("bwmOpenBrowser failed with error: %s", nm_err_peek());
+        sendErrorReply(QDBusError::InternalError, QString("bwmOpenBrowser failed with error: %1").arg(nm_err()));
         return;
     }
     nm_action_result_free(res);
@@ -328,11 +323,9 @@ void NickelDBus::nsForceWifi(QString const& action) {
 void NickelDBus::ndbSettings(QString const& action, const char* setting) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray qarg = QString("%1:%2").arg(action).arg(setting).toUtf8();
-    char *err;
-    nm_action_result_t *res = nm_action_nickel_setting(qarg.constData(), &err);
+    nm_action_result_t *res = nm_action_nickel_setting(qarg.constData());
     if (!res) {
-        nh_log("ndbSettings failed with error: %s", err);
-        free(err);
+        nh_log("ndbSettings failed with error: %s", nm_err());
         return;
     }
     nm_action_result_free(res);
@@ -349,12 +342,10 @@ void NickelDBus::pwrReboot() {
 }
 
 void NickelDBus::pwrAction(const char *action) {
-    char *err;
-    nm_action_result_t *res = nm_action_power(action, &err);
+    nm_action_result_t *res = nm_action_power(action);
     if (!res) {
-        nh_log("pwrAction failed with error: %s", err);
-        sendErrorReply(QDBusError::InternalError, QString("pwrAction failed with error: %1").arg(err));
-        free(err);
+        nh_log("pwrAction failed with error: %s", nm_err_peek());
+        sendErrorReply(QDBusError::InternalError, QString("pwrAction failed with error: %1").arg(nm_err()));
         return;
     }
     nm_action_result_free(res);
