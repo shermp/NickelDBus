@@ -149,7 +149,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * \param static_metaobject_symbol the "mangled" symbol of the staticMetaObject property for a class
          * \return QString Formatted output of the available details (signals and slots)
          */
-        QString nickelClassDetails(QString const& static_metaobject_symbol);
+        QString miscNickelClassDetails(QString const& static_metaobject_symbol);
         // misc
         /*!
          * \brief Check if a signal was successfully connected
@@ -158,7 +158,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * \return true 
          * \return false 
          */
-        bool signalConnected(QString const& signal_name);
+        bool miscSignalConnected(QString const& signal_name);
         /*!
          * \brief Show a small, temporariy text box with a message 
          * 
@@ -166,12 +166,12 @@ class NickelDBus : public QObject, protected QDBusContext {
          * \param msg_main the main message to display
          * \param msg_sub a sub-message to display, optional and may be omitted
          */
-        void showToast(int toast_duration, QString const& msg_main, QString const& msg_sub = QStringLiteral(""));
+        void mwcToast(int toast_duration, QString const& msg_main, QString const& msg_sub = QStringLiteral(""));
         /*!
          * \brief Navigate to the home screen
          * 
          */
-        void goHome();
+        void mwcHome();
         // Confirmation Dialogs
         /*!
          * \brief Show a confirmation dialog with no buttons (except close)

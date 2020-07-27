@@ -144,7 +144,7 @@ QString NickelDBus::getNickelMetaObjectDetails(const QMetaObject* nmo) {
     return str;
 }
 
-QString NickelDBus::nickelClassDetails(QString const& static_metaobject_symbol) {
+QString NickelDBus::miscNickelClassDetails(QString const& static_metaobject_symbol) {
     NDB_DBUS_USB_ASSERT(QString(""));
     typedef QMetaObject NickelMetaObject;
     NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
@@ -197,11 +197,11 @@ void NickelDBus::showConfirmDlgAcceptReject(QString const& title, QString const&
     return showConfirmationDialog(title, body, acceptText, rejectText);
 }
 
-bool NickelDBus::signalConnected(QString const &signal_name) {
+bool NickelDBus::miscSignalConnected(QString const &signal_name) {
     return connectedSignals.contains(signal_name);
 }
 
-void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
+void NickelDBus::mwcToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
     NDB_DBUS_USB_ASSERT((void) 0);
     // The following code has been adapted from NickelMenu
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
@@ -211,7 +211,7 @@ void NickelDBus::showToast(int toast_duration, QString const &msg_main, QString 
     nSym.MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
 }
 
-void NickelDBus::goHome() {
+void NickelDBus::mwcHome() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("home");
 }
