@@ -159,7 +159,7 @@ void NickelDBus::allowDialog() {
     allowDlg = true;
 }
 
-void NickelDBus::showConfirmationDialog(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
+void NickelDBus::dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
     allowDlg = false;
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -175,26 +175,26 @@ void NickelDBus::showConfirmationDialog(QString const& title, QString const& bod
     if (!rejectText.isEmpty()) { nSym.ConfirmationDialog__setRejectButtonText(dlg, rejectText); }
 
     dlg->setModal(true);
-    QObject::connect(dlg, &QDialog::finished, this, &NickelDBus::confirmDlgResult);
+    QObject::connect(dlg, &QDialog::finished, this, &NickelDBus::dlgConfirmResult);
     QObject::connect(dlg, &QDialog::finished, this, &NickelDBus::allowDialog);
     QObject::connect(dlg, &QDialog::finished, dlg, &QDialog::deleteLater);
     dlg->open();
 }
 
-void NickelDBus::showConfirmDlgNoBtns(QString const& title, QString const& body) {
-    return showConfirmationDialog(title, body, QString(""), QString(""));
+void NickelDBus::dlgConfirmNoBtns(QString const& title, QString const& body) {
+    return dlgConfirmation(title, body, QString(""), QString(""));
 }
 
-void NickelDBus::showConfirmDlgAccept(QString const& title, QString const& body, QString const& acceptText) {
-    return showConfirmationDialog(title, body, acceptText, QString(""));
+void NickelDBus::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
+    return dlgConfirmation(title, body, acceptText, QString(""));
 }
 
-void NickelDBus::showConfirmDlgReject(QString const& title, QString const& body, QString const& rejectText) {
-    return showConfirmationDialog(title, body, QString(""), rejectText);
+void NickelDBus::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
+    return dlgConfirmation(title, body, QString(""), rejectText);
 }
 
-void NickelDBus::showConfirmDlgAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
-    return showConfirmationDialog(title, body, acceptText, rejectText);
+void NickelDBus::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
+    return dlgConfirmation(title, body, acceptText, rejectText);
 }
 
 bool NickelDBus::miscSignalConnected(QString const &signal_name) {

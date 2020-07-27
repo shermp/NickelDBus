@@ -57,7 +57,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * 
          * \param result will be 0 for REJECT or 1 for ACCEPT
          */
-        void confirmDlgResult(int result);
+        void dlgConfirmResult(int result);
         // PlugworkFlowManager signals
         /*!
          * \brief The signal that nickel emits when the content import process has completed.
@@ -176,39 +176,39 @@ class NickelDBus : public QObject, protected QDBusContext {
         /*!
          * \brief Show a confirmation dialog with no buttons (except close)
          * 
-         * When the dialog is closed, a confirmDlgResult(result_code) signal is emitted.
+         * When the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
          * result_code will be REJECT (0)
          * 
          * \param title Title of the dialog
          * \param body Body text of the dialog
          */
-        void showConfirmDlgNoBtns(QString const& title, QString const& body);
+        void dlgConfirmNoBtns(QString const& title, QString const& body);
         /*!
          * \brief Show a confirmation dialog with an accept button
          * 
-         * When the accept button is tapped, or the dialog is closed, a confirmDlgResult(result_code) signal is emitted.
+         * When the accept button is tapped, or the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
          * result_code will be ACCEPT (1) if accept button tapped, otherwise REJECT (0)
          * 
          * \param title Title of the dialog
          * \param body Body text of the dialog
          * \param acceptText The label of the accept button (eg: 'accept', 'ok', 'yes')
          */
-        void showConfirmDlgAccept(QString const& title, QString const& body, QString const& acceptText);
+        void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
         /*!
          * \brief Show a confirmation dialog with reject button
          * 
-         * When the reject button is tapped, or the dialog is closed, a confirmDlgResult(result_code) signal is emitted.
+         * When the reject button is tapped, or the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
          * result_code will be REJECT (0)
          * 
          * \param title Title of the dialog
          * \param body Body text of the dialog
          * \param rejectText The label of the reject button (eg: 'reject', 'cancel', 'no')
          */
-        void showConfirmDlgReject(QString const& title, QString const& body, QString const& rejectText);
+        void dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText);
         /*!
          * \brief Show a confirmation dialog with both accapt and reject buttons
          * 
-         * When either button is tapped, or the dialog is closed, a confirmDlgResult(result_code) signal is emitted.
+         * When either button is tapped, or the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
          * result_code will be ACCEPT (1) if accept button tapped, otherwise REJECT (0)
          * 
          * \param title Title of the dialog
@@ -216,7 +216,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * \param acceptText The label of the accept button (eg: 'accept', 'ok', 'yes')
          * \param rejectText The label of the reject button (eg: 'reject', 'cancel', 'no')
          */
-        void showConfirmDlgAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
+        void dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
         // PlugworkFlowManager
         /*!
          * \brief Begin an abbreviated book rescan. Same as 'rescan_books' from NickelMenu
@@ -305,7 +305,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         QString getNickelMetaObjectDetails(const QMetaObject* nmo);
         template <typename T>
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
-        void showConfirmationDialog(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
+        void dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
 };
 
 #endif
