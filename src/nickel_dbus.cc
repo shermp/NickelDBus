@@ -35,7 +35,7 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
         return;
     }
     // Resolve the rest of the Nickel symbols up-front
-    // PlugworkFlowManager
+    // PlugWorkFlowManager
     ndbResolveSymbol("_ZN19PlugWorkflowManager14sharedInstanceEv", nh_symoutptr(nSym.PlugWorkflowManager_sharedInstance));
     // WirelessManager
     ndbResolveSymbol("_ZN15WirelessManager14sharedInstanceEv", nh_symoutptr(nSym.WirelesManager_sharedInstance));
@@ -181,7 +181,7 @@ void NickelDBus::dlgConfirmation(QString const& title, QString const& body, QStr
     dlg->open();
 }
 
-void NickelDBus::dlgConfirmNoBtns(QString const& title, QString const& body) {
+void NickelDBus::dlgConfirmNoBtn(QString const& title, QString const& body) {
     return dlgConfirmation(title, body, QString(""), QString(""));
 }
 

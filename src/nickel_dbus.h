@@ -20,7 +20,7 @@ typedef QDialog ConfirmationDialog;
     #define NDB_DBUS_OBJECT_PATH "/nickeldbus"
 #endif
 /*!
- * \brief Register a service on the d-bus system bus on Kobo ereader devices
+ * \brief Register a service on the d-bus system bus on Kobo e-reader devices
  * 
  */
 class NickelDBus : public QObject, protected QDBusContext {
@@ -82,7 +82,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         /*!
          * \brief This signal appears to be emitted when the network has successfully connected
          * 
-         * I'm unsure if this is emitted when the wifi connects, or when a valid IP address
+         * I'm unsure if this is emitted when the WiFi connects, or when a valid IP address
          * is obtained.
          */
         void wmNetworkConnected();
@@ -160,7 +160,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          */
         bool miscSignalConnected(QString const& signal_name);
         /*!
-         * \brief Show a small, temporariy text box with a message 
+         * \brief Show a small, temporary text box with a message 
          * 
          * \param toast_duration in milliseconds, required
          * \param msg_main the main message to display
@@ -182,7 +182,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * \param title Title of the dialog
          * \param body Body text of the dialog
          */
-        void dlgConfirmNoBtns(QString const& title, QString const& body);
+        void dlgConfirmNoBtn(QString const& title, QString const& body);
         /*!
          * \brief Show a confirmation dialog with an accept button
          * 
@@ -217,7 +217,7 @@ class NickelDBus : public QObject, protected QDBusContext {
          * \param rejectText The label of the reject button (eg: 'reject', 'cancel', 'no')
          */
         void dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
-        // PlugworkFlowManager
+        // PlugWorkFlowManager
         /*!
          * \brief Begin an abbreviated book rescan. Same as 'rescan_books' from NickelMenu
          */
@@ -228,15 +228,15 @@ class NickelDBus : public QObject, protected QDBusContext {
         void pfmRescanBooksFull();
         // Wireless methods (WirelessFlowManager)
         /*!
-         * \brief Connect to wifi network. Same as 'autoconnect' option from NickelMenu
+         * \brief Connect to WiFi network. Same as 'autoconnect' option from NickelMenu
          */
         void wfmConnectWireless();
         /*!
-         * \brief Connect silently to wifi network. Same as 'autoconnect_silent' from NickelMenu
+         * \brief Connect silently to WiFi network. Same as 'autoconnect_silent' from NickelMenu
          */
         void wfmConnectWirelessSilently();
         /*!
-         * \brief Enable/disable/toggle wifi. Same as NickelMenu wifi 'enable'/'disable'/'toggle' options
+         * \brief Enable/disable/toggle WiFi. Same as NickelMenu WiFi 'enable'/'disable'/'toggle' options
          * 
          * \param action string, one of 'enable', 'disable', 'toggle'
          */
