@@ -326,6 +326,7 @@ void NickelDBus::ndbSettings(QString const& action, const char* setting) {
     nm_action_result_t *res = nm_action_nickel_setting(qarg.constData());
     if (!res) {
         nh_log("ndbSettings failed with error: %s", nm_err());
+        sendErrorReply(QDBusError::InternalError, QString("ndbSettings failed with error: %1").arg(nm_err()));
         return;
     }
     nm_action_result_free(res);
