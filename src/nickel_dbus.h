@@ -275,6 +275,15 @@ class NickelDBus : public QObject, protected QDBusContext {
          * \param action string, one of 'enable', 'disable', 'toggle'
          */
         void nsForceWifi(QString const& action);
+        // Power commands
+        /*!
+         * \brief Shutdown the Kobo
+         */
+        void pwrShutdown();
+        /*!
+         * \brief Reboot the Kobo
+         */
+        void pwrReboot();
     protected Q_SLOTS:
         void allowDialog();
     private:
@@ -306,6 +315,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         template <typename T>
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
         void dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
+        void pwrAction(const char *action);
 };
 
 #endif

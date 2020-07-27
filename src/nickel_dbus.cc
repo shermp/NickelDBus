@@ -337,3 +337,25 @@ void NickelDBus::ndbSettings(QString const& action, const char* setting) {
     }
     nm_action_result_free(res);
 }
+
+void NickelDBus::pwrShutdown() {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    return pwrAction("shutdown");
+}
+
+void NickelDBus::pwrReboot() {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    return pwrAction("reboot");
+}
+
+void NickelDBus::pwrAction(const char *action) {
+    char *err;
+    nm_action_result_t *res = nm_action_power(action, &err);
+    if (!res) {
+        nh_log("pwrAction failed with error: %s", err);
+        sendErrorReply(QDBusError::InternalError, QString("pwrAction failed with error: %1").arg(err));
+        free(err);
+        return;
+    }
+    nm_action_result_free(res);
+}
