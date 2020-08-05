@@ -5,6 +5,7 @@
 #include <NickelHook.h>
 #include "../NickelMenu/src/action.h"
 #include "../NickelMenu/src/util.h"
+#include "semver_c/semver.h"
 #include "util.h"
 #include "nickel_dbus.h"
 #include "adapter/nickel_dbus_adapter.h"
@@ -108,6 +109,14 @@ void NickelDBus::connectSignals() {
 
 QString NickelDBus::ndbVersion() {
     return QStringLiteral(NH_VERSION);
+}
+
+bool NickelDBus::ndbSatisfiesVersion(QString vers) {
+    semver_t curr = {};
+    semver_t comp = {};
+    NDB_DBUS_ASSERT(false, QDBusError::InternalError, !semver_parse(NH_VERSION, &curr), "current version is not a valid semver string");
+    NDB_DBUS_ASSERT(false, QDBusError::InvalidArgs, !semver_parse(vers.toUtf8().constData(), &comp), "version is not a valid semver string");
+    return (bool)semver_satisfies(curr, comp, ">=");
 }
 
 bool NickelDBus::ndbInUSBMS() {

@@ -140,6 +140,14 @@ class NickelDBus : public QObject, protected QDBusContext {
          */
         QString ndbVersion();
         /*!
+         * \brief Tests if the current version of NickelDBus satisfies vers
+         * 
+         * \param vers the version to test
+         * \return true if the current version of NickelDBus is >= the requested version
+         * \return false 
+         */
+        bool ndbSatisfiesVersion(QString vers);
+        /*!
          * \brief Print available details from nickel classes
          * 
          * This method attempts to dlsym then parse the staticMetaObject

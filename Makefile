@@ -10,6 +10,9 @@ override LIBRARY  := libndb.so
 override SOURCES  += src/nickeldbus.cc src/nickel_dbus.cc $(ADAPTER_DIR)/nickel_dbus_adapter.cpp
 # NM sources
 override SOURCES  += NickelMenu/src/util.c NickelMenu/src/action.c NickelMenu/src/action_c.c NickelMenu/src/action_cc.cc NickelMenu/src/kfmon.c
+# Semver source
+override SOURCES  += src/semver_c/semver.c
+
 override CFLAGS   += -Wall -Wextra -Werror
 override CXXFLAGS += -Wall -Wextra -Werror -Wno-missing-field-initializers
 
