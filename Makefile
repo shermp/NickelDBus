@@ -1,6 +1,6 @@
 include NickelHook/NickelHook.mk
 
-override DBUS_IFACE_NAME := local.shermp.nickeldbus
+override DBUS_IFACE_NAME := com.github.shermp.nickeldbus
 override DBUS_IFACE_XML := src/adapter/$(DBUS_IFACE_NAME).xml
 override DBUS_IFACE_CFG := $(subst .,-,$(DBUS_IFACE_NAME)).conf
 override ADAPTER_DIR := src/adapter

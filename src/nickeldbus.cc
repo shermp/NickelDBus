@@ -21,6 +21,7 @@ static bool ndb_uninstall() {
     nh_delete_file("/mnt/onboard/.adds/ndb/bin/ndb-cli");
     nh_delete_dir("/mnt/onboard/.adds/ndb/bin");
     nh_delete_file("/etc/dbus-1/system.d/local-shermp-nickeldbus.conf");
+    nh_delete_file("/etc/dbus-1/system.d/com-github-shermp-nickeldbus.conf");
     return true;
 }
 

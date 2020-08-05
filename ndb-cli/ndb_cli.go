@@ -231,7 +231,7 @@ func main() {
 	var err error
 	d := dbusCLI{}
 	d.dbusPath = dbus.ObjectPath("/nickeldbus")
-	d.dbusIface = "local.shermp.nickeldbus"
+	d.dbusIface = "com.github.shermp.nickeldbus"
 
 	methodFlags := flag.NewFlagSet("method", flag.ExitOnError)
 	// methodWaitForSig := d.methodFlags.String("wait-for-signal", "", "Wait for named signal after calling method.")

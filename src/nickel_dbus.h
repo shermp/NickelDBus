@@ -14,7 +14,7 @@ typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
 
 #ifndef NDB_DBUS_IFACE_NAME
-    #define NDB_DBUS_IFACE_NAME "local.shermp.nickeldbus"
+    #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
 #endif
 #ifndef NDB_DBUS_OBJECT_PATH
     #define NDB_DBUS_OBJECT_PATH "/nickeldbus"

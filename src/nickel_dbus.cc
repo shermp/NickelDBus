@@ -12,11 +12,13 @@
 NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
     new NickelDBusAdapter(this);
     initSucceeded = true;
+    nh_log("NickelDBus: registering object %s", NDB_DBUS_OBJECT_PATH);
     if (!conn.registerObject(NDB_DBUS_OBJECT_PATH, this)) {
         nh_log("NickelDBus: failed to register object on system bus");
         initSucceeded = false;
         return;
     }
+    nh_log("NickelDBus: registering interface %s", NDB_DBUS_IFACE_NAME);
     if (!conn.registerService(NDB_DBUS_IFACE_NAME)) {
         nh_log("NickelDBus: failed to register service on the system bus");
         initSucceeded = false;

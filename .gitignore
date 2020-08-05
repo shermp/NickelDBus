@@ -10,9 +10,10 @@ ndb-cli/ndb-cli
 compile_commands.json
 /src/adapter/nickel_dbus_adapter.h
 /src/adapter/nickel_dbus_adapter.cpp
-/src/adapter/local.shermp.nickeldbus.xml
+/src/adapter/com.github.shermp.nickeldbus.xml
 /KoboRoot.tgz
 /libndb.so
+/NickelMenu/src/util.o
 /NickelMenu/src/action.o
 /NickelMenu/src/action_c.o
 /NickelMenu/src/kfmon.o
