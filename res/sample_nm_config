@@ -1,0 +1,7 @@
+menu_item: main : My Awesome App : cmd_output :/path/to/ndb-upgrade.sh -c 0.0.5
+    chain_success : skip : 4
+        chain_failure : cmd_output  :1000:quiet :/path/to/ndb-upgrade.sh -u /path/to/ndb_koboroot.tgz
+        chain_success : nickel_misc :rescan_books_full
+        chain_success : dbg_toast   :NickelDBus installed or upgraded!
+        chain_success : skip : -1
+    chain_success : cmd_spawn : /path/to/awsome-program
