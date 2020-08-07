@@ -8,9 +8,11 @@ ndb-cli/ndb-cli
 .clangd/
 .cache/
 compile_commands.json
-/src/adapter/nickel_dbus_adapter.h
-/src/adapter/nickel_dbus_adapter.cpp
-/src/adapter/com.github.shermp.nickeldbus.xml
+/src/interface/nickel_dbus_adapter.h
+/src/interface/nickel_dbus_adapter.cpp
+/src/interface/nickel_dbus_proxy.h
+/src/interface/nickel_dbus_proxy.cpp
+/src/interface/com.github.shermp.nickeldbus.xml
 /KoboRoot.tgz
 /libndb.so
 /NickelMenu/src/util.o
@@ -20,8 +22,8 @@ compile_commands.json
 /src/nickeldbus.o
 /src/nickel_dbus.o
 /NickelMenu/src/action_cc.o
-/src/adapter/nickel_dbus_adapter.o
+/src/interface/nickel_dbus_adapter.o
 /src/nickel_dbus.moc
-/src/adapter/nickel_dbus_adapter.moc
+/src/interface/nickel_dbus_adapter.moc
 /src/nickel_dbus.moc.o
-/src/adapter/nickel_dbus_adapter.moc.o
+/src/interface/nickel_dbus_adapter.moc.o
