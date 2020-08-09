@@ -61,10 +61,6 @@ int NDBCli::callMethod() {
     // Forgive the if-ladder, but it's the easiest way to do this...
     // Note, this can probably be done more consisely with QMetaObjects
     // and QMetaMethods, but dealing with the types there makes my head hurt...
-    if (!ndb->isValid()) {
-        errString = QStringLiteral("interface not valid");
-        return -1;
-    }
     if (!validateArgCount()) {
         errString = QStringLiteral("invalid parameter count");
         return -1;
@@ -225,6 +221,10 @@ void NDBCli::setTimeout(int t) {
 }
 
 void NDBCli::start() {
+    if (!ndb->isValid()) {
+        qCritical() << "interface not valid" << endl;
+        QCoreApplication::exit(1);
+    }
     if (signalNames.size() > 0) {
         if (connectSignals() != 0) {
             qCritical() << "failed with: " << errString << endl;
