@@ -15,7 +15,7 @@ No configuration is required.
 NickelDBus is designed to give application developers a way of interacting with Kobo's nickel from a script or program. It can perform many of the same actions that NickelMenu can, and also provides a limited number of signals that can be monitored. For example, if you need to know when the content import process has completed, you can listen/wait for the `pfmDoneProcessing` signal.
 
 NickelDBus exports the following interface:
-```local.shermp.nickeldbus```
+```com.github.shermp.nickeldbus```
 And can be found at the following path:
 ```/nickeldbus```
 
