@@ -45,13 +45,8 @@ NDBCli::NDBCli(QObject* parent, com::github::shermp::nickeldbus *ndb) : QObject(
 bool NDBCli::validateArgCount() {
     bool retval = false;
     const QMetaObject *mo = ndb->metaObject();
-    // qDebug() << "methodName: " << methodName << endl;
-    // qDebug() << "numArgs: " << methodArgs.size();
     for (int i = mo->methodOffset(); i < mo->methodCount(); ++i ) {
         QMetaMethod method = mo->method(i);
-        // qDebug() << "Current method name: " << method.name() << endl;
-        // qDebug() << "Current param count: " << method.parameterCount() << endl;
-        // qDebug() << "Current method type: " << method.methodType() << endl;
         if (!QString(method.name()).compare(methodName) && (method.methodType() == QMetaMethod::Method || method.methodType() == QMetaMethod::Slot)) {
             if (method.parameterCount() == methodArgs.size()) {
                 retval = true;
@@ -115,9 +110,9 @@ int NDBCli::callMethod() {
     } else if (!methodName.compare("bwmOpenBrowser")) {
         bool modal;
         if (methodArgs.count() > 0) {
-            if (!methodArgs.at(0).compare("true", Qt::CaseSensitive) || !methodArgs.at(0).compare("t", Qt::CaseSensitive)) {
+            if (!methodArgs.at(0).compare("true", Qt::CaseInsensitive) || !methodArgs.at(0).compare("t", Qt::CaseInsensitive)) {
                 modal = true;
-            } else if (!methodArgs.at(0).compare("false", Qt::CaseSensitive) || !methodArgs.at(0).compare("f", Qt::CaseSensitive)) {
+            } else if (!methodArgs.at(0).compare("false", Qt::CaseInsensitive) || !methodArgs.at(0).compare("f", Qt::CaseInsensitive)) {
                 modal = false;
             } else {
                 errString =  QStringLiteral("could not parse modal. One of 'true', 't', 'false', 'f' required");
