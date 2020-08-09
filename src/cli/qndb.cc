@@ -6,19 +6,21 @@
 
 int main(int argc, char **argv) {
     QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("ndb-cli");
+    QCoreApplication::setApplicationName("qndb");
     QCoreApplication::setApplicationVersion("0.1");
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("NickelDBus");
+    parser.setApplicationDescription("Qt CLI for NickelDBus");
     parser.addHelpOption();
     parser.addVersionOption();
 
-    QCommandLineOption signalOption(QStringList() << "s" << "signal", "Wait for signal", "signalName");
+    parser.addPositionalArgument("arguments", "Arguments to pass to method. Have no affect when a method is not set.", "[args...]");
+
+    QCommandLineOption signalOption(QStringList() << "s" << "signal", "Wait for signal, and prints its output, if any.", "signal name");
     parser.addOption(signalOption);
-    QCommandLineOption timeoutOption(QStringList() << "t" << "timeout", "Signal timeout", "timeoutVal");
+    QCommandLineOption timeoutOption(QStringList() << "t" << "timeout", "Signal timeout in milliseconds.", "timeout ms");
     parser.addOption(timeoutOption);
-    QCommandLineOption methodOption(QStringList() << "m" << "method", "Method to invoke", "methodName");
+    QCommandLineOption methodOption(QStringList() << "m" << "method", "Method to invoke.", "method name");
     parser.addOption(methodOption);
 
     parser.process(app);
