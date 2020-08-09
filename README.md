@@ -23,38 +23,38 @@ And can be found at the following path:
 
 Kobo devices provide the standard `dbus-send` and `dbus-monitor` tools by default. NickelDBus is fully compatible with these tools if you wish to use them (hint, they are a PITA to use...).
 
-Alternatively, a CLI tool written in Go has been created, called `ndb-cli`. Usage is very simple:
+Alternatively, a CLI tool written Qt C++ has been created, called `qndb`. Usage is very simple:
 
 Call a method
 ```
-ndb-cli method <method_name> <method_args>
+qndb -m <method_name> <method_args>
 ```
 Wait indefinitely for a signal. The signal name and any of its outputs will be printed to stdout (space delimited)
 ```
-ndb-cli signal <signal_name>
+qndb -s <signal_name>
 ```
-Wait for a signal, with a 10s timeout
+Wait for a signal, with a 10s timeout (timeout is expressed in milliseconds)
 ```
-ndb-cli signal --timeout 10 <signal_name>
+qndb -t 10000 -s <signal_name>
 ```
 Call a method, then wait for a signal, and timeout after 10s
 ```
-ndb-cli method --signal <signal_name> --signal-timeout 10 <method_name> <method_args>
+qndb -s <signal_name> -t 10000 -m <method_name> <method_args>
 ```
-It's possible to listen for multiple signals. The first signal that is recieved that matches one of the desired signals is output.
+It's possible to listen for multiple signals. The first signal that is received that matches one of the desired signals is output.
 ```
-ndb-cli signal <signal_name1> <signal_name2> ...
+qndb -s <signal_name1> -s <signal_name2> ...
 ```
 And yes, this also works for waiting for signal in method calls
 ```
-ndb-cli method --signal <signal_name1> --signal <signal_name2> <method_name> <method_args>
+qndb -s <signal_name1> -s <signal_name2> -m <method_args>
 ```
 
-`ndb-cli` returns 0 on success, or 1 otherwise.
+`qndb` returns 0 on success, or 1 otherwise.
 
 ### Language bindings
 
-Bindings are available for most programming languages. For example, `ndb-cli` uses [godbus](https://github.com/godbus/dbus) and NickelDBus itself uses [QtDbus](https://doc.qt.io/qt-5/qtdbus-index.html).
+Bindings are available for most programming languages. For example, `qndb` and NickelDBus uses [QtDbus](https://doc.qt.io/qt-5/qtdbus-index.html).
 
 ## Compiling
 
@@ -62,4 +62,6 @@ This library was designed to be compiled with [NickelTC](https://github.com/geek
 
 A KoboRoot.tgz that can be installed on your Kobo can be generated with `make all koboroot`.
 
-To start developing with NickelDBus, you will first need to generate the dbus adapter headers. You can run `make adapter` to do this. Alternatively, `make all` will also do this as part of the compile process. Note, this requires the `qdbuscpp2xml` and `qdbusxml2cpp` programs from Qt, which are included with NickelTC. 
+To start developing with NickelDBus, you will first need to generate the dbus adapter and proxy headers. You can run `make interface` to do this. Alternatively, `make all` will also do this as part of the compile process. Note, this requires the `qdbuscpp2xml` and `qdbusxml2cpp` programs from Qt, which are included with NickelTC.
+
+To compile `qndb`, currently you need to change into the `src/cli` directory, and run `make cli`. Note, the interface files must have been created in the root directory first.
