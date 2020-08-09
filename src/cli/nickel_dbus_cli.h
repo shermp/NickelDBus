@@ -14,6 +14,7 @@ class NDBCli : public QObject {
         void setMethodArgs(QStringList args);
         void setSignalNames(QStringList names);
         void setTimeout(int timeout);
+        void setPrintAPI(bool api);
     
     Q_SIGNALS:
         void timeoutTriggered();
@@ -30,13 +31,14 @@ class NDBCli : public QObject {
         QString methodName;
         QStringList methodArgs;
         QStringList signalNames;
-        bool signalComplete, methodComplete;
+        bool signalComplete, methodComplete, printApi;
         int timeout;
         com::github::shermp::nickeldbus* ndb;
         int callMethod();
         bool validateArgCount();
         int connectSignals();
         void processSignal(QString name, QString param = QString());
+        void printAPI();
 };
 
 #endif

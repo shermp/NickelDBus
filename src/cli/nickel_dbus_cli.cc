@@ -235,10 +235,55 @@ void NDBCli::setTimeout(int t) {
     timeout = t;
 }
 
+void NDBCli::setPrintAPI(bool api) {
+    printApi = api;
+}
+
+void NDBCli::printAPI() {
+    QTextStream(stdout) << "The following methods and their arguments can be called:" << endl;
+    QTextStream methodOut(stdout);
+    const QMetaObject *mo = ndb->metaObject();
+    for (int i = mo->methodOffset(); i < mo->methodCount(); ++ i) {
+        QMetaMethod method = mo->method(i);
+        if (method.methodType() == QMetaMethod::Slot) {
+            methodOut << "    " << method.name();
+            auto params = method.parameterNames();
+            auto paramTypes = method.parameterTypes();
+            for (int j = 0; j < params.size(); ++j) {
+                methodOut << " " << "<" << paramTypes.at(j) << ">" << " " << params.at(j);
+                if (j < params.size() - 1) {
+                    methodOut << ",";
+                }
+            }
+            methodOut << endl;
+        }
+    }
+    QTextStream(stdout) << "\nThe following signals and their 'return' value can be waited for:" << endl;
+    for (int i = mo->methodOffset(); i < mo->methodCount(); ++ i) {
+        QMetaMethod method = mo->method(i);
+        if (method.methodType() == QMetaMethod::Signal) {
+            methodOut << "    " << method.name();
+            auto params = method.parameterNames();
+            auto paramTypes = method.parameterTypes();
+            for (int j = 0; j < params.size(); ++j) {
+                methodOut << " " << "<" << paramTypes.at(j) << ">" << " " << params.at(j);
+                if (j < params.size() - 1) {
+                    methodOut << ",";
+                }
+            }
+            methodOut << endl;
+        }
+    }
+}
+
 void NDBCli::start() {
     if (!ndb->isValid()) {
         qCritical() << "interface not valid" << endl;
         QCoreApplication::exit(1);
+    }
+    if (printApi) {
+        printAPI();
+        QCoreApplication::quit();
     }
     if (signalNames.size() > 0) {
         if (connectSignals() != 0) {

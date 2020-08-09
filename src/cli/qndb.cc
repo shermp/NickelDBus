@@ -22,6 +22,8 @@ int main(int argc, char **argv) {
     parser.addOption(timeoutOption);
     QCommandLineOption methodOption(QStringList() << "m" << "method", "Method to invoke.", "method name");
     parser.addOption(methodOption);
+    QCommandLineOption apiOption(QStringList() << "a" << "api", "Print API usage");
+    parser.addOption(apiOption);
 
     parser.process(app);
 
@@ -30,6 +32,7 @@ int main(int argc, char **argv) {
     com::github::shermp::nickeldbus ndb("com.github.shermp.nickeldbus", "/nickeldbus", QDBusConnection::systemBus(), &app);
     NDBCli cli(&app, &ndb);
 
+    cli.setPrintAPI(parser.isSet(apiOption));
     if (parser.isSet(signalOption)) {
         cli.setSignalNames(parser.values(signalOption));
     }
