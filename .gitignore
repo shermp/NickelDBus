@@ -12,6 +12,9 @@ compile_commands.json
 /src/interface/nickel_dbus_adapter.cpp
 /src/interface/nickel_dbus_proxy.h
 /src/interface/nickel_dbus_proxy.cpp
+/src/interface/nickel_dbus_proxy.o
+/src/interface/nickel_dbus_proxy.moc
+/src/interface/nickel_dbus_proxy.moc.o
 /src/interface/com.github.shermp.nickeldbus.xml
 /KoboRoot.tgz
 /libndb.so
@@ -27,3 +30,8 @@ compile_commands.json
 /src/interface/nickel_dbus_adapter.moc
 /src/nickel_dbus.moc.o
 /src/interface/nickel_dbus_adapter.moc.o
+/src/cli/nickel_dbus_cli.moc
+/src/cli/nickel_dbus_cli.moc.o
+/src/cli/nickel_dbus_cli.o
+/src/cli/qndb.o
+/src/cli/qndb
