@@ -162,7 +162,10 @@ int NDBCli::connectSignals() {
                         errString = QString("cannot handle signal with type %1").arg(QMetaType::typeName(method.parameterType(0)));
                         return -1;
                     }
-                } 
+                } else {
+                    errString = QString("cannot handle signal with more than one parameter");
+                    return -1;
+                }
             }
         }
     }
