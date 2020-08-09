@@ -58,9 +58,21 @@ bool NDBCli::validateArgCount() {
 }
 
 int NDBCli::callMethod() {
-    // Forgive the if-ladder, but it's the easiest way to do this...
-    // Note, this can probably be done more consisely with QMetaObjects
-    // and QMetaMethods, but dealing with the types there makes my head hurt...
+    // Forgive the if-ladder, but it's the easiest way to do this... Note, this
+    // can probably be done more consisely with QMetaObjects and QMetaMethods,
+    // but dealing with the types there makes my head hurt...
+    //
+    // To elaborate, first we must obtain the QMetaMethod (easy enough). Then we
+    // have to get the number of parameters for that method. Following that, one
+    // has to convert the QString args from the command list into usable types,
+    // perhaps into a QVariantList. Invoking the method involves setting the
+    // parameters using Q_ARG() macros, which involve knowing the type of each
+    // arg. And then there's the return value. That requires a pre-declared
+    // variable, and it's type, and the invoke method stores the return value
+    // there. Our return type happens to be a templated class
+    // (QDBusPendingReply<T>).
+    //
+    // I've decided it's all in the too-hard basket.
     if (!validateArgCount()) {
         errString = QStringLiteral("invalid parameter count");
         return -1;
