@@ -42,19 +42,55 @@ NDBCli::NDBCli(QObject* parent, com::github::shermp::nickeldbus *ndb) : QObject(
     timeout = -1;
 }
 
-bool NDBCli::validateArgCount() {
-    bool retval = false;
+int NDBCli::getMethodIndex() {
     const QMetaObject *mo = ndb->metaObject();
     for (int i = mo->methodOffset(); i < mo->methodCount(); ++i ) {
         QMetaMethod method = mo->method(i);
         if (!QString(method.name()).compare(methodName) && (method.methodType() == QMetaMethod::Method || method.methodType() == QMetaMethod::Slot)) {
             if (method.parameterCount() == methodArgs.size()) {
-                retval = true;
-                break;
+                return i;
             }
         }
     }
-    return retval;
+    return -1;
+}
+
+QVariantList NDBCli::convertParams(int methodIndex, bool *ok) {
+    QVariantList args = QVariantList();
+    QMetaMethod m = ndb->metaObject()->method(methodIndex);
+    QList<QByteArray> paramNames = m.parameterNames();
+    for (int i = 0; i < m.parameterCount(); ++i) {
+        switch (m.parameterType(i)) {
+        case QMetaType::Type::Int:
+            args.append(methodArgs.at(i).toInt(ok)); 
+            if (!*ok) {
+                errString = QString("could not parse integer: %1").arg(QString(paramNames.at(i)));
+            } 
+            break;
+        case QMetaType::Type::Bool:
+            *ok = true;
+            if (!methodArgs.at(i).compare("true", Qt::CaseInsensitive) || !methodArgs.at(i).compare("t", Qt::CaseInsensitive)) {
+                args.append(true);
+            } else if (!methodArgs.at(i).compare("false", Qt::CaseInsensitive) || !methodArgs.at(i).compare("f", Qt::CaseInsensitive)) {
+                args.append(false);
+            } else {
+                errString =  QString("could not parse bool: %1. One of 'true', 't', 'false', 'f' required").arg(QString(paramNames.at(i)));
+                *ok = false;
+            }
+            break;
+        case QMetaType::Type::QString:
+            args.append(methodArgs.at(i));
+            *ok = true;
+            break;
+        default:
+            errString =  QString("unsupported type: %1").arg(QString(paramNames.at(i)));
+            *ok = false;
+        }
+        if (!*ok) {
+            return args;
+        }
+    }
+    return args;
 }
 
 int NDBCli::callMethod() {
@@ -73,38 +109,39 @@ int NDBCli::callMethod() {
     // (QDBusPendingReply<T>).
     //
     // I've decided it's all in the too-hard basket.
-    if (!validateArgCount()) {
-        errString = QStringLiteral("invalid parameter count");
+    int methodIndex = getMethodIndex();
+    if (methodIndex < 0) {
+        errString = QStringLiteral("non-existent method or invalid parameter count");
+        return -1;
+    }
+    bool args_ok;
+    QVariantList args = convertParams(methodIndex, &args_ok);
+    if (!args_ok) {
+        // convertArgs already sets the error string
         return -1;
     }
     if (!methodName.compare("ndbVersion")) {
         NDBCLI_CALL_METHOD(QString, ndb->ndbVersion());
     } else if (!methodName.compare("miscNickelClassDetails")) {
-        NDBCLI_CALL_METHOD(QString, ndb->miscNickelClassDetails(methodArgs.at(0)));
+        NDBCLI_CALL_METHOD(QString, ndb->miscNickelClassDetails(args.at(0).toString()));
     } else if (!methodName.compare("miscSignalConnected")) {
-        NDBCLI_CALL_METHOD(bool, ndb->miscSignalConnected(methodArgs.at(0)));
+        NDBCLI_CALL_METHOD(bool, ndb->miscSignalConnected(args.at(0).toString()));
     } else if (!methodName.compare("mwcToast")) {
-        bool conv_ok;
-        int duration = methodArgs.at(0).toInt(&conv_ok);
-        if (!conv_ok) {
-            errString = QStringLiteral("could not parse timestamp");
-            return -1;
-        }
         if (methodArgs.size() == 2) {
-            NDBCLI_CALL_METHOD_VOID(ndb->mwcToast(duration, methodArgs.at(1)));
+            NDBCLI_CALL_METHOD_VOID(ndb->mwcToast(args.at(0).toInt(), args.at(1).toString()));
         } else {
-            NDBCLI_CALL_METHOD_VOID(ndb->mwcToast(duration, methodArgs.at(1), methodArgs.at(2)));
+            NDBCLI_CALL_METHOD_VOID(ndb->mwcToast(args.at(0).toInt(), args.at(1).toString(), args.at(2).toString()));
         }
     } else if (!methodName.compare("mwcHome")) {
         NDBCLI_CALL_METHOD_VOID(ndb->mwcHome());
     } else if (!methodName.compare("dlgConfirmNoBtn")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmNoBtn(methodArgs.at(0), methodArgs.at(1)));
+        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmNoBtn(args.at(0).toString(), args.at(1).toString()));
     } else if (!methodName.compare("dlgConfirmAccept")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmAccept(methodArgs.at(0), methodArgs.at(1), methodArgs.at(2)));
+        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmAccept(args.at(0).toString(), args.at(1).toString(), args.at(2).toString()));
     } else if (!methodName.compare("dlgConfirmReject")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmReject(methodArgs.at(0), methodArgs.at(1), methodArgs.at(2)));
+        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmReject(args.at(0).toString(), args.at(1).toString(), args.at(2).toString()));
     } else if (!methodName.compare("dlgConfirmAcceptReject")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmAcceptReject(methodArgs.at(0), methodArgs.at(1), methodArgs.at(2), methodArgs.at(3)));
+        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmAcceptReject(args.at(0).toString(), args.at(1).toString(), args.at(2).toString(), args.at(3).toString()));
     } else if (!methodName.compare("pfmRescanBooks")) {
         NDBCLI_CALL_METHOD_VOID(ndb->pfmRescanBooks());
     } else if (!methodName.compare("pfmRescanBooksFull")) {
@@ -114,35 +151,26 @@ int NDBCli::callMethod() {
     } else if (!methodName.compare("wfmConnectWirelessSilently")) {
         NDBCLI_CALL_METHOD_VOID(ndb->wfmConnectWirelessSilently());
     } else if (!methodName.compare("wfmSetAirplaneMode")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->wfmSetAirplaneMode(methodArgs.at(0)));
+        NDBCLI_CALL_METHOD_VOID(ndb->wfmSetAirplaneMode(args.at(0).toString()));
     } else if (!methodName.compare("bwmOpenBrowser")) {
-        bool modal;
         if (methodArgs.count() > 0) {
-            if (!methodArgs.at(0).compare("true", Qt::CaseInsensitive) || !methodArgs.at(0).compare("t", Qt::CaseInsensitive)) {
-                modal = true;
-            } else if (!methodArgs.at(0).compare("false", Qt::CaseInsensitive) || !methodArgs.at(0).compare("f", Qt::CaseInsensitive)) {
-                modal = false;
-            } else {
-                errString =  QStringLiteral("could not parse modal. One of 'true', 't', 'false', 'f' required");
-                return -1;
-            }
             if (methodArgs.count() == 1) {
-                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(modal));
+                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(args.at(0).toBool()));
             } else if (methodArgs.count() == 2) {
-                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(modal, methodArgs.at(1)));
+                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(args.at(0).toBool(), args.at(1).toString()));
             } else {
-                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(modal, methodArgs.at(1), methodArgs.at(2)));
+                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(args.at(0).toBool(), args.at(1).toString(), args.at(2).toString()));
             }
         }
         NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser());
     } else if (!methodName.compare("nsInvert")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsInvert(methodArgs.at(0)));
+        NDBCLI_CALL_METHOD_VOID(ndb->nsInvert(args.at(0).toString()));
     } else if (!methodName.compare("nsLockscreen")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsLockscreen(methodArgs.at(0)));
+        NDBCLI_CALL_METHOD_VOID(ndb->nsLockscreen(args.at(0).toString()));
     } else if (!methodName.compare("nsScreenshots")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsScreenshots(methodArgs.at(0)));
+        NDBCLI_CALL_METHOD_VOID(ndb->nsScreenshots(args.at(0).toString()));
     } else if (!methodName.compare("nsForceWifi")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsForceWifi(methodArgs.at(0)));
+        NDBCLI_CALL_METHOD_VOID(ndb->nsForceWifi(args.at(0).toString()));
     } else if (!methodName.compare("pwrShutdown")) {
         NDBCLI_CALL_METHOD_VOID(ndb->pwrShutdown());
     } else if (!methodName.compare("pwrReboot")) {

@@ -35,7 +35,8 @@ class NDBCli : public QObject {
         int timeout;
         com::github::shermp::nickeldbus* ndb;
         int callMethod();
-        bool validateArgCount();
+        int getMethodIndex();
+        QVariantList convertParams(int methodIndex, bool *ok);
         int connectSignals();
         void processSignal(QString name, QString param = QString());
         void printMethods(int methodType);
