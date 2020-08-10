@@ -68,8 +68,8 @@ Bindings are available for most programming languages. For example, `qndb` and N
 
 This library was designed to be compiled with [NickelTC](https://github.com/geek1011/NickelTC).
 
-A KoboRoot.tgz that can be installed on your Kobo can be generated with `make all koboroot`.
+A KoboRoot.tgz that can be installed on your Kobo can be generated with `make koboroot`.
 
-To start developing with NickelDBus, you will first need to generate the dbus adapter and proxy headers. You can run `make interface` to do this. Alternatively, `make all` will also do this as part of the compile process. Note, this requires the `qdbuscpp2xml` and `qdbusxml2cpp` programs from Qt, which are included with NickelTC.
+To start developing with NickelDBus, you will first need to generate the dbus adapter and proxy headers. You can run `make interface` to do this. Alternatively, `make` will also do this as part of the compile process. Note, this requires the `qdbuscpp2xml` and `qdbusxml2cpp` programs from Qt, which are included with NickelTC.
 
-To compile `qndb`, currently you need to change into the `src/cli` directory, and run `make cli`. Note, the interface files must have been created in the root directory first.
+To compile `qndb`, run `make cli`. Note, you will need to run this before `make koboroot`.
