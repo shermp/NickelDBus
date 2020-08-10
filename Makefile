@@ -38,6 +38,16 @@ interface: $(ADAPTER) $(PROXY)
 dbuscfg:
 	script/make-dbus-conf.sh res/$(DBUS_IFACE_CFG) $(DBUS_IFACE_NAME)
 
+.PHONY: cli
+cli: interface
+	cd src/cli && $(MAKE)
+
+,PHONY: clean-cli
+clean-cli:
+	cd src/cli && $(MAKE) clean
+
+clean: clean-cli
+
 $(SOURCES): $(ADAPTER)
 
 $(DBUS_IFACE_XML): src/nickel_dbus.h | $(IFACE_DIR)

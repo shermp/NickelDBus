@@ -93,9 +93,9 @@ $(OBJECTS_MOC): %.moc.o: %.moc
 $(MOCS_MOC): %.moc: %.h
 	$(call nh_cmd_moch,$@,$^)
 
-.PHONY: cli clean
+.PHONY: all clean
 
-cli: $(BINARY)
+all: $(BINARY)
 
 clean:
 	rm -f $(GENERATED)
