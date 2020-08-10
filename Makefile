@@ -24,7 +24,7 @@ override ADAPTER  := $(IFACE_DIR)/nickel_dbus_adapter.h
 override PROXY    := $(IFACE_DIR)/nickel_dbus_proxy.h
 
 override KOBOROOT += res/$(DBUS_IFACE_CFG):/etc/dbus-1/system.d/$(DBUS_IFACE_CFG)
-override KOBOROOT += src/cli/qndb:/mnt/onboard/.adds/ndb/bin/qndb
+override KOBOROOT += src/cli/qndb:/usr/bin/qndb
 
 override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML)
 
