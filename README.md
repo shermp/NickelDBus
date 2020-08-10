@@ -10,6 +10,10 @@ Grab the latest release from the releases page, and copy the the KoboRoot.tgz to
 
 No configuration is required.
 
+## Uninstalling
+
+To uninstall NickelDBus, simply create a file called `ndb_uninstall` in the USB root (AKA `/mnt/onboard`) and reboot your Kobo.
+
 ## Usage
 
 NickelDBus is designed to give application developers a way of interacting with Kobo's nickel from a script or program. It can perform many of the same actions that NickelMenu can, and also provides a limited number of signals that can be monitored. For example, if you need to know when the content import process has completed, you can listen/wait for the `pfmDoneProcessing` signal.
@@ -23,7 +27,7 @@ And can be found at the following path:
 
 Kobo devices provide the standard `dbus-send` and `dbus-monitor` tools by default. NickelDBus is fully compatible with these tools if you wish to use them (hint, they are a PITA to use...).
 
-Alternatively, a CLI tool written Qt C++ has been created, called `qndb`. Usage is very simple:
+Alternatively, a CLI tool written in Qt has been created, called `qndb`. Usage is very simple:
 
 Call a method
 ```
@@ -48,6 +52,10 @@ qndb -s <signal_name1> -s <signal_name2> ...
 And yes, this also works for waiting for signal in method calls
 ```
 qndb -s <signal_name1> -s <signal_name2> -m <method_args>
+```
+If you want a quick reference of all the available methods to call and signals to wait for, you can do
+```
+qndb -a
 ```
 
 `qndb` returns 0 on success, or 1 otherwise.
