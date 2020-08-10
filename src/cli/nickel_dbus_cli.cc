@@ -215,7 +215,7 @@ void NDBCli::handleSignal(QString val) {
 }
 
 void NDBCli::handleTimeout() {
-    qCritical() << "timeout expired after" << timeout << "milliseconds" << endl;
+    qCritical() << "timeout expired after" << timeout << "milliseconds";
     QCoreApplication::exit(1);
 }
 
@@ -268,7 +268,7 @@ void NDBCli::printAPI() {
 
 void NDBCli::start() {
     if (!ndb->isValid()) {
-        qCritical() << "interface not valid" << endl;
+        qCritical() << "interface not valid";
         QCoreApplication::exit(1);
     }
     if (printApi) {
@@ -277,13 +277,13 @@ void NDBCli::start() {
     }
     if (signalNames.size() > 0) {
         if (connectSignals() != 0) {
-            qCritical() << "failed with: " << errString << endl;
+            qCritical() << "failed with: " << errString;
             QCoreApplication::exit(1);
         }
     }
     if (!methodName.isEmpty()) {
         if (callMethod() != 0) {
-            qCritical() << "failed with: " << errString << endl;
+            qCritical() << "failed with: " << errString;
             QCoreApplication::exit(1);
         } else {
             if (signalNames.size() > 0 && signalComplete) {
