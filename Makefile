@@ -24,12 +24,9 @@ override ADAPTER  := $(IFACE_DIR)/nickel_dbus_adapter.h
 override PROXY    := $(IFACE_DIR)/nickel_dbus_proxy.h
 
 override KOBOROOT += res/$(DBUS_IFACE_CFG):/etc/dbus-1/system.d/$(DBUS_IFACE_CFG)
-ifndef NDB_EXCLUDE_CLI
-override KOBOROOT += ndb-cli/ndb-cli:/mnt/onboard/.adds/ndb/bin/ndb-cli
-endif
+override KOBOROOT += src/cli/qndb:/mnt/onboard/.adds/ndb/bin/qndb
 
 override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML)
-override GITIGNORE += ndb-cli/ndb-cli
 
 .PHONY: interface
 interface: $(ADAPTER) $(PROXY)
