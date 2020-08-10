@@ -38,6 +38,7 @@ class NDBCli : public QObject {
         bool validateArgCount();
         int connectSignals();
         void processSignal(QString name, QString param = QString());
+        void printMethods(int methodType);
         void printAPI();
 };
 
