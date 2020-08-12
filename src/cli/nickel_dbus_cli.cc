@@ -91,6 +91,7 @@ int NDBCli::printMethodReply(void *reply) {
     return rv;
 }
 
+// This method leaks. It's probably not worth the hassle to make it not leak.
 int NDBCli::callMethodInvoke() {
     int methodIndex = getMethodIndex();
     if (methodIndex < 0) {
@@ -101,6 +102,7 @@ int NDBCli::callMethodInvoke() {
     QList<void*> params = QList<void*>();
     QList<QGenericArgument> genericArgs = QList<QGenericArgument>();
     for (int i = 0; i < m.parameterCount(); ++i) {
+        // This is the leaky bit, as QMetaType::create() does a heap allocation
         params.append(QMetaType::create(m.parameterType(i)));
         if (!convertParam(i, m.parameterType(i), params.at(i))) {
             errString = QString("unable to convert parameter %1").arg(QString(m.parameterNames().at(i)));
