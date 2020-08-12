@@ -8,24 +8,6 @@
 
 #include "nickel_dbus_cli.h"
 
-#define NDBCLI_CALL_METHOD(retType, method) QDBusPendingReply<retType> r = method;          \
-r.waitForFinished();                                                                        \
-if (!r.isError()) {                                                                         \
-    if (r.count() > 0) {QTextStream(stdout) << r.value() << endl;}                          \
-    return 0;                                                                               \
-} else {                                                                                    \
-    errString = QString("method failed with err: %1 and message: %2").arg(QDBusError::errorString(r.error().type())).arg(r.error().message()); \
-    return -1;                                                                               \
-}
-#define NDBCLI_CALL_METHOD_VOID(method) QDBusPendingReply<> r = method;                     \
-r.waitForFinished();                                                                        \
-if (!r.isError()) {                                                                         \
-    return 0;                                                                               \
-} else {                                                                                    \
-    errString = QString("method failed with err: %1 and message: %2").arg(QDBusError::errorString(r.error().type())).arg(r.error().message()); \
-    return -1;                                                                               \
-}
-
 #define NDBCLI_HANDLE_SIG_BODY() QMetaMethod method = sender()->metaObject()->method(senderSignalIndex()); \
     processSignal(QString(method.name()), QString(" %1").arg(val));
 
@@ -55,129 +37,85 @@ int NDBCli::getMethodIndex() {
     return -1;
 }
 
-QVariantList NDBCli::convertParams(int methodIndex, bool *ok) {
-    QVariantList args = QVariantList();
-    QMetaMethod m = ndb->metaObject()->method(methodIndex);
-    QList<QByteArray> paramNames = m.parameterNames();
-    for (int i = 0; i < m.parameterCount(); ++i) {
-        switch (m.parameterType(i)) {
-        case QMetaType::Type::Int:
-            args.append(methodArgs.at(i).toInt(ok)); 
-            if (!*ok) {
-                errString = QString("could not parse integer: %1").arg(QString(paramNames.at(i)));
-            } 
-            break;
-        case QMetaType::Type::Bool:
-            *ok = true;
-            if (!methodArgs.at(i).compare("true", Qt::CaseInsensitive) || !methodArgs.at(i).compare("t", Qt::CaseInsensitive)) {
-                args.append(true);
-            } else if (!methodArgs.at(i).compare("false", Qt::CaseInsensitive) || !methodArgs.at(i).compare("f", Qt::CaseInsensitive)) {
-                args.append(false);
-            } else {
-                errString =  QString("could not parse bool: %1. One of 'true', 't', 'false', 'f' required").arg(QString(paramNames.at(i)));
-                *ok = false;
-            }
-            break;
-        case QMetaType::Type::QString:
-            args.append(methodArgs.at(i));
-            *ok = true;
-            break;
-        default:
-            errString =  QString("unsupported type: %1").arg(QString(paramNames.at(i)));
-            *ok = false;
+bool NDBCli::convertParam(int index, int typeID, void *param) {
+    bool ok = false;
+    if (typeID == QMetaType::Type::Int) {
+        int *i = reinterpret_cast<int*> (param);
+        *i = methodArgs.at(index).toInt(&ok); 
+    } else if (typeID == QMetaType::Type::Bool) {
+        bool *b = reinterpret_cast<bool*> (param);
+        ok = true;
+        if (!methodArgs.at(index).compare("true", Qt::CaseInsensitive) || !methodArgs.at(index).compare("t", Qt::CaseInsensitive)) {
+            *b = true;
+        } else if (!methodArgs.at(index).compare("false", Qt::CaseInsensitive) || !methodArgs.at(index).compare("f", Qt::CaseInsensitive)) {
+            *b = false;
+        } else {
+            ok = false;
         }
-        if (!*ok) {
-            return args;
-        }
+    } else if (typeID == QMetaType::Type::QString) {
+        QString *s = reinterpret_cast<QString*> (param);
+        s->append(methodArgs.at(index));
+        ok = true;
     }
-    return args;
+    return ok;
 }
 
-int NDBCli::callMethod() {
-    // Forgive the if-ladder, but it's the easiest way to do this... Note, this
-    // can probably be done more consisely with QMetaObjects and QMetaMethods,
-    // but dealing with the types there makes my head hurt...
-    //
-    // To elaborate, first we must obtain the QMetaMethod (easy enough). Then we
-    // have to get the number of parameters for that method. Following that, one
-    // has to convert the QString args from the command list into usable types,
-    // perhaps into a QVariantList. Invoking the method involves setting the
-    // parameters using Q_ARG() macros, which involve knowing the type of each
-    // arg. And then there's the return value. That requires a pre-declared
-    // variable, and it's type, and the invoke method stores the return value
-    // there. Our return type happens to be a templated class
-    // (QDBusPendingReply<T>).
-    //
-    // I've decided it's all in the too-hard basket.
+template<typename T>
+void NDBCli::printMethodReply(void *reply) {
+    QDBusPendingReply<T> *r = reinterpret_cast<QDBusPendingReply<T>*>(reply);
+    if (r->count() > 0) {
+        QTextStream(stdout) << r->value() << endl;
+    }
+}
+
+int NDBCli::callMethodInvoke() {
     int methodIndex = getMethodIndex();
     if (methodIndex < 0) {
         errString = QStringLiteral("non-existent method or invalid parameter count");
         return -1;
     }
-    bool args_ok;
-    QVariantList args = convertParams(methodIndex, &args_ok);
-    if (!args_ok) {
-        // convertArgs already sets the error string
+    QMetaMethod m = ndb->metaObject()->method(methodIndex);
+    QList<void*> params = QList<void*>();
+    QList<QGenericArgument> genericArgs = QList<QGenericArgument>();
+    for (int i = 0; i < m.parameterCount(); ++i) {
+        params.append(QMetaType::create(m.parameterType(i)));
+        if (!convertParam(i, m.parameterType(i), params.at(i))) {
+            errString = QString("unable to convert parameter %1").arg(QString(m.parameterNames().at(i)));
+            return -1;
+        }
+        genericArgs.append(QGenericArgument(m.parameterNames().at(i), params.at(i)));
+    }
+    for (int i = m.parameterCount(); i < 10; ++i) {
+        genericArgs.append(QGenericArgument());
+    }
+    qRegisterMetaType<QDBusPendingReply<>>("QDBusPendingReply<>");
+    int strPR = qRegisterMetaType<QDBusPendingReply<QString>>("QDBusPendingReply<QString>");
+    int boolPR = qRegisterMetaType<QDBusPendingReply<bool>>("QDBusPendingReply<bool>");
+    int intPR = qRegisterMetaType<QDBusPendingReply<int>>("QDBusPendingReply<int>");
+    int id = QMetaType::type(m.typeName());
+    if (id == QMetaType::UnknownType) {
+        errString = QStringLiteral("could not create variable of unknown type");
         return -1;
     }
-    if (!methodName.compare("ndbVersion")) {
-        NDBCLI_CALL_METHOD(QString, ndb->ndbVersion());
-    } else if (!methodName.compare("miscNickelClassDetails")) {
-        NDBCLI_CALL_METHOD(QString, ndb->miscNickelClassDetails(args.at(0).toString()));
-    } else if (!methodName.compare("miscSignalConnected")) {
-        NDBCLI_CALL_METHOD(bool, ndb->miscSignalConnected(args.at(0).toString()));
-    } else if (!methodName.compare("mwcToast")) {
-        if (methodArgs.size() == 2) {
-            NDBCLI_CALL_METHOD_VOID(ndb->mwcToast(args.at(0).toInt(), args.at(1).toString()));
-        } else {
-            NDBCLI_CALL_METHOD_VOID(ndb->mwcToast(args.at(0).toInt(), args.at(1).toString(), args.at(2).toString()));
-        }
-    } else if (!methodName.compare("mwcHome")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->mwcHome());
-    } else if (!methodName.compare("dlgConfirmNoBtn")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmNoBtn(args.at(0).toString(), args.at(1).toString()));
-    } else if (!methodName.compare("dlgConfirmAccept")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmAccept(args.at(0).toString(), args.at(1).toString(), args.at(2).toString()));
-    } else if (!methodName.compare("dlgConfirmReject")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmReject(args.at(0).toString(), args.at(1).toString(), args.at(2).toString()));
-    } else if (!methodName.compare("dlgConfirmAcceptReject")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->dlgConfirmAcceptReject(args.at(0).toString(), args.at(1).toString(), args.at(2).toString(), args.at(3).toString()));
-    } else if (!methodName.compare("pfmRescanBooks")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->pfmRescanBooks());
-    } else if (!methodName.compare("pfmRescanBooksFull")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->pfmRescanBooksFull());
-    } else if (!methodName.compare("wfmConnectWireless")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->wfmConnectWireless());
-    } else if (!methodName.compare("wfmConnectWirelessSilently")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->wfmConnectWirelessSilently());
-    } else if (!methodName.compare("wfmSetAirplaneMode")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->wfmSetAirplaneMode(args.at(0).toString()));
-    } else if (!methodName.compare("bwmOpenBrowser")) {
-        if (methodArgs.count() > 0) {
-            if (methodArgs.count() == 1) {
-                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(args.at(0).toBool()));
-            } else if (methodArgs.count() == 2) {
-                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(args.at(0).toBool(), args.at(1).toString()));
-            } else {
-                NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser(args.at(0).toBool(), args.at(1).toString(), args.at(2).toString()));
-            }
-        }
-        NDBCLI_CALL_METHOD_VOID(ndb->bwmOpenBrowser());
-    } else if (!methodName.compare("nsInvert")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsInvert(args.at(0).toString()));
-    } else if (!methodName.compare("nsLockscreen")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsLockscreen(args.at(0).toString()));
-    } else if (!methodName.compare("nsScreenshots")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsScreenshots(args.at(0).toString()));
-    } else if (!methodName.compare("nsForceWifi")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->nsForceWifi(args.at(0).toString()));
-    } else if (!methodName.compare("pwrShutdown")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->pwrShutdown());
-    } else if (!methodName.compare("pwrReboot")) {
-        NDBCLI_CALL_METHOD_VOID(ndb->pwrReboot());
-    } 
-    errString = QStringLiteral("unknown method");
-    return -1;
+    void *ret = QMetaType::create(id);
+    if (!ret) {
+        errString = QStringLiteral("unable to create return variable");
+        return -1;
+    }
+    if (!m.invoke(ndb, 
+        Qt::DirectConnection, 
+        QGenericReturnArgument(m.typeName(), ret), 
+        genericArgs.at(0), genericArgs.at(1), genericArgs.at(2), genericArgs.at(3), genericArgs.at(4),
+        genericArgs.at(5), genericArgs.at(6), genericArgs.at(7), genericArgs.at(8), genericArgs.at(9)
+    )) {
+        errString = QString("unable to call method %1").arg(QString(m.methodSignature()));
+        return -1;
+    }
+    // Stupid templated class. Is there a way of making the following more generic?
+    if      (id == strPR)  {printMethodReply<QString>(ret);}
+    else if (id == boolPR) {printMethodReply<bool>(ret);}
+    else if (id == intPR)  {printMethodReply<int>(ret);}
+    return 0;
 }
 
 int NDBCli::connectSignals() {
@@ -310,7 +248,7 @@ void NDBCli::start() {
         }
     }
     if (!methodName.isEmpty()) {
-        if (callMethod() != 0) {
+        if (callMethodInvoke() != 0) {
             qCritical() << "failed with: " << errString;
             QCoreApplication::exit(1);
         } else {
