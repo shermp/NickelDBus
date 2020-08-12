@@ -111,6 +111,10 @@ int NDBCli::callMethodInvoke() {
         return -1;
     }
     QMetaMethod m = ndb->metaObject()->method(methodIndex);
+    if (m.parameterCount() > 10) {
+        errString = QStringLiteral("a maximum of 10 parameters are allowed");
+        return -1;
+    }
     MethodParamList params = MethodParamList();
     for (int i = 0; i < m.parameterCount(); ++i) {
         params.mp[i].type = m.parameterType(i);
