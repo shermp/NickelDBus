@@ -17,6 +17,19 @@
     errString = QString("unable to connect %1 to handleSignals()").arg(QString(method.methodSignature()));                    \
     return -1;}
 
+MethodParamList::MethodParamList() {
+    mp.resize(10);
+}
+
+MethodParamList::~MethodParamList() {
+    for (int i = 0; i < mp.size(); ++i) {
+        if (mp[i].param) {
+            QMetaType::destroy(mp[i].type, mp[i].param);
+        }
+    }
+}
+
+
 NDBCli::NDBCli(QObject* parent, com::github::shermp::nickeldbus *ndb) : QObject(parent) {
     this->ndb = ndb;
     signalComplete = methodComplete = false;
@@ -91,11 +104,6 @@ int NDBCli::printMethodReply(void *reply) {
     return rv;
 }
 
-// Quick and dirty macro to plug some leaks
-#define NDBCLI_METHOD_CLEANUP() for (int k = 0; k < m.parameterCount(); ++k) { \
-        if (params[k]) {QMetaType::destroy(m.parameterType(k), params[k]);} \
-    }
-
 int NDBCli::callMethodInvoke() {
     int methodIndex = getMethodIndex();
     if (methodIndex < 0) {
@@ -103,19 +111,15 @@ int NDBCli::callMethodInvoke() {
         return -1;
     }
     QMetaMethod m = ndb->metaObject()->method(methodIndex);
-    QList<void*> params = QList<void*>();
-    QList<QGenericArgument> genericArgs = QList<QGenericArgument>();
+    MethodParamList params = MethodParamList();
     for (int i = 0; i < m.parameterCount(); ++i) {
-        params.append(QMetaType::create(m.parameterType(i)));
-        if (!convertParam(i, m.parameterType(i), params.at(i))) {
+        params.mp[i].type = m.parameterType(i);
+        params.mp[i].param = QMetaType::create(params.mp[i].type);
+        if (!convertParam(i, params.mp[i].type, params.mp[i].param)) {
             errString = QString("unable to convert parameter %1").arg(QString(m.parameterNames().at(i)));
-            NDBCLI_METHOD_CLEANUP();
             return -1;
         }
-        genericArgs.append(QGenericArgument(m.parameterNames().at(i), params.at(i)));
-    }
-    for (int i = m.parameterCount(); i < 10; ++i) {
-        genericArgs.append(QGenericArgument());
+        params.mp[i].genericArg = QGenericArgument(m.parameterNames().at(i), params.mp[i].param);
     }
     // QDBusPendingReply<> doesn't appear to be a QObject, and even if it is, it
     // isn't registered as a QMetaType. We'll take care of it here, and register
@@ -128,24 +132,21 @@ int NDBCli::callMethodInvoke() {
     int id = QMetaType::type(m.typeName());
     if (id == QMetaType::UnknownType) {
         errString = QStringLiteral("could not create variable of unknown type");
-        NDBCLI_METHOD_CLEANUP();
         return -1;
     }
     void *ret = QMetaType::create(id);
     if (!ret) {
         errString = QStringLiteral("unable to create return variable");
-        NDBCLI_METHOD_CLEANUP();
         return -1;
     }
     if (!m.invoke(ndb, 
         Qt::DirectConnection, 
         QGenericReturnArgument(m.typeName(), ret), 
-        genericArgs.at(0), genericArgs.at(1), genericArgs.at(2), genericArgs.at(3), genericArgs.at(4),
-        genericArgs.at(5), genericArgs.at(6), genericArgs.at(7), genericArgs.at(8), genericArgs.at(9)
+        params.mp[0].genericArg, params.mp[1].genericArg, params.mp[2].genericArg, params.mp[3].genericArg, params.mp[4].genericArg,
+        params.mp[5].genericArg, params.mp[6].genericArg, params.mp[7].genericArg, params.mp[8].genericArg, params.mp[9].genericArg
     )) {
         errString = QString("unable to call method %1").arg(QString(m.methodSignature()));
         QMetaType::destroy(id, ret);
-        NDBCLI_METHOD_CLEANUP();
         return -1;
     }
     // Stupid templated class. Is there a way of making the following more generic?
@@ -156,7 +157,6 @@ int NDBCli::callMethodInvoke() {
     else if (id == intPR)  {printRV = printMethodReply<int>(ret);}
     else {printRV = -1;}
     QMetaType::destroy(id, ret);
-    NDBCLI_METHOD_CLEANUP();
     return printRV;
 }
 

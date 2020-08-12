@@ -2,7 +2,19 @@
 #define NICKEL_DBUS_CLI_H
 
 #include <QObject>
+#include <QVector>
 #include "../interface/nickel_dbus_proxy.h"
+
+struct MethodParamList {
+    struct MethodParam {
+        int type;
+        void *param;
+        QGenericArgument genericArg;
+    };
+    QVector<MethodParam> mp;
+    MethodParamList();
+    ~MethodParamList();
+};
 
 class NDBCli : public QObject {
     Q_OBJECT
