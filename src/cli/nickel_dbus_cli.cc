@@ -10,8 +10,7 @@
 
 #include "nickel_dbus_cli.h"
 
-#define NDBCLI_HANDLE_SIG_BODY() QMetaMethod method = sender()->metaObject()->method(senderSignalIndex()); \
-    processSignal(QString(method.name()), QString(" %1").arg(val));
+#define NDBCLI_HANDLE_SIG_BODY() processSignal(QString(sender()->metaObject()->method(senderSignalIndex()).name()), QString(" %1").arg(val));
 
 #define NDBCLI_CONNECT_SIGNAL(type) if (!QObject::connect(ndb, "2" + method.methodSignature(), this, SLOT(handleSignal(type)))) { \
     errString = QString("unable to connect %1 to handleSignals()").arg(QString(method.methodSignature()));                    \
@@ -206,8 +205,7 @@ void NDBCli::processSignal(QString name, QString param) {
 }
 
 void NDBCli::handleSignal() {
-    QMetaMethod method = sender()->metaObject()->method(senderSignalIndex());
-    processSignal(QString(method.name()));
+    processSignal(QString(sender()->metaObject()->method(senderSignalIndex()).name()));
 }
 
 void NDBCli::handleSignal(int val) {
