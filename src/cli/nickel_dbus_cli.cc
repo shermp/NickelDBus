@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <QTimer>
 
+#include <type_traits>
+
 #include "nickel_dbus_cli.h"
 
 #define NDBCLI_HANDLE_SIG_BODY() QMetaMethod method = sender()->metaObject()->method(senderSignalIndex()); \
@@ -61,11 +63,32 @@ bool NDBCli::convertParam(int index, int typeID, void *param) {
 }
 
 template<typename T>
-void NDBCli::printMethodReply(void *reply) {
+int NDBCli::printMethodReply(void *reply) {
+    int rv = -1;
     QDBusPendingReply<T> *r = reinterpret_cast<QDBusPendingReply<T>*>(reply);
-    if (r->count() > 0) {
-        QTextStream(stdout) << r->value() << endl;
+    r->waitForFinished();
+    if (!r->isError()) {
+        if (r->count() > 0) {
+            QTextStream(stdout) << r->value() << endl;
+        }
+        rv = 0;
+    } else {
+        errString = QString("method failed with err: %1 and message: %2").arg(QDBusError::errorString(r->error().type())).arg(r->error().message());
     }
+    return rv;
+}
+
+// We seem to need to make this a separate function from above, as the compiler
+// throws a fit when typename parameter is void.
+int NDBCli::printMethodReply(void *reply) {
+    int rv = -0;
+    QDBusPendingReply<> *r = reinterpret_cast<QDBusPendingReply<>*>(reply);
+    r->waitForFinished();
+    if (r->isError()) {
+        errString = QString("method failed with err: %1 and message: %2").arg(QDBusError::errorString(r->error().type())).arg(r->error().message());
+        rv = -1;
+    }
+    return rv;
 }
 
 int NDBCli::callMethodInvoke() {
@@ -92,7 +115,7 @@ int NDBCli::callMethodInvoke() {
     // isn't registered as a QMetaType. We'll take care of it here, and register
     // one of every type we may currently encounter (plus int, because it could
     // be used in the future).
-    qRegisterMetaType<QDBusPendingReply<>>("QDBusPendingReply<>");
+    int voidPR = qRegisterMetaType<QDBusPendingReply<>>("QDBusPendingReply<>");
     int strPR = qRegisterMetaType<QDBusPendingReply<QString>>("QDBusPendingReply<QString>");
     int boolPR = qRegisterMetaType<QDBusPendingReply<bool>>("QDBusPendingReply<bool>");
     int intPR = qRegisterMetaType<QDBusPendingReply<int>>("QDBusPendingReply<int>");
@@ -116,10 +139,13 @@ int NDBCli::callMethodInvoke() {
         return -1;
     }
     // Stupid templated class. Is there a way of making the following more generic?
-    if      (id == strPR)  {printMethodReply<QString>(ret);}
-    else if (id == boolPR) {printMethodReply<bool>(ret);}
-    else if (id == intPR)  {printMethodReply<int>(ret);}
-    return 0;
+    int printRV;
+    if      (id == voidPR) {printRV = printMethodReply(ret);}
+    else if (id == strPR)  {printRV = printMethodReply<QString>(ret);}
+    else if (id == boolPR) {printRV = printMethodReply<bool>(ret);}
+    else if (id == intPR)  {printRV = printMethodReply<int>(ret);}
+    else {printRV = -1;}
+    return printRV;
 }
 
 int NDBCli::connectSignals() {

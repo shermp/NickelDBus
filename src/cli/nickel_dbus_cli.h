@@ -36,7 +36,8 @@ class NDBCli : public QObject {
         com::github::shermp::nickeldbus* ndb;
         int callMethodInvoke();
         template<typename T>
-        void printMethodReply(void *reply);
+        int printMethodReply(void *reply);
+        int printMethodReply(void *reply);
         bool convertParam(int index, int typeID, void *param);
         int getMethodIndex();
         int connectSignals();
