@@ -91,7 +91,11 @@ int NDBCli::printMethodReply(void *reply) {
     return rv;
 }
 
-// This method leaks. It's probably not worth the hassle to make it not leak.
+// Quick and dirty macro to plug some leaks
+#define NDBCLI_METHOD_CLEANUP() for (int k = 0; k < m.parameterCount(); ++k) { \
+        if (params[k]) {QMetaType::destroy(m.parameterType(k), params[k]);} \
+    }
+
 int NDBCli::callMethodInvoke() {
     int methodIndex = getMethodIndex();
     if (methodIndex < 0) {
@@ -102,10 +106,10 @@ int NDBCli::callMethodInvoke() {
     QList<void*> params = QList<void*>();
     QList<QGenericArgument> genericArgs = QList<QGenericArgument>();
     for (int i = 0; i < m.parameterCount(); ++i) {
-        // This is the leaky bit, as QMetaType::create() does a heap allocation
         params.append(QMetaType::create(m.parameterType(i)));
         if (!convertParam(i, m.parameterType(i), params.at(i))) {
             errString = QString("unable to convert parameter %1").arg(QString(m.parameterNames().at(i)));
+            NDBCLI_METHOD_CLEANUP();
             return -1;
         }
         genericArgs.append(QGenericArgument(m.parameterNames().at(i), params.at(i)));
@@ -124,11 +128,13 @@ int NDBCli::callMethodInvoke() {
     int id = QMetaType::type(m.typeName());
     if (id == QMetaType::UnknownType) {
         errString = QStringLiteral("could not create variable of unknown type");
+        NDBCLI_METHOD_CLEANUP();
         return -1;
     }
     void *ret = QMetaType::create(id);
     if (!ret) {
         errString = QStringLiteral("unable to create return variable");
+        NDBCLI_METHOD_CLEANUP();
         return -1;
     }
     if (!m.invoke(ndb, 
@@ -138,6 +144,8 @@ int NDBCli::callMethodInvoke() {
         genericArgs.at(5), genericArgs.at(6), genericArgs.at(7), genericArgs.at(8), genericArgs.at(9)
     )) {
         errString = QString("unable to call method %1").arg(QString(m.methodSignature()));
+        QMetaType::destroy(id, ret);
+        NDBCLI_METHOD_CLEANUP();
         return -1;
     }
     // Stupid templated class. Is there a way of making the following more generic?
@@ -147,6 +155,8 @@ int NDBCli::callMethodInvoke() {
     else if (id == boolPR) {printRV = printMethodReply<bool>(ret);}
     else if (id == intPR)  {printRV = printMethodReply<int>(ret);}
     else {printRV = -1;}
+    QMetaType::destroy(id, ret);
+    NDBCLI_METHOD_CLEANUP();
     return printRV;
 }
 
