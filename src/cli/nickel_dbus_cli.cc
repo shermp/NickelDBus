@@ -88,6 +88,10 @@ int NDBCli::callMethodInvoke() {
     for (int i = m.parameterCount(); i < 10; ++i) {
         genericArgs.append(QGenericArgument());
     }
+    // QDBusPendingReply<> doesn't appear to be a QObject, and even if it is, it
+    // isn't registered as a QMetaType. We'll take care of it here, and register
+    // one of every type we may currently encounter (plus int, because it could
+    // be used in the future).
     qRegisterMetaType<QDBusPendingReply<>>("QDBusPendingReply<>");
     int strPR = qRegisterMetaType<QDBusPendingReply<QString>>("QDBusPendingReply<QString>");
     int boolPR = qRegisterMetaType<QDBusPendingReply<bool>>("QDBusPendingReply<bool>");
