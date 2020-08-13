@@ -28,7 +28,6 @@ MethodParamList::~MethodParamList() {
     }
 }
 
-
 NDBCli::NDBCli(QObject* parent, com::github::shermp::nickeldbus *ndb) : QObject(parent) {
     this->ndb = ndb;
     signalComplete = methodComplete = false;

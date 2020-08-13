@@ -57,8 +57,9 @@ If you want a quick reference of all the available methods to call and signals t
 ```
 qndb -a
 ```
+Note that for boolean outputs from `qndb`, *true* is `1` and *false* is `0`.
 
-`qndb` returns 0 on success, or 1 otherwise.
+`qndb` itself returns `0` on success, or `1` otherwise.
 
 ### Language bindings
 
