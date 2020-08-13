@@ -10,12 +10,6 @@
 
 #include "nickel_dbus_cli.h"
 
-#define NDBCLI_HANDLE_SIG_BODY() processSignal(QString(sender()->metaObject()->method(senderSignalIndex()).name()), QString(" %1").arg(val));
-
-#define NDBCLI_CONNECT_SIGNAL(type) if (!QObject::connect(ndb, "2" + method.methodSignature(), this, SLOT(handleSignal(type)))) { \
-    errString = QString("unable to connect %1 to handleSignals()").arg(QString(method.methodSignature()));                    \
-    return -1;}
-
 MethodParamList::MethodParamList() {
     mp.resize(10);
 }
@@ -163,64 +157,40 @@ int NDBCli::callMethodInvoke() {
 }
 
 int NDBCli::connectSignals() {
-    const QMetaObject *mo = ndb->metaObject();
-    for (int i = 0; i < signalNames.size(); ++i) {
-        for (int j = mo->methodOffset(); j < mo->methodCount(); ++j ) {
-            QMetaMethod method = mo->method(j);
-            if (!QString(method.name()).compare(signalNames.at(i)) && method.methodType() == QMetaMethod::Signal) {
-                if (method.parameterCount() == 0) {
-                    NDBCLI_CONNECT_SIGNAL();
-                } else if (method.parameterCount() == 1) {
-                    switch (method.parameterType(0)) {
-                    case QMetaType::Type::Int:
-                        NDBCLI_CONNECT_SIGNAL(int); break;
-                    case QMetaType::Type::Bool:
-                        NDBCLI_CONNECT_SIGNAL(bool); break;
-                    case QMetaType::Type::Double:
-                        NDBCLI_CONNECT_SIGNAL(double); break;
-                    case QMetaType::Type::QString:
-                        NDBCLI_CONNECT_SIGNAL(QString); break;
-                    default:
-                        errString = QString("cannot handle signal with type %1").arg(QMetaType::typeName(method.parameterType(0)));
-                        return -1;
-                    }
-                } else {
-                    errString = QString("cannot handle signal with more than one parameter");
-                    return -1;
-                }
-            }
-        }
-    }
+    // Connect signals to handleSignal() using C++11 lambda expressions
+    // Not sure if this is better or worse than the previous implementation 
+    QObject::connect(ndb, &NickelDBusProxy::dlgConfirmResult, [this](int result){handleSignal(QStringLiteral("dlgConfirmResult"), QVariant(result));});
+    QObject::connect(ndb, &NickelDBusProxy::pfmAboutToConnect, [this](){handleSignal(QStringLiteral("pfmAboutToConnect"));});
+    QObject::connect(ndb, &NickelDBusProxy::pfmDoneProcessing, [this](){handleSignal(QStringLiteral("pfmDoneProcessing"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmLinkQualityForConnectedNetwork, [this](double quality){handleSignal(QStringLiteral("wmLinkQualityForConnectedNetwork"), QVariant(quality));});
+    QObject::connect(ndb, &NickelDBusProxy::wmMacAddressAvailable, [this](const QString &mac){handleSignal(QStringLiteral("wmMacAddressAvailable"), QVariant(mac));});
+    QObject::connect(ndb, &NickelDBusProxy::wmNetworkConnected, [this](){handleSignal(QStringLiteral("wmNetworkConnected"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmNetworkDisconnected, [this](){handleSignal(QStringLiteral("wmNetworkDisconnected"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmNetworkFailedToConnect, [this](){handleSignal(QStringLiteral("wmNetworkFailedToConnect"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmNetworkForgotten, [this](){handleSignal(QStringLiteral("wmNetworkForgotten"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmScanningAborted, [this](){handleSignal(QStringLiteral("wmScanningAborted"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmScanningFinished, [this](){handleSignal(QStringLiteral("wmScanningFinished"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmScanningStarted, [this](){handleSignal(QStringLiteral("wmScanningStarted"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmTryingToConnect, [this](){handleSignal(QStringLiteral("wmTryingToConnect"));});
+    QObject::connect(ndb, &NickelDBusProxy::wmWifiEnabled, [this](bool enabled){handleSignal(QStringLiteral("wmWifiEnabled"), QVariant(enabled));});
     return 0;
 }
 
-void NDBCli::processSignal(QString name, QString param) {
-    QTextStream(stdout) << name << param << endl;
-    if (methodName.isEmpty() || methodComplete) {
+void NDBCli::handleSignal(const QString& sigName, QVariant val1, QVariant val2, QVariant val3, QVariant val4) {
+    if (signalNames.contains(sigName)) {
+        QTextStream out(stdout);
+        out << sigName;
+        if (val1.isValid()) { out << " " << val1.toString(); }
+        if (val2.isValid()) { out << " " << val2.toString(); }
+        if (val3.isValid()) { out << " " << val3.toString(); }
+        if (val4.isValid()) { out << " " << val4.toString(); }
+        out << endl;
+        if (methodName.isEmpty() || methodComplete) {
         QCoreApplication::quit();
-    } else {
-        signalComplete = true;
+        } else {
+            signalComplete = true;
+        }
     }
-}
-
-void NDBCli::handleSignal() {
-    processSignal(QString(sender()->metaObject()->method(senderSignalIndex()).name()));
-}
-
-void NDBCli::handleSignal(int val) {
-    NDBCLI_HANDLE_SIG_BODY();
-}
-
-void NDBCli::handleSignal(bool val) {
-    NDBCLI_HANDLE_SIG_BODY();
-}
-
-void NDBCli::handleSignal(double val) {
-    NDBCLI_HANDLE_SIG_BODY();
-}
-
-void NDBCli::handleSignal(QString val) {
-    NDBCLI_HANDLE_SIG_BODY();
 }
 
 void NDBCli::handleTimeout() {
