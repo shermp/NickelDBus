@@ -17,12 +17,12 @@ int main(int argc, char **argv) {
     parser.addPositionalArgument("arguments", "Arguments to pass to method. Have no affect when a method is not set.", "[args...]");
 
     QCommandLineOption signalOption(QStringList() << "s" << "signal", "Wait for signal, and prints its output, if any.", "signal name");
-    parser.addOption(signalOption);
     QCommandLineOption timeoutOption(QStringList() << "t" << "timeout", "Signal timeout in milliseconds.", "timeout ms");
-    parser.addOption(timeoutOption);
     QCommandLineOption methodOption(QStringList() << "m" << "method", "Method to invoke.", "method name");
-    parser.addOption(methodOption);
     QCommandLineOption apiOption(QStringList() << "a" << "api", "Print API usage");
+    parser.addOption(signalOption);
+    parser.addOption(timeoutOption);
+    parser.addOption(methodOption);
     parser.addOption(apiOption);
 
     parser.process(app);
