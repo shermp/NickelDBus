@@ -10,12 +10,16 @@ Grab the latest release from the releases page, and copy the the KoboRoot.tgz to
 
 No configuration is required.
 
+## Uninstalling
+
+To uninstall NickelDBus, simply create a file called `ndb_uninstall` in the USB root (AKA `/mnt/onboard`) and reboot your Kobo.
+
 ## Usage
 
 NickelDBus is designed to give application developers a way of interacting with Kobo's nickel from a script or program. It can perform many of the same actions that NickelMenu can, and also provides a limited number of signals that can be monitored. For example, if you need to know when the content import process has completed, you can listen/wait for the `pfmDoneProcessing` signal.
 
 NickelDBus exports the following interface:
-```local.shermp.nickeldbus```
+```com.github.shermp.nickeldbus```
 And can be found at the following path:
 ```/nickeldbus```
 
@@ -23,43 +27,50 @@ And can be found at the following path:
 
 Kobo devices provide the standard `dbus-send` and `dbus-monitor` tools by default. NickelDBus is fully compatible with these tools if you wish to use them (hint, they are a PITA to use...).
 
-Alternatively, a CLI tool written in Go has been created, called `ndb-cli`. Usage is very simple:
+Alternatively, a CLI tool written in Qt has been created, called `qndb`. Usage is very simple:
 
 Call a method
 ```
-ndb-cli method <method_name> <method_args>
+qndb -m <method_name> <method_args>
 ```
 Wait indefinitely for a signal. The signal name and any of its outputs will be printed to stdout (space delimited)
 ```
-ndb-cli signal <signal_name>
+qndb -s <signal_name>
 ```
-Wait for a signal, with a 10s timeout
+Wait for a signal, with a 10s timeout (timeout is expressed in milliseconds)
 ```
-ndb-cli signal --timeout 10 <signal_name>
+qndb -t 10000 -s <signal_name>
 ```
 Call a method, then wait for a signal, and timeout after 10s
 ```
-ndb-cli method --signal <signal_name> --signal-timeout 10 <method_name> <method_args>
+qndb -s <signal_name> -t 10000 -m <method_name> <method_args>
 ```
-It's possible to listen for multiple signals. The first signal that is recieved that matches one of the desired signals is output.
+It's possible to listen for multiple signals. The first signal that is received that matches one of the desired signals is output.
 ```
-ndb-cli signal <signal_name1> <signal_name2> ...
+qndb -s <signal_name1> -s <signal_name2> ...
 ```
 And yes, this also works for waiting for signal in method calls
 ```
-ndb-cli method --signal <signal_name1> --signal <signal_name2> <method_name> <method_args>
+qndb -s <signal_name1> -s <signal_name2> -m <method_args>
 ```
+If you want a quick reference of all the available methods to call and signals to wait for, you can do
+```
+qndb -a
+```
+Note that for boolean outputs from `qndb`, *true* is `1` and *false* is `0`.
 
-`ndb-cli` returns 0 on success, or 1 otherwise.
+`qndb` itself returns `0` on success, or `1` otherwise.
 
 ### Language bindings
 
-Bindings are available for most programming languages. For example, `ndb-cli` uses [godbus](https://github.com/godbus/dbus) and NickelDBus itself uses [QtDbus](https://doc.qt.io/qt-5/qtdbus-index.html).
+Bindings are available for most programming languages. For example, `qndb` and NickelDBus uses [QtDbus](https://doc.qt.io/qt-5/qtdbus-index.html).
 
 ## Compiling
 
 This library was designed to be compiled with [NickelTC](https://github.com/geek1011/NickelTC).
 
-A KoboRoot.tgz that can be installed on your Kobo can be generated with `make all koboroot`.
+A KoboRoot.tgz that can be installed on your Kobo can be generated with `make koboroot`.
 
-To start developing with NickelDBus, you will first need to generate the dbus adapter headers. You can run `make adapter` to do this. Alternatively, `make all` will also do this as part of the compile process. Note, this requires the `qdbuscpp2xml` and `qdbusxml2cpp` programs from Qt, which are included with NickelTC. 
+To start developing with NickelDBus, you will first need to generate the dbus adapter and proxy headers. You can run `make interface` to do this. Alternatively, `make` will also do this as part of the compile process. Note, this requires the `qdbuscpp2xml` and `qdbusxml2cpp` programs from Qt, which are included with NickelTC.
+
+To compile `qndb`, run `make cli`. Note, you will need to run this before `make koboroot`.

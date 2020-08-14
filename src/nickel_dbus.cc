@@ -7,7 +7,7 @@
 #include "../NickelMenu/src/util.h"
 #include "util.h"
 #include "nickel_dbus.h"
-#include "adapter/nickel_dbus_adapter.h"
+#include "interface/nickel_dbus_adapter.h"
 
 NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
     new NickelDBusAdapter(this);
