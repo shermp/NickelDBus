@@ -27,12 +27,13 @@ class NDBCli : public QObject {
         void setSignalNames(QStringList names);
         void setTimeout(int timeout);
         void setPrintAPI(bool api);
-    
+        void handleSignalParam0();
+        void handleSignalParam1(QVariant val1);
     Q_SIGNALS:
         void timeoutTriggered();
     public Q_SLOTS:
         void start();
-        void handleSignal(const QString& sigName, QVariant = QVariant(), QVariant = QVariant(), QVariant = QVariant(), QVariant = QVariant());
+        
         void handleTimeout();
     private:
         QString errString;
@@ -48,9 +49,10 @@ class NDBCli : public QObject {
         int printMethodReply(void *reply);
         bool convertParam(int index, int typeID, void *param);
         int getMethodIndex();
-        int connectSignals();
+        void connectSignals();
         void printMethods(int methodType);
         void printAPI();
+        void handleSignal(const QString& sigName, QVariant = QVariant(), QVariant = QVariant(), QVariant = QVariant(), QVariant = QVariant());
 };
 
 #endif

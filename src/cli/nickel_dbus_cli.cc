@@ -156,24 +156,32 @@ int NDBCli::callMethodInvoke() {
     return printRV;
 }
 
-int NDBCli::connectSignals() {
-    // Connect signals to handleSignal() using C++11 lambda expressions
-    // Not sure if this is better or worse than the previous implementation 
-    QObject::connect(ndb, &NickelDBusProxy::dlgConfirmResult, [this](int result){handleSignal(QStringLiteral("dlgConfirmResult"), QVariant(result));});
-    QObject::connect(ndb, &NickelDBusProxy::pfmAboutToConnect, [this](){handleSignal(QStringLiteral("pfmAboutToConnect"));});
-    QObject::connect(ndb, &NickelDBusProxy::pfmDoneProcessing, [this](){handleSignal(QStringLiteral("pfmDoneProcessing"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmLinkQualityForConnectedNetwork, [this](double quality){handleSignal(QStringLiteral("wmLinkQualityForConnectedNetwork"), QVariant(quality));});
-    QObject::connect(ndb, &NickelDBusProxy::wmMacAddressAvailable, [this](const QString &mac){handleSignal(QStringLiteral("wmMacAddressAvailable"), QVariant(mac));});
-    QObject::connect(ndb, &NickelDBusProxy::wmNetworkConnected, [this](){handleSignal(QStringLiteral("wmNetworkConnected"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmNetworkDisconnected, [this](){handleSignal(QStringLiteral("wmNetworkDisconnected"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmNetworkFailedToConnect, [this](){handleSignal(QStringLiteral("wmNetworkFailedToConnect"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmNetworkForgotten, [this](){handleSignal(QStringLiteral("wmNetworkForgotten"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmScanningAborted, [this](){handleSignal(QStringLiteral("wmScanningAborted"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmScanningFinished, [this](){handleSignal(QStringLiteral("wmScanningFinished"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmScanningStarted, [this](){handleSignal(QStringLiteral("wmScanningStarted"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmTryingToConnect, [this](){handleSignal(QStringLiteral("wmTryingToConnect"));});
-    QObject::connect(ndb, &NickelDBusProxy::wmWifiEnabled, [this](bool enabled){handleSignal(QStringLiteral("wmWifiEnabled"), QVariant(enabled));});
-    return 0;
+#define NDBCLI_SIG_NAME() QString(sender()->metaObject()->method(senderSignalIndex()).name())
+#define NDBCLI_SIG_CONNECT(signal, handler) QObject::connect(ndb, &NickelDBusProxy::signal, this, &NDBCli::handler)
+
+void NDBCli::connectSignals() {
+    NDBCLI_SIG_CONNECT(dlgConfirmResult, handleSignalParam1);
+    NDBCLI_SIG_CONNECT(pfmAboutToConnect, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(pfmDoneProcessing, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmLinkQualityForConnectedNetwork, handleSignalParam1);
+    NDBCLI_SIG_CONNECT(wmMacAddressAvailable, handleSignalParam1);
+    NDBCLI_SIG_CONNECT(wmNetworkConnected, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmNetworkDisconnected, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmNetworkFailedToConnect, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmNetworkForgotten, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmScanningAborted, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmScanningFinished, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmScanningStarted, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmTryingToConnect, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(wmWifiEnabled, handleSignalParam1);
+}
+
+void NDBCli::handleSignalParam0() {
+    handleSignal(NDBCLI_SIG_NAME());
+}
+
+void NDBCli::handleSignalParam1(QVariant val1) {
+    handleSignal(NDBCLI_SIG_NAME(), val1);
 }
 
 void NDBCli::handleSignal(const QString& sigName, QVariant val1, QVariant val2, QVariant val3, QVariant val4) {
@@ -255,10 +263,7 @@ void NDBCli::start() {
         QCoreApplication::quit();
     }
     if (signalNames.size() > 0) {
-        if (connectSignals() != 0) {
-            qCritical() << "failed with: " << errString;
-            QCoreApplication::exit(1);
-        }
+        connectSignals();
     }
     if (!methodName.isEmpty()) {
         if (callMethodInvoke() != 0) {
