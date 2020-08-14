@@ -322,6 +322,11 @@ void NickelDBus::nsForceWifi(QString const& action) {
     return ndbSettings(action, "force_wifi");
 }
 
+void NickelDBus::nsAutoUSBGadget(QString const& action) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    return ndbSettings(action, "auto_usb_gadget");
+}
+
 void NickelDBus::ndbSettings(QString const& action, const char* setting) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray qarg = QString("%1:%2").arg(action).arg(setting).toUtf8();
