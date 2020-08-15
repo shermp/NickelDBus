@@ -70,9 +70,9 @@ override CXXFLAGS += -Wall -Wextra -Werror -Wno-missing-field-initializers
 override IFACE_DIR := ../interface
 override BINARY   := qndb
 # cli sources
-override SOURCES  := qndb.cc nickel_dbus_cli.cc $(IFACE_DIR)/nickel_dbus_proxy.cpp
+override SOURCES  := qndb.cc ndb_cli.cc $(IFACE_DIR)/ndb_proxy.cpp
 
-override MOCS 	  := $(IFACE_DIR)/nickel_dbus_proxy.h nickel_dbus_cli.h
+override MOCS 	  := $(IFACE_DIR)/ndb_proxy.h ndb_cli.h
 
 override OBJECTS_C    := $(filter %.o,$(SOURCES:%.c=%.o))
 override OBJECTS_CXX  := $(filter %.o,$(SOURCES:%.cc=%.o))

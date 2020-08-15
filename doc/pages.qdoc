@@ -140,7 +140,7 @@
 
     \section2 API Documentation
 
-    The API is documented \l {NickelDBus}{here}. It is Qt based documentation, but it should
+    The API is documented \l {NDB}{here}. It is Qt based documentation, but it should
     be easy to determine what's needed for other languages or CLI tools.
 
     \section1 Compiling NickelDBus

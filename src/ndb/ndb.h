@@ -21,7 +21,7 @@ typedef QDialog ConfirmationDialog;
 #endif
 
 
-class NickelDBus : public QObject, protected QDBusContext {
+class NDB : public QObject, protected QDBusContext {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", NDB_DBUS_IFACE_NAME)
 
@@ -29,8 +29,8 @@ class NickelDBus : public QObject, protected QDBusContext {
     
     public:
         bool initSucceeded;
-        NickelDBus(QObject* parent);
-        ~NickelDBus();
+        NDB(QObject* parent);
+        ~NDB();
         // bool registerDBus();
         void connectSignals();
 

@@ -3,12 +3,12 @@
 
 #include <NickelHook.h>
 
-#include "nickel_dbus.h"
+#include "ndb.h"
 
-NickelDBus *ndb;
+NDB *ndb;
 
 static int ndb_init() {
-    ndb = new NickelDBus(nullptr);
+    ndb = new NDB(nullptr);
     if (!ndb->initSucceeded) {
         delete ndb;
         return -1;

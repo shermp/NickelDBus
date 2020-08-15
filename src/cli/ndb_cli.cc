@@ -8,7 +8,7 @@
 
 #include <type_traits>
 
-#include "nickel_dbus_cli.h"
+#include "ndb_cli.h"
 
 MethodParamList::MethodParamList() {
     mp.resize(10);
@@ -157,7 +157,7 @@ int NDBCli::callMethodInvoke() {
 }
 
 #define NDBCLI_SIG_NAME() QString(sender()->metaObject()->method(senderSignalIndex()).name())
-#define NDBCLI_SIG_CONNECT(signal, handler) QObject::connect(ndb, &NickelDBusProxy::signal, this, &NDBCli::handler)
+#define NDBCLI_SIG_CONNECT(signal, handler) QObject::connect(ndb, &NDBProxy::signal, this, &NDBCli::handler)
 
 void NDBCli::connectSignals() {
     NDBCLI_SIG_CONNECT(dlgConfirmResult, handleSignalParam1);

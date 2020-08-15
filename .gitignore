@@ -1,7 +1,7 @@
 # make gitignore
-src/interface/nickel_dbus_proxy.moc
-src/interface/nickel_dbus_proxy.o
-src/interface/nickel_dbus_proxy.moc.o
+src/interface/ndb_proxy.moc
+src/interface/ndb_proxy.o
+src/interface/ndb_proxy.moc.o
 doc/html
 .kdev4/
 *.kdev4
@@ -11,10 +11,10 @@ doc/html
 .clangd/
 .cache/
 compile_commands.json
-/src/interface/nickel_dbus_adapter.h
-/src/interface/nickel_dbus_adapter.cpp
-/src/interface/nickel_dbus_proxy.h
-/src/interface/nickel_dbus_proxy.cpp
+/src/interface/ndb_adapter.h
+/src/interface/ndb_adapter.cpp
+/src/interface/ndb_proxy.h
+/src/interface/ndb_proxy.cpp
 /src/interface/com.github.shermp.nickeldbus.xml
 /KoboRoot.tgz
 /libndb.so
@@ -23,10 +23,10 @@ compile_commands.json
 /NickelMenu/src/action_c.o
 /NickelMenu/src/kfmon.o
 /src/ndb/nickeldbus.o
-/src/ndb/nickel_dbus.o
+/src/ndb/ndb.o
 /NickelMenu/src/action_cc.o
-/src/interface/nickel_dbus_adapter.o
-/src/ndb/nickel_dbus.moc
-/src/interface/nickel_dbus_adapter.moc
-/src/ndb/nickel_dbus.moc.o
-/src/interface/nickel_dbus_adapter.moc.o
+/src/interface/ndb_adapter.o
+/src/ndb/ndb.moc
+/src/interface/ndb_adapter.moc
+/src/ndb/ndb.moc.o
+/src/interface/ndb_adapter.moc.o

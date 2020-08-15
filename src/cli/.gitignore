@@ -9,6 +9,6 @@
 compile_commands.json
 qndb
 qndb.o
-nickel_dbus_cli.o
-nickel_dbus_cli.moc
-nickel_dbus_cli.moc.o
+ndb_cli.o
+ndb_cli.moc
+ndb_cli.moc.o

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QVector>
-#include "../interface/nickel_dbus_proxy.h"
+#include "../interface/ndb_proxy.h"
 
 struct MethodParamList {
     struct MethodParam {
