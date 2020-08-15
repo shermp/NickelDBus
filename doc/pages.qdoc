@@ -1,0 +1,166 @@
+/*!
+    \page index.html 
+    
+    \indexpage Introduction 
+    
+    \startpage Introduction
+
+    \nextpage For Users
+
+    \title Introduction
+
+    NickelDBus is a mod for Kobo e-readers. Heavily inspired by 
+    \l {https://github.com/pgaskin/NickelMenu}{NickelMenu}, it
+    allows developers to perform many of the same actions as NickelMenu, but
+    from scripts or programs, instead of from the UI.
+
+    As well as the ability to trigger actions, NickelDBus also allows you to
+    wait on a limited selection of signals. Such signals include knowing when
+    the content import process has completed, or whether WiFi has connected, 
+    among others.
+
+    This is all achieved through the magic of d-bus. NickelDBus registers itself
+    on the \c system bus.
+
+    Read on to find out more:
+
+    \list
+    \li \l {For Users}
+    \li \l {For Developers}
+    \endlist
+ */
+
+/*!
+    \page userdoc.html
+
+    \indexpage Introduction 
+    
+    \startpage Introduction
+
+    \previouspage Introduction
+
+    \nextpage For Developers
+
+    \title For Users
+
+    If you are an end-user who was directed here by a mod developer, this is 
+    page for you. All you need to know is how to install and uninstall NickelDBus.
+
+    \section1 Installation
+
+    Installing NickelDBus is simple. Simply go to the 
+    \l {https://github.com/shermp/NickelDBus/releases}{releases} page and
+    download the latest release. 
+
+    Copy the downloaded \c KoboRoot.tgz to the \c .kobo directory on the root
+    of your kobo when plugged into USB. Eject/disconnect your Kobo, and it will
+    automatically install itself.
+
+    There is no need to configure anything after installation.
+
+    \note NickelDBus should survive factory resets.
+
+    \section1 Upgrading
+
+    To upgrade NickelDBus, simply follow the same procedure as installing it.
+
+    \section1 Uninstallation
+
+    If you ever want to remove NickelDBus, simply connect your Kobo to your
+    computer over USB and create a file (can be empty) called \c ndb_uninstall
+    on the root of the drive.
+
+    Then disconnect your Kobo, and reboot. NickelDBus should now be removed.
+ */
+
+/*!
+    \page developerdoc.html
+
+    \indexpage Introduction 
+    
+    \startpage Introduction
+
+    \previouspage For Users
+
+    \title For Developers
+
+    NickelDBus presents itself on the d-bus \c system bus. It has an interface
+    of \c com.github.shermp.nickeldbus and a path of \c /nickeldbus.
+
+    To interact with NickelDBus, you can use language bindings for your favourite
+    programming language. Most if not all languages have bindings available.
+
+    \section1 Usage
+
+    \section2 CLI Tools
+
+    Shell script users may use the standard \c dbus-send and \c dbus-monitor tools.
+    Programs like qdbus and gdbus are also available.
+
+    Alternatively, NickelDBus installs a small tool called \c qndb if you wish to
+    use it. \c qndb allows you to call a method, or wait for a signal, or call
+    a method then wait for a signal.
+
+    \section3 qndb
+
+    The \c qndb usage is as follows:
+
+    \code
+        Usage: qndb [options] [args...]
+        Qt CLI for NickelDBus
+
+        Options:
+          -h, --help                  Displays this help.
+          -v, --version               Displays version information.
+          -s, --signal <signal name>  Wait for signal, and prints its output, if any.
+          -t, --timeout <timeout ms>  Signal timeout in milliseconds.
+          -m, --method <method name>  Method to invoke.
+          -a, --api                   Print API usage
+
+        Arguments:
+         arguments                   Arguments to pass to method. Have no affect when
+                                     a method is not set. 
+    \endcode
+
+    And here are a few examples:
+
+    Print the current NickelDBus version
+    \code qndb -m ndbVersion \endcode
+
+    Show a toast on-screen for 3 seconds, with message 'Hello World!':
+    \code qndb -m mwcToast 3000 "Hello World" \endcode
+
+    Trigger library rescan, and wait for content import to complete, with a 30 second timeout:
+    \code qndb -t 30000 -s pfmDoneProcessing -m pfmRescanBooksFull \endcode
+
+    \section2 Language Bindings
+
+    Most languages will have d-bus bindings available. NickelDBus and \c qndb were written
+    in Qt using QtDBus. 
+
+    \section2 API Documentation
+
+    The API is documented \l {NickelDBus}{here}. It is Qt based documentation, but it should
+    be easy to determine what's needed for other languages or CLI tools.
+
+    \section1 Compiling NickelDBus
+
+    NickelDBus is a Qt and C++ based project. It was designed to be used with 
+    \l {https://github.com/pgaskin/NickelTC}{NickelTC}. As such, the Makefile expects that
+    to be available.
+
+    To build everything from scratch, run:
+    \code make clean && make && make cli && make koboroot \endcode
+
+    That will compile the library, \c qndb and package it up into a \c KoboRoot.tgz ready to
+    be installed onto a Kobo.
+
+    To make this documentation, run
+    \code make doc \endcode
+
+    If you are developing NickelDBus, you will probably want to run 
+    \code make interface \endcode
+
+    if you haven't already run \c make so that you have the auto-generated adapter and proxy
+    code and header files.
+ */

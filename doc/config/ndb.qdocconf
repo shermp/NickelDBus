@@ -27,12 +27,12 @@ outputdir   = ../html
 # The headerdirs variable specifies the directories
 # containing the header files associated
 # with the .cpp source files used in the documentation.
-headerdirs  = "../../src/ndb/"
+headerdirs  = .. ../../src/ndb/
 
 # The sourcedirs variable specifies the
 # directories containing the .cpp or .qdoc
 # files used in the documentation.
-sourcedirs  = "../../src/ndb" 
+sourcedirs  = .. ../../src/ndb
 
 # The exampledirs variable specifies the directories containing
 # the source code of the example files.
