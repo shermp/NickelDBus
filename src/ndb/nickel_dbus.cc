@@ -92,7 +92,7 @@ void NickelDBus::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *
     }
 }
 
-/*!
+/*! 
  * \brief Connects available Nickel signals to d-bus
  * 
  * Failures to connect a signal will stop execution, the failure will be logged
@@ -508,3 +508,90 @@ void NickelDBus::pwrAction(const char *action) {
     }
     nm_action_result_free(res);
 }
+
+/* Signal Documentation */
+
+/*!
+ * \fn void NickelDBus::dlgConfirmResult(int result)
+ * \brief The signal that is emitted when a confirmation dialog is dismissed
+ * 
+ * When emitted, \a result will be \c 1 for ACCEPT or \c 0 for REJECT
+ */
+
+/*!
+ * \fn void NickelDBus::pfmDoneProcessing()
+ * \brief The signal that nickel emits when the content import process has completed.
+ * 
+ * The signal will be emitted following the content import triggered whenever 
+ * the user unplugs from the computer, when \c rescan_books / \c rescan_books_full 
+ * actions are triggered from NickelMenu, or when \l NickelDBus::pfmRescanBooks() 
+ * or \l NickelDBus::pfmRescanBooksFull() methods are called from NickelDBus.
+ */
+
+/*!
+ * \fn void NickelDBus::pfmAboutToConnect()
+ * \brief The signal that nickel emits when it is about to start the USB connection
+ */
+
+/*!
+ * \fn void NickelDBus::wmTryingToConnect()
+ * \brief (todo: figure this out)
+ */
+
+/*!
+ * \fn void NickelDBus::wmNetworkConnected()
+ * \brief This signal appears to be emitted when the network has successfully connected
+ * I'm unsure if this is emitted when the WiFi connects, or when a valid IP address
+ * is obtained.
+ */
+
+/*!
+ * \fn void NickelDBus::wmNetworkDisconnected()
+ * \brief (todo: figure this out)
+ */
+
+/*!
+ * \fn void NickelDBus::wmNetworkForgotten()
+ * \brief (todo: figure this out)
+ */
+
+/*!
+ * \fn void NickelDBus::wmNetworkFailedToConnect()
+ * \brief (todo: figure this out)
+ */
+
+/*!
+ * \fn void NickelDBus::wmScanningStarted()
+ * \brief (todo: figure this out)
+ */
+
+/*!
+ * \fn void NickelDBus::wmScanningFinished()
+ * \brief (todo: figure this out)
+ */
+
+/*!
+ * \fn void NickelDBus::wmScanningAborted()
+ * \brief (todo: figure this out)
+ */
+
+/*!
+ * \fn void NickelDBus::wmWifiEnabled(bool enabled)
+ * \brief (todo: figure this out)
+ * 
+ * Is wifi \a enabled ?
+ */
+
+/*!
+ * \fn void NickelDBus::wmLinkQualityForConnectedNetwork(double quality)
+ * \brief (todo: figure this out)
+ * 
+ * Shows the \a quality of the wifi signal
+ */
+
+/*!
+ * \fn void NickelDBus::wmMacAddressAvailable(QString mac)
+ * \brief (todo: figure this out)
+ * 
+ * \a mac address
+ */

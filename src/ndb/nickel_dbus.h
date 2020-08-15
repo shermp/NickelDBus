@@ -29,108 +29,27 @@ class NickelDBus : public QObject, protected QDBusContext {
     
     public:
         bool initSucceeded;
-        /*!
-         * \brief Construct a new Nickel D-Bus object
-         * 
-         * \param parent 
-         */
         NickelDBus(QObject* parent);
-        /*!
-         * \brief Destroy the Nickel D-Bus object
-         * 
-         */
         ~NickelDBus();
         // bool registerDBus();
-        /*!
-         * \brief Connects available Nickel signals to d-bus
-         * 
-         * Failures to connect a signal will stop execution, the failure will be logged
-         * to syslog. 
-         */
         void connectSignals();
 
     Q_SIGNALS:
-        /*!
-         * \brief The signal that is emitted when a confirmation dialog button is tapped, or the dialog is closed
-         * 
-         * \a result will be 0 for REJECT or 1 for ACCEPT
-         */
         void dlgConfirmResult(int result);
         // PlugworkFlowManager signals
-        /*!
-         * \brief The signal that nickel emits when the content import process has completed.
-         * 
-         * The signal will be emitted following the content import triggered whenever 
-         * the user unplugs from the computer, when rescan_books/rescan_books_full 
-         * actions are triggered from NickelMenu, or when pfmRescanBooks/pfmRescanBooksFull
-         * methods are called from NickelDBus.
-         */
         void pfmDoneProcessing();
-        /*!
-         * \brief The signal that nickel emits when it is about to start the USB connection
-         * 
-         */
         void pfmAboutToConnect();
         // WirelessManager signals
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         */
         void wmTryingToConnect();
-        /*!
-         * \brief This signal appears to be emitted when the network has successfully connected
-         * 
-         * I'm unsure if this is emitted when the WiFi connects, or when a valid IP address
-         * is obtained.
-         */
         void wmNetworkConnected();
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         */
         void wmNetworkDisconnected();
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         */
         void wmNetworkForgotten();
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         */
         void wmNetworkFailedToConnect();
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         */
         void wmScanningStarted();
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         */
         void wmScanningFinished();
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         */
         void wmScanningAborted();
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         * Is wifi \a enabled
-         */
         void wmWifiEnabled(bool enabled);
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         * Shows the \a quality of the wifi signal
-         */
         void wmLinkQualityForConnectedNetwork(double quality);
-        /*!
-         * \brief (todo: figure this out)
-         * 
-         * \a mac address
-         */
         void wmMacAddressAvailable(QString mac);
 
     public Q_SLOTS:
