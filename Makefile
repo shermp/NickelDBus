@@ -53,7 +53,7 @@ clean: clean-cli
 gitignore: gitignore-cli
 
 doc:
-	cd doc && qdoc ndb.qdocconf
+	cd doc/config && qdoc ndb.qdocconf
 
 $(SOURCES): $(ADAPTER)
 
