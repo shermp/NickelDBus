@@ -2,7 +2,7 @@
 # and there are some compatibility issues between old and new
 # practices. For that reason, any QDoc configuration file needs to
 # include compat.qdocconf.
-#include(compat.qdocconf)
+# include(compat.qdocconf)
 
 # You can also specify file extensions manually.
 headers.fileextensions  = "*.h *.hpp"
@@ -15,12 +15,12 @@ outputdir   = html
 # The headerdirs variable specifies the directories
 # containing the header files associated
 # with the .cpp source files used in the documentation.
-headerdirs  = ../src
+headerdirs  = "../src/ndb/"
 
 # The sourcedirs variable specifies the
 # directories containing the .cpp or .qdoc
 # files used in the documentation.
-sourcedirs  = "../src ." 
+sourcedirs  = "../src/ndb" 
 
 # The exampledirs variable specifies the directories containing
 # the source code of the example files.
