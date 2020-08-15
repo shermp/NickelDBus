@@ -452,11 +452,6 @@ Content table
 
 @media screen {
     .toc {
-        clear: both;
-        clear: right;
-        position: relative;
-        top: 83px;
-        float: right;
         vertical-align: top;
         -moz-border-radius: 7px 7px 7px 7px;
         -webkit-border-radius: 7px 7px 7px 7px;
@@ -470,7 +465,7 @@ Content table
         height: auto;
         width: 200px;
         text-align: left;
-        margin-left: 20px;
+        /* margin-left: 20px; */
     }
 }
 
