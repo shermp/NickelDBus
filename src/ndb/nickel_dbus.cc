@@ -21,6 +21,7 @@
  */
 
 /*!
+ * \internal
  * \brief Construct a new Nickel D-Bus object
  * 
  * \a parent QObject
@@ -69,6 +70,10 @@ NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
 }
 
+/*!
+ * \internal
+ * \brief Destroy the NickelDBus::NickelDBus object
+ */
 NickelDBus::~NickelDBus() {
     conn.unregisterService(NDB_DBUS_IFACE_NAME);
     conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
@@ -93,6 +98,7 @@ void NickelDBus::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *
 }
 
 /*! 
+ * \internal
  * \brief Connects available Nickel signals to d-bus
  * 
  * Failures to connect a signal will stop execution, the failure will be logged
@@ -191,6 +197,10 @@ QString NickelDBus::miscNickelClassDetails(QString const& staticMmetaobjectSymbo
     return getNickelMetaObjectDetails((const NickelMetaObject*)nmo);
 }
 
+/*!
+ * \internal
+ * \brief Internal slot to enable new dialogs to be created 
+ */
 void NickelDBus::allowDialog() {
     allowDlg = true;
 }
