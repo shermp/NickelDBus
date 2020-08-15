@@ -1,5 +1,7 @@
 # make gitignore
-ndb-cli/ndb-cli
+src/interface/nickel_dbus_proxy.moc
+src/interface/nickel_dbus_proxy.o
+src/interface/nickel_dbus_proxy.moc.o
 .kdev4/
 *.kdev4
 .kateconfig
@@ -12,9 +14,6 @@ compile_commands.json
 /src/interface/nickel_dbus_adapter.cpp
 /src/interface/nickel_dbus_proxy.h
 /src/interface/nickel_dbus_proxy.cpp
-/src/interface/nickel_dbus_proxy.o
-/src/interface/nickel_dbus_proxy.moc
-/src/interface/nickel_dbus_proxy.moc.o
 /src/interface/com.github.shermp.nickeldbus.xml
 /KoboRoot.tgz
 /libndb.so
@@ -22,16 +21,11 @@ compile_commands.json
 /NickelMenu/src/action.o
 /NickelMenu/src/action_c.o
 /NickelMenu/src/kfmon.o
-/src/nickeldbus.o
-/src/nickel_dbus.o
+/src/ndb/nickeldbus.o
+/src/ndb/nickel_dbus.o
 /NickelMenu/src/action_cc.o
 /src/interface/nickel_dbus_adapter.o
-/src/nickel_dbus.moc
+/src/ndb/nickel_dbus.moc
 /src/interface/nickel_dbus_adapter.moc
-/src/nickel_dbus.moc.o
+/src/ndb/nickel_dbus.moc.o
 /src/interface/nickel_dbus_adapter.moc.o
-/src/cli/nickel_dbus_cli.moc
-/src/cli/nickel_dbus_cli.moc.o
-/src/cli/nickel_dbus_cli.o
-/src/cli/qndb.o
-/src/cli/qndb

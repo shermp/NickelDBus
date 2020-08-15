@@ -81,6 +81,8 @@ override MOCS_MOC     := $(filter %.moc,$(MOCS:%.h=%.moc))
 override OBJECTS_MOC  := $(MOCS_MOC:%=%.o)
 override GENERATED    := $(BINARY) $(OBJECTS_C) $(OBJECTS_CXX) $(OBJECTS_CXX1) $(MOCS_MOC) $(OBJECTS_MOC)
 
+override GITIGNORE += .kdev4/ *.kdev4 .kateconfig .vscode/ .idea/ .clangd/ .cache/ compile_commands.json $(filter-out ../interface/%,$(GENERATED))
+
 $(BINARY): override CFLAGS   += -fPIC
 $(BINARY): override CXXFLAGS += -fPIC
 
@@ -104,9 +106,13 @@ $(OBJECTS_MOC): %.moc.o: %.moc
 $(MOCS_MOC): %.moc: %.h
 	$(call nh_cmd_moch,$@,$^)
 
-.PHONY: all clean
+.PHONY: all clean gitignore
 
 all: $(BINARY)
 
 clean:
 	rm -f $(GENERATED)
+
+gitignore:
+	echo "# make gitignore" > .gitignore
+	echo "$(strip $(GITIGNORE))" | tr " " "\n" >> .gitignore
