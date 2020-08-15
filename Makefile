@@ -28,7 +28,7 @@ override KOBOROOT += src/cli/qndb:/usr/bin/qndb
 
 override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML)
 
-override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o)
+override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) doc/html
 
 .PHONY: interface
 interface: $(ADAPTER) $(PROXY)
@@ -37,7 +37,7 @@ interface: $(ADAPTER) $(PROXY)
 dbuscfg:
 	script/make-dbus-conf.sh res/$(DBUS_IFACE_CFG) $(DBUS_IFACE_NAME)
 
-.PHONY: cli clean-cli gitignore-cli
+.PHONY: cli clean-cli gitignore-cli doc
 
 cli: interface
 	cd src/cli && $(MAKE)
@@ -51,6 +51,9 @@ gitignore-cli:
 clean: clean-cli
 
 gitignore: gitignore-cli
+
+doc:
+	cd doc && qdoc ndb.qdocconf
 
 $(SOURCES): $(ADAPTER)
 

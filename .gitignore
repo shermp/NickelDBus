@@ -2,6 +2,7 @@
 src/interface/nickel_dbus_proxy.moc
 src/interface/nickel_dbus_proxy.o
 src/interface/nickel_dbus_proxy.moc.o
+doc/html
 .kdev4/
 *.kdev4
 .kateconfig
