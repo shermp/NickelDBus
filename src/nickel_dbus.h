@@ -55,7 +55,7 @@ class NickelDBus : public QObject, protected QDBusContext {
         /*!
          * \brief The signal that is emitted when a confirmation dialog button is tapped, or the dialog is closed
          * 
-         * \param result will be 0 for REJECT or 1 for ACCEPT
+         * \a result will be 0 for REJECT or 1 for ACCEPT
          */
         void dlgConfirmResult(int result);
         // PlugworkFlowManager signals
@@ -119,176 +119,51 @@ class NickelDBus : public QObject, protected QDBusContext {
         /*!
          * \brief (todo: figure this out)
          * 
+         * Is wifi \a enabled
          */
         void wmWifiEnabled(bool enabled);
         /*!
          * \brief (todo: figure this out)
          * 
+         * Shows the \a quality of the wifi signal
          */
         void wmLinkQualityForConnectedNetwork(double quality);
         /*!
          * \brief (todo: figure this out)
          * 
+         * \a mac address
          */
         void wmMacAddressAvailable(QString mac);
 
     public Q_SLOTS:
-        /*!
-         * \brief Returns the version of NickelDBus, as a string.
-         * 
-         * \return QString 
-         */
         QString ndbVersion();
-        /*!
-         * \brief Print available details from nickel classes
-         * 
-         * This method attempts to dlsym then parse the staticMetaObject
-         * property available in many of the classes. In most cases, the
-         * available signals and slots can be determined
-         * 
-         * \param static_metaobject_symbol the "mangled" symbol of the staticMetaObject property for a class
-         * \return QString Formatted output of the available details (signals and slots)
-         */
-        QString miscNickelClassDetails(QString const& static_metaobject_symbol);
+        QString miscNickelClassDetails(QString const& staticMmetaobjectSymbol);
         // misc
-        /*!
-         * \brief Check if a signal was successfully connected
-         * 
-         * \param signal_name the signal name, sans parentheses and parameters
-         * \return true 
-         * \return false 
-         */
-        bool miscSignalConnected(QString const& signal_name);
-        /*!
-         * \brief Show a small, temporary text box with a message 
-         * 
-         * \param toast_duration in milliseconds, required
-         * \param msg_main the main message to display
-         * \param msg_sub a sub-message to display, optional and may be omitted
-         */
-        void mwcToast(int toast_duration, QString const& msg_main, QString const& msg_sub = QStringLiteral(""));
-        /*!
-         * \brief Navigate to the home screen
-         * 
-         */
+        bool miscSignalConnected(QString const& signalName);
+        void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
         void mwcHome();
         // Confirmation Dialogs
-        /*!
-         * \brief Show a confirmation dialog with no buttons (except close)
-         * 
-         * When the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
-         * result_code will be REJECT (0)
-         * 
-         * \param title Title of the dialog
-         * \param body Body text of the dialog
-         */
         void dlgConfirmNoBtn(QString const& title, QString const& body);
-        /*!
-         * \brief Show a confirmation dialog with an accept button
-         * 
-         * When the accept button is tapped, or the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
-         * result_code will be ACCEPT (1) if accept button tapped, otherwise REJECT (0)
-         * 
-         * \param title Title of the dialog
-         * \param body Body text of the dialog
-         * \param acceptText The label of the accept button (eg: 'accept', 'ok', 'yes')
-         */
         void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
-        /*!
-         * \brief Show a confirmation dialog with reject button
-         * 
-         * When the reject button is tapped, or the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
-         * result_code will be REJECT (0)
-         * 
-         * \param title Title of the dialog
-         * \param body Body text of the dialog
-         * \param rejectText The label of the reject button (eg: 'reject', 'cancel', 'no')
-         */
         void dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText);
-        /*!
-         * \brief Show a confirmation dialog with both accapt and reject buttons
-         * 
-         * When either button is tapped, or the dialog is closed, a dlgConfirmResult(result_code) signal is emitted.
-         * result_code will be ACCEPT (1) if accept button tapped, otherwise REJECT (0)
-         * 
-         * \param title Title of the dialog
-         * \param body Body text of the dialog
-         * \param acceptText The label of the accept button (eg: 'accept', 'ok', 'yes')
-         * \param rejectText The label of the reject button (eg: 'reject', 'cancel', 'no')
-         */
         void dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
         // PlugWorkFlowManager
-        /*!
-         * \brief Begin an abbreviated book rescan. Same as 'rescan_books' from NickelMenu
-         */
         void pfmRescanBooks();
-        /*!
-         * \brief Begins a full book rescan. Same as 'rescan_books_full' from NickelMenu
-         */
         void pfmRescanBooksFull();
         // Wireless methods (WirelessFlowManager)
-        /*!
-         * \brief Connect to WiFi network. Same as 'autoconnect' option from NickelMenu
-         */
         void wfmConnectWireless();
-        /*!
-         * \brief Connect silently to WiFi network. Same as 'autoconnect_silent' from NickelMenu
-         */
         void wfmConnectWirelessSilently();
-        /*!
-         * \brief Enable/disable/toggle WiFi. Same as NickelMenu WiFi 'enable'/'disable'/'toggle' options
-         * 
-         * \param action string, one of 'enable', 'disable', 'toggle'
-         */
         void wfmSetAirplaneMode(QString const& action);
         // Web Browser (BrowserWorkflowManager)
-        /*!
-         * \brief Open the web browser. Same as NickelMenu browser options
-         * 
-         * \param modal boolean, select whether the browser should open as a modal or not
-         * \param url string, an optional URL to open
-         * \param css string, optional CSS to set
-         */
         void bwmOpenBrowser(bool modal = false, QString const& url = QString(), QString const& css = QString());
         // Nickel Settings
-        /*!
-         * \brief Invert the screen
-         * 
-         * \param action string, one of 'enable', 'disable', 'toggle'
-         */
         void nsInvert(QString const& action);
-        /*!
-         * \brief Set UnlockEnabled
-         * 
-         * \param action string, one of 'enable', 'disable', 'toggle'
-         */
         void nsLockscreen(QString const& action);
-        /*!
-         * \brief Enable screenshots
-         * 
-         * \param action string, one of 'enable', 'disable', 'toggle'
-         */
         void nsScreenshots(QString const& action);
-        /*!
-         * \brief Sets the developer ForceWifiOn setting
-         * 
-         * \param action string, one of 'enable', 'disable', 'toggle'
-         */
         void nsForceWifi(QString const& action);
-        /*!
-         * \brief Sets the auto USB connect setting
-         * 
-         * \param action string, one of 'enable', 'disable', 'toggle'
-         */
         void nsAutoUSBGadget(QString const& action);
         // Power commands
-        /*!
-         * \brief Shutdown the Kobo
-         */
         void pwrShutdown();
-        /*!
-         * \brief Reboot the Kobo
-         */
         void pwrReboot();
     protected Q_SLOTS:
         void allowDialog();

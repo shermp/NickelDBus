@@ -9,6 +9,11 @@
 #include "nickel_dbus.h"
 #include "interface/nickel_dbus_adapter.h"
 
+/*!
+ * \brief Construct a new Nickel D-Bus object
+ * 
+ * \a parent QObject
+ */
 NickelDBus::NickelDBus(QObject* parent) : QObject(parent), QDBusContext() {
     new NickelDBusAdapter(this);
     initSucceeded = true;
@@ -76,6 +81,12 @@ void NickelDBus::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *
     }
 }
 
+/*!
+ * \brief Connects available Nickel signals to d-bus
+ * 
+ * Failures to connect a signal will stop execution, the failure will be logged
+ * to syslog. 
+ */
 void NickelDBus::connectSignals() {
     if (nSym.PlugWorkflowManager_sharedInstance) {
         PlugWorkflowManager *wf = nSym.PlugWorkflowManager_sharedInstance();
@@ -106,6 +117,9 @@ void NickelDBus::connectSignals() {
     }
 }
 
+/*!
+ * \brief Get the version of NickelDBus
+ */
 QString NickelDBus::ndbVersion() {
     return QStringLiteral(NH_VERSION);
 }
@@ -147,11 +161,19 @@ QString NickelDBus::getNickelMetaObjectDetails(const QMetaObject* nmo) {
     return str;
 }
 
-QString NickelDBus::miscNickelClassDetails(QString const& static_metaobject_symbol) {
+/*!
+ * \brief Print available details from nickel classes
+ * 
+ * This method attempts to dlsym then parse the staticMetaObject
+ * property available from the mangeled \a staticMmetaobjectSymbol
+ * 
+ * A formatted string of available signals and slots is returned.
+ */
+QString NickelDBus::miscNickelClassDetails(QString const& staticMmetaobjectSymbol) {
     NDB_DBUS_USB_ASSERT(QString(""));
     typedef QMetaObject NickelMetaObject;
-    NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, static_metaobject_symbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
-    QByteArray sym = static_metaobject_symbol.toLatin1();
+    NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, staticMmetaobjectSymbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    QByteArray sym = staticMmetaobjectSymbol.toLatin1();
     NickelMetaObject *nmo;
     reinterpret_cast<void*&>(nmo) = dlsym(libnickel, sym.constData());
     NDB_DBUS_ASSERT(QString(""), QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
@@ -184,46 +206,105 @@ void NickelDBus::dlgConfirmation(QString const& title, QString const& body, QStr
     dlg->open();
 }
 
+/*!
+ * \brief Show a confirmation dialog with no buttons (except close)
+ * 
+ * Create a dialog box with \a title and \a body. This dialog only has a close
+ * button.
+ * 
+ * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
+ */
 void NickelDBus::dlgConfirmNoBtn(QString const& title, QString const& body) {
     return dlgConfirmation(title, body, QString(""), QString(""));
 }
 
+/*!
+ * \brief Show a confirmation dialog with accept and close buttons
+ *
+ * Create a dialog box with \a title and \a body. This dialog has a close
+ * button, and an accept button labeled with \a acceptText
+ *
+ * When the dialog is closed, or the accept button is pressed, a 
+ * \l dlgConfirmResult() signal is emitted.
+ */
 void NickelDBus::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
     return dlgConfirmation(title, body, acceptText, QString(""));
 }
 
+/*!
+ * \brief Show a confirmation dialog with reject and close buttons
+ *
+ * Create a dialog box with \a title and \a body. This dialog has a close
+ * button, and a reject button labeled with \a rejectText
+ *
+ * When the dialog is closed, or the reject button is pressed, a 
+ * \l dlgConfirmResult() signal is emitted.
+ */
 void NickelDBus::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
     return dlgConfirmation(title, body, QString(""), rejectText);
 }
 
+/*!
+ * \brief Show a confirmation dialog with reject and close buttons
+ *
+ * Create a dialog box with \a title and \a body. This dialog has a close
+ * button, a reject button labeled with \a rejectText, and an accept
+ * button labeled with \a acceptText.
+ *
+ * When the dialog is closed, either button is pressed, a 
+ * \l dlgConfirmResult() signal is emitted.
+ */
 void NickelDBus::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     return dlgConfirmation(title, body, acceptText, rejectText);
 }
 
-bool NickelDBus::miscSignalConnected(QString const &signal_name) {
-    return connectedSignals.contains(signal_name);
+/*!
+ * \brief Check if a signal was successfully connected
+ * 
+ * Check if \a signalName is connected. \a signalName must be provided
+ * without parentheses and parameters.
+ * 
+ * Returns \c 1 if exists, or \c 0 otherwise
+ */
+bool NickelDBus::miscSignalConnected(QString const &signalName) {
+    return connectedSignals.contains(signalName);
 }
 
-void NickelDBus::mwcToast(int toast_duration, QString const &msg_main, QString const &msg_sub) {
+/*!
+ * \brief Show a small, temporary text box with a message 
+ * 
+ * Show a text box on screen for \a toastDuration duration (in milliseconds)
+ * with \a msgMain as the body text, and an optional \a msgSub
+ */
+void NickelDBus::mwcToast(int toastDuration, QString const &msgMain, QString const &msgSub) {
     NDB_DBUS_USB_ASSERT((void) 0);
     // The following code has been adapted from NickelMenu
-    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, toast_duration > 0 && toast_duration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, toastDuration > 0 && toastDuration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
     NDB_DBUS_SYM_ASSERT((void) 0, nSym.MainWindowController_sharedInstance && nSym.MainWindowController_toast);
     MainWindowController *mwc = nSym.MainWindowController_sharedInstance();
     NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, mwc, "could not get MainWindowController instance");
-    nSym.MainWindowController_toast(mwc, msg_main, msg_sub, toast_duration);
+    nSym.MainWindowController_toast(mwc, msgMain, msgSub, toastDuration);
 }
 
+/*!
+ * \brief Navigate to the home screen
+ */
 void NickelDBus::mwcHome() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("home");
 }
 
+/*!
+ * \brief Begin an abbreviated book rescan. Same as 'rescan_books' from NickelMenu
+ */
 void NickelDBus::pfmRescanBooks() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("rescan_books");
 }
 
+/*!
+ * \brief Begins a full book rescan. Same as 'rescan_books_full' from NickelMenu
+ */
 void NickelDBus::pfmRescanBooksFull() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("rescan_books_full");
@@ -243,16 +324,33 @@ bool NickelDBus::ndbActionStrValid(QString const& actStr) {
     return (!actStr.compare("enable") || !actStr.compare("disable") || !actStr.compare("toggle"));
 }
 
+/*!
+ * \brief Connect to WiFi network.
+ * 
+ * Note, this is the same as 'autoconnect' option from NickelMenu
+ */
 void NickelDBus::wfmConnectWireless() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbWireless("autoconnect");
 }
 
+/*!
+ * \brief Connect silently to WiFi network.
+ * 
+ * Note, this is the same as 'autoconnect_silent' from NickelMenu
+ */
 void NickelDBus::wfmConnectWirelessSilently() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbWireless("autoconnect_silent");
 }
 
+/*!
+ * \brief Enable/disable/toggle WiFi. Same as NickelMenu WiFi 'enable'/'disable'/'toggle' options
+ * 
+ * Note, this is the same as NickelMenu WiFi 'enable'/'disable'/'toggle' options.
+ * 
+ * \a action should be one of \c {enable}, \c {disable}, \c {toggle}
+ */
 void NickelDBus::wfmSetAirplaneMode(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
@@ -270,6 +368,16 @@ void NickelDBus::ndbWireless(const char *act) {
     nm_action_result_free(res);
 }
 
+/*!
+ * \brief Open the web browser.
+ * 
+ * Note, this is the same as the NickelMenu browser options
+ * 
+ * Opens the web browser to the default homepage. if \a modal
+ * is \c true then the browser will be opened as a modal box with
+ * a close button. If \a url is set, the browser will open it on
+ * open. If \a css is set, additional CSS is supplied to the browser
+ */
 void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
     NDB_DBUS_USB_ASSERT((void) 0);
     QString qarg = QStringLiteral("");
@@ -302,26 +410,51 @@ void NickelDBus::bwmOpenBrowser(bool modal, QString const& url, QString const& c
     nm_action_result_free(res);
 }
 
+/*!
+ * \brief Invert the screen
+ * 
+ * Set \a action to \c {enable}, \c {disable} or \c {toggle} inversion.
+ */
 void NickelDBus::nsInvert(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "invert");
 }
 
+/*!
+ * \brief Set UnlockEnabled
+ * 
+ * Set \a action to \c {enable}, \c {disable} or \c {toggle} UnlockEnabled.
+ */
 void NickelDBus::nsLockscreen(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "lockscreen");
 }
 
+/*!
+ * \brief Set screenshot setting
+ * 
+ * Set \a action to \c {enable}, \c {disable} or \c {toggle} screenshots.
+ */
 void NickelDBus::nsScreenshots(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "screenshots");
 }
 
+/*!
+ * \brief Sets the developer ForceWifiOn setting
+ * 
+ * Set \a action to \c {enable}, \c {disable} or \c {toggle} ForceWifiOn.
+ */
 void NickelDBus::nsForceWifi(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "force_wifi");
 }
 
+/*!
+ * \brief Sets the auto USB connect setting
+ * 
+ * Set \a action to \c {enable}, \c {disable} or \c {toggle} auto USB connect.
+ */
 void NickelDBus::nsAutoUSBGadget(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "auto_usb_gadget");
@@ -339,11 +472,17 @@ void NickelDBus::ndbSettings(QString const& action, const char* setting) {
     nm_action_result_free(res);
 }
 
+/*!
+ * \brief Shutdown Kobo
+ */
 void NickelDBus::pwrShutdown() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return pwrAction("shutdown");
 }
 
+/*!
+ * \brief Reboot Kobo
+ */
 void NickelDBus::pwrReboot() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return pwrAction("reboot");
