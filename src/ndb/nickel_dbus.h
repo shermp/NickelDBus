@@ -19,10 +19,8 @@ typedef QDialog ConfirmationDialog;
 #ifndef NDB_DBUS_OBJECT_PATH
     #define NDB_DBUS_OBJECT_PATH "/nickeldbus"
 #endif
-/*!
- * \brief Register a service on the d-bus system bus on Kobo e-reader devices
- * 
- */
+
+
 class NickelDBus : public QObject, protected QDBusContext {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", NDB_DBUS_IFACE_NAME)

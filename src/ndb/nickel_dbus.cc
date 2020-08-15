@@ -10,6 +10,17 @@
 #include "../interface/nickel_dbus_adapter.h"
 
 /*!
+ * \class NickelDBus
+ * \brief The NickelDBus class registers a service on d-bus of Kobo e-readers.
+ * 
+ * NickelDBus provides a bridge between Kobo's proprietary software, libnickel, 
+ * and other software running on Kobo e-readers. It registers itself as a 
+ * service on d-bus, and provides methods and signals to monitor and interact 
+ * with nickel.
+ * 
+ */
+
+/*!
  * \brief Construct a new Nickel D-Bus object
  * 
  * \a parent QObject
