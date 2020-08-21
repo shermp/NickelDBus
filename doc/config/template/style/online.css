@@ -204,13 +204,13 @@ h2, p.h2 {
     overflow: hidden;
 }
 
-h3 {
+/* h3 {
     font: 500 14px/1.2 Arial;
     font-weight: 100;
     text-decoration: underline;
     margin-bottom: 30px;
     margin-top: 30px;
-}
+} */
 
 h3.fn, span.fn {
     border-width: 1px;

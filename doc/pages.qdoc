@@ -1,13 +1,15 @@
 /*!
     \page index.html 
     
-    \indexpage Introduction 
+    \indexpage NickelDBus 
     
-    \startpage Introduction
+    \startpage NickelDBus
 
-    \nextpage For Users
+    \nextpage {NDB}{API Documentation}
 
-    \title Introduction
+    \title NickelDBus
+
+    \section1 Introduction
 
     NickelDBus is a mod for Kobo e-readers. Heavily inspired by 
     \l {https://github.com/pgaskin/NickelMenu}{NickelMenu}, it
@@ -21,30 +23,6 @@
 
     This is all achieved through the magic of d-bus. NickelDBus registers itself
     on the \c system bus.
-
-    Read on to find out more:
-
-    \list
-    \li \l {For Users}
-    \li \l {For Developers}
-    \endlist
- */
-
-/*!
-    \page userdoc.html
-
-    \indexpage Introduction 
-    
-    \startpage Introduction
-
-    \previouspage Introduction
-
-    \nextpage For Developers
-
-    \title For Users
-
-    If you are an end-user who was directed here by a mod developer, this is 
-    page for you. All you need to know is how to install and uninstall NickelDBus.
 
     \section1 Installation
 
@@ -71,18 +49,8 @@
     on the root of the drive.
 
     Then disconnect your Kobo, and reboot. NickelDBus should now be removed.
- */
 
-/*!
-    \page developerdoc.html
-
-    \indexpage Introduction 
-    
-    \startpage Introduction
-
-    \previouspage For Users
-
-    \title For Developers
+    \section1 Developer Documentation
 
     NickelDBus presents itself on the d-bus \c system bus. It has an interface
     of \c com.github.shermp.nickeldbus and a path of \c /nickeldbus.
@@ -90,9 +58,9 @@
     To interact with NickelDBus, you can use language bindings for your favourite
     programming language. Most if not all languages have bindings available.
 
-    \section1 Usage
+    \section2 Usage
 
-    \section2 CLI Tools
+    \section3 CLI Tools
 
     Shell script users may use the standard \c dbus-send and \c dbus-monitor tools.
     Programs like qdbus and gdbus are also available.
@@ -101,7 +69,7 @@
     use it. \c qndb allows you to call a method, or wait for a signal, or call
     a method then wait for a signal.
 
-    \section3 qndb
+    \section4 qndb
 
     The \c qndb usage is as follows:
 
@@ -133,17 +101,17 @@
     Trigger library rescan, and wait for content import to complete, with a 30 second timeout:
     \code qndb -t 30000 -s pfmDoneProcessing -m pfmRescanBooksFull \endcode
 
-    \section2 Language Bindings
+    \section3 Language Bindings
 
     Most languages will have d-bus bindings available. NickelDBus and \c qndb were written
     in Qt using QtDBus. 
 
-    \section2 API Documentation
+    \section3 API Documentation
 
     The API is documented \l {NDB}{here}. It is Qt based documentation, but it should
     be easy to determine what's needed for other languages or CLI tools.
 
-    \section1 Compiling NickelDBus
+    \section2 Compiling NickelDBus
 
     NickelDBus is a Qt and C++ based project. It was designed to be used with 
     \l {https://github.com/pgaskin/NickelTC}{NickelTC}. As such, the Makefile expects that
@@ -163,4 +131,5 @@
 
     if you haven't already run \c make so that you have the auto-generated adapter and proxy
     code and header files.
+
  */
