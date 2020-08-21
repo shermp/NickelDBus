@@ -4,6 +4,17 @@ CC            = $(CROSS_COMPILE)gcc
 CXX           = $(CROSS_COMPILE)g++
 PKG_CONFIG    = $(CROSS_COMPILE)pkg-config
 STRIP         = $(CROSS_COMPILE)strip
+AS            = $(CROSS_COMPILE)as
+# NOTE: Point to the GCC wrappers for sane LTO handling.
+#       But don't use LTO, it's terrible on GCC 4.9
+AR            = $(CROSS_COMPILE)gcc-ar
+RANLIB        = $(CROSS_COMPILE)gcc-ranlib
+NM            = $(CROSS_COMPILE)gcc-nm
+LD            = $(CROSS_COMPILE)ld
+READELF       = $(CROSS_COMPILE)readelf
+OBJCOPY       = $(CROSS_COMPILE)objcopy
+OBJDUMP       = $(CROSS_COMPILE)objdump
+STRINGS       = $(CROSS_COMPILE)strings
 
 override nh_comma := ,
 
@@ -59,9 +70,9 @@ override CXXFLAGS += -Wall -Wextra -Werror -Wno-missing-field-initializers
 override IFACE_DIR := ../interface
 override BINARY   := qndb
 # cli sources
-override SOURCES  := qndb.cc nickel_dbus_cli.cc $(IFACE_DIR)/nickel_dbus_proxy.cpp
+override SOURCES  := qndb.cc ndb_cli.cc $(IFACE_DIR)/ndb_proxy.cpp
 
-override MOCS 	  := $(IFACE_DIR)/nickel_dbus_proxy.h nickel_dbus_cli.h
+override MOCS 	  := $(IFACE_DIR)/ndb_proxy.h ndb_cli.h
 
 override OBJECTS_C    := $(filter %.o,$(SOURCES:%.c=%.o))
 override OBJECTS_CXX  := $(filter %.o,$(SOURCES:%.cc=%.o))
@@ -69,6 +80,8 @@ override OBJECTS_CXX1 := $(filter %.o,$(SOURCES:%.cpp=%.o))
 override MOCS_MOC     := $(filter %.moc,$(MOCS:%.h=%.moc))
 override OBJECTS_MOC  := $(MOCS_MOC:%=%.o)
 override GENERATED    := $(BINARY) $(OBJECTS_C) $(OBJECTS_CXX) $(OBJECTS_CXX1) $(MOCS_MOC) $(OBJECTS_MOC)
+
+override GITIGNORE += .kdev4/ *.kdev4 .kateconfig .vscode/ .idea/ .clangd/ .cache/ compile_commands.json $(filter-out ../interface/%,$(GENERATED))
 
 $(BINARY): override CFLAGS   += -fPIC
 $(BINARY): override CXXFLAGS += -fPIC
@@ -93,9 +106,13 @@ $(OBJECTS_MOC): %.moc.o: %.moc
 $(MOCS_MOC): %.moc: %.h
 	$(call nh_cmd_moch,$@,$^)
 
-.PHONY: all clean
+.PHONY: all clean gitignore
 
 all: $(BINARY)
 
 clean:
 	rm -f $(GENERATED)
+
+gitignore:
+	echo "# make gitignore" > .gitignore
+	echo "$(strip $(GITIGNORE))" | tr " " "\n" >> .gitignore

@@ -2,7 +2,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
-#include "nickel_dbus_cli.h"
+#include "ndb_cli.h"
 
 int main(int argc, char **argv) {
     QCoreApplication app(argc, argv);
