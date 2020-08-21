@@ -55,6 +55,7 @@ class NDB : public QObject, protected QDBusContext {
     public Q_SLOTS:
         QString ndbVersion();
         QString miscNickelClassDetails(QString const& staticMmetaobjectSymbol);
+        QString ndbNickelWidgets();
         // misc
         bool miscSignalConnected(QString const& signalName);
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
