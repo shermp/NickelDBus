@@ -174,6 +174,7 @@ void NDBCli::connectSignals() {
     NDBCLI_SIG_CONNECT(wmScanningStarted, handleSignalParam0);
     NDBCLI_SIG_CONNECT(wmTryingToConnect, handleSignalParam0);
     NDBCLI_SIG_CONNECT(wmWifiEnabled, handleSignalParam1);
+    NDBCLI_SIG_CONNECT(ndbViewChanged, handleSignalParam1);
 }
 
 void NDBCli::handleSignalParam0() {
@@ -182,6 +183,10 @@ void NDBCli::handleSignalParam0() {
 
 void NDBCli::handleSignalParam1(QVariant val1) {
     handleSignal(NDBCLI_SIG_NAME(), val1);
+}
+
+void NDBCli::handleSignalParam2(QVariant val1, QVariant val2) {
+    handleSignal(NDBCLI_SIG_NAME(), val1, val2);
 }
 
 void NDBCli::handleSignal(const QString& sigName, QVariant val1, QVariant val2, QVariant val3, QVariant val4) {

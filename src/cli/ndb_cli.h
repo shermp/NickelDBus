@@ -29,6 +29,7 @@ class NDBCli : public QObject {
         void setPrintAPI(bool api);
         void handleSignalParam0();
         void handleSignalParam1(QVariant val1);
+        void handleSignalParam2(QVariant val1, QVariant val2);
     Q_SIGNALS:
         void timeoutTriggered();
     public Q_SLOTS:
