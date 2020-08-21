@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QSet>
+#include <QStackedWidget>
 #include <QtDBus>
 #include <QDBusContext>
 
@@ -51,11 +52,13 @@ class NDB : public QObject, protected QDBusContext {
         void wmWifiEnabled(bool enabled);
         void wmLinkQualityForConnectedNetwork(double quality);
         void wmMacAddressAvailable(QString mac);
+        void ndbViewChanged(QString newView);
 
     public Q_SLOTS:
         QString ndbVersion();
         QString miscNickelClassDetails(QString const& staticMmetaobjectSymbol);
         QString ndbNickelWidgets();
+        QString ndbCurrentView();
         // misc
         bool miscSignalConnected(QString const& signalName);
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
@@ -85,10 +88,13 @@ class NDB : public QObject, protected QDBusContext {
         void pwrReboot();
     protected Q_SLOTS:
         void allowDialog();
+        void handleQSWCurrentChanged(int index);
+        void handleQSWTimer();
     private:
         void *libnickel;
         bool allowDlg = true;
         QSet<QString> connectedSignals;
+        QStackedWidget *stackedWidget = nullptr;
         
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);

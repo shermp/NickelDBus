@@ -1,5 +1,8 @@
 #include <dlfcn.h>
+#include <QApplication>
 #include <QString>
+#include <QWidget>
+#include <QTimer>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
@@ -78,7 +81,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
                 if (QWidget *w = sw->widget(j)) {
                     if (!QString(w->metaObject()->className()).compare("HomePageView")) {
                         nh_log("NickelDBus: HomePageView exists during init");
-}
+                    }
                 }
             }
         }
@@ -154,6 +157,46 @@ void NDB::connectSignals() {
  */
 QString NDB::ndbVersion() {
     return QStringLiteral(NH_VERSION);
+}
+
+void NDB::handleQSWCurrentChanged(int index) {
+    if (index >= 0) {
+        // I'd rather emit the ndbViewChanged signal here, but it's
+        // not reliable, so it seems it needs to wait until the signal
+        // handler completes. Hence the timer.
+        QTimer::singleShot(10, this, &NDB::handleQSWTimer);
+    }
+}
+
+void NDB::handleQSWTimer() {
+    emit ndbViewChanged(ndbCurrentView());
+}
+
+QString NDB::ndbCurrentView() {
+    // The ReadingView widget can be found in the same QStackedWidget
+    // as the HomePageView widget. We can search for it using the
+    // appropriate QApplication static methods
+    if (!stackedWidget) {
+        QWidgetList wl = QApplication::allWidgets();
+        for (int i = 0; i < wl.size(); ++i) {
+            if (!QString(wl[i]->metaObject()->className()).compare("QStackedWidget")) {
+                QStackedWidget *sw = static_cast<QStackedWidget*>(wl[i]);
+                for (int j = 0; j < sw->count(); ++j) {
+                    if (QWidget *w = sw->widget(j)) {
+                        if (!QString(w->metaObject()->className()).compare("HomePageView")) {
+                            stackedWidget = sw;
+                            QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDB::handleQSWCurrentChanged);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, stackedWidget, "unable to retrieve HomePageView stacked widget");
+    QWidget *w = stackedWidget->currentWidget();
+    NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, w, "QStackedWidget has no current widget");
+    return QString(w->metaObject()->className());
 }
 
 bool NDB::ndbInUSBMS() {
