@@ -148,6 +148,10 @@ QString NDB::ndbVersion() {
     return QStringLiteral(NH_VERSION);
 }
 
+void NDB::handleStackedWidgetDestroyed() {
+    stackedWidget = nullptr;
+}
+
 void NDB::handleQSWCurrentChanged(int index) {
     if (index >= 0) {
         // I'd rather emit the ndbViewChanged signal here, but it's
@@ -181,6 +185,9 @@ QString NDB::ndbCurrentView() {
                         if (!QString(w->metaObject()->className()).compare("HomePageView")) {
                             stackedWidget = sw;
                             QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDB::handleQSWCurrentChanged);
+                            // Just in case Nickel ever decides to destroy the stacked widget, we'll connect its destroyed()
+                            // signal to make sure we aren't left with a dangling pointer.
+                            QObject::connect(stackedWidget, &QObject::destroyed, this, &NDB::handleStackedWidgetDestroyed);
                             break;
                         }
                     }
@@ -239,7 +246,7 @@ QString NDB::getNickelMetaObjectDetails(const QMetaObject* nmo) {
  * 
  * A formatted string of available signals and slots is returned.
  */
-QString NDB::miscNickelClassDetails(QString const& staticMmetaobjectSymbol) {
+QString NDB::ndbNickelClassDetails(QString const& staticMmetaobjectSymbol) {
     NDB_DBUS_USB_ASSERT(QString(""));
     typedef QMetaObject NickelMetaObject;
     NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, staticMmetaobjectSymbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
@@ -340,7 +347,7 @@ void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QStr
  * 
  * Returns \c 1 if exists, or \c 0 otherwise
  */
-bool NDB::miscSignalConnected(QString const &signalName) {
+bool NDB::ndbSignalConnected(QString const &signalName) {
     return connectedSignals.contains(signalName);
 }
 

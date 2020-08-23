@@ -56,11 +56,11 @@ class NDB : public QObject, protected QDBusContext {
 
     public Q_SLOTS:
         QString ndbVersion();
-        QString miscNickelClassDetails(QString const& staticMmetaobjectSymbol);
+        QString ndbNickelClassDetails(QString const& staticMmetaobjectSymbol);
         QString ndbNickelWidgets();
         QString ndbCurrentView();
         // misc
-        bool miscSignalConnected(QString const& signalName);
+        bool ndbSignalConnected(QString const& signalName);
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
         void mwcHome();
         // Confirmation Dialogs
@@ -90,6 +90,7 @@ class NDB : public QObject, protected QDBusContext {
         void allowDialog();
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
+        void handleStackedWidgetDestroyed();
     private:
         void *libnickel;
         bool allowDlg = true;
