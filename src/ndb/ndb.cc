@@ -198,7 +198,11 @@ QString NDB::ndbCurrentView() {
     NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, stackedWidget, "unable to retrieve HomePageView stacked widget");
     QWidget *w = stackedWidget->currentWidget();
     NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, w, "QStackedWidget has no current widget");
-    return QString(w->metaObject()->className());
+    QString className = QString(w->metaObject()->className());
+    if (!className.compare("ReadingView")) {
+        QObject::connect(w, SIGNAL(pageChanged(int)), this, SIGNAL(rvPageChanged(int)), Qt::UniqueConnection);
+    }
+    return className;
 }
 
 bool NDB::ndbInUSBMS() {

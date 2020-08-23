@@ -13,6 +13,7 @@ typedef QObject PlugWorkflowManager;
 typedef QObject WirelessManager;
 typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
+typedef QWidget ReadingView;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
@@ -52,6 +53,7 @@ class NDB : public QObject, protected QDBusContext {
         void wmWifiEnabled(bool enabled);
         void wmLinkQualityForConnectedNetwork(double quality);
         void wmMacAddressAvailable(QString mac);
+        void rvPageChanged(int num);
         void ndbViewChanged(QString newView);
 
     public Q_SLOTS:
