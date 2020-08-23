@@ -53,6 +53,10 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     // The following symbols are required. If they can't be resolved, bail out
     ndbResolveSymbol("_ZN11PlugManager14sharedInstanceEv", nh_symoutptr(nSym.PlugManager__sharedInstance));
     ndbResolveSymbol("_ZNK11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
+    if (!nSym.PlugManager__gadgetMode) {
+        // Older firmware versions use a slightly different mangled symbol
+        ndbResolveSymbol("_ZN11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
+    }
     if (!nSym.PlugManager__sharedInstance || !nSym.PlugManager__gadgetMode) {
         initSucceeded = false;
         return;
