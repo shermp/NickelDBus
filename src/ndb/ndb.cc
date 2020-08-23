@@ -258,6 +258,75 @@ QString NDB::ndbNickelClassDetails(QString const& staticMmetaobjectSymbol) {
 }
 
 /*!
+ * \brief Check if a signal was successfully connected
+ * 
+ * Check if \a signalName is connected. \a signalName must be provided
+ * without parentheses and parameters.
+ * 
+ * Returns \c 1 if exists, or \c 0 otherwise
+ */
+bool NDB::ndbSignalConnected(QString const &signalName) {
+    return connectedSignals.contains(signalName);
+}
+
+QString NDB::ndbNickelWidgets() {
+    QString str = QString("Active Modal: \n");
+    QWidget *modal = QApplication::activeModalWidget();
+    if (modal) {
+        str.append(QString("%1\n").arg(modal->metaObject()->className()));
+    }
+    str.append("\nActive Window: \n");
+    QWidget *window = QApplication::activeWindow();
+    if (window) {
+        str.append(QString("%1\n").arg(window->metaObject()->className()));
+    }
+    str.append("\nFocused widget: \n");
+    QWidget *focus = QApplication::focusWidget();
+    if (focus) {
+        str.append(QString("%1\n").arg(focus->metaObject()->className()));
+    }
+    str.append("\nAll Widgets: \n");
+    QWidgetList widgets = QApplication::allWidgets();
+    for (int i = 0; i < widgets.size(); ++i) {
+        str.append(QString("%1\n").arg(widgets[i]->metaObject()->className()));
+    }
+    str.append("\nReading View State: \n");
+    QWidgetList visWidgets = QApplication::allWidgets();
+    for (int i = 0; i < visWidgets.size(); ++i) {
+        if (!QString(visWidgets[i]->metaObject()->className()).compare("ReadingView")) {
+            if (!visWidgets[i]->isHidden()) {
+                str.append("visible\n");
+            }
+            str.append("\nReadingView Hierachy: ");
+            QWidget *w = visWidgets[i];
+            while (w) {
+                str.append(QString("%1 -> ").arg(w->metaObject()->className()));
+                w = w->parentWidget();
+            }
+            str.append("\n");
+        }
+    }
+    str.append("\nStacked Widgets: \n");
+    for (int i = 0; i < visWidgets.size(); ++i) {
+        if (!QString(visWidgets[i]->metaObject()->className()).compare("QStackedWidget")) {
+            str.append("\nWidgets in Stack: \n");
+            QStackedWidget *sw = static_cast<QStackedWidget *>(visWidgets[i]);
+            for (int j = 0; j < sw->count(); ++j) {
+                if (QWidget *w = sw->widget(j)) {
+                    str.append(QString("%1\n").arg(w->metaObject()->className()));
+                }
+            }
+        }
+    }
+
+    // foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+    //     if (!widget->isHidden())
+    //         str.append("%1").arg(widget->metaObject()->className());
+    // }
+    return str;
+}
+
+/*!
  * \internal
  * \brief Internal slot to enable new dialogs to be created 
  */
@@ -337,75 +406,6 @@ void NDB::dlgConfirmReject(QString const& title, QString const& body, QString co
  */
 void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     return dlgConfirmation(title, body, acceptText, rejectText);
-}
-
-/*!
- * \brief Check if a signal was successfully connected
- * 
- * Check if \a signalName is connected. \a signalName must be provided
- * without parentheses and parameters.
- * 
- * Returns \c 1 if exists, or \c 0 otherwise
- */
-bool NDB::ndbSignalConnected(QString const &signalName) {
-    return connectedSignals.contains(signalName);
-}
-
-QString NDB::ndbNickelWidgets() {
-    QString str = QString("Active Modal: \n");
-    QWidget *modal = QApplication::activeModalWidget();
-    if (modal) {
-        str.append(QString("%1\n").arg(modal->metaObject()->className()));
-    }
-    str.append("\nActive Window: \n");
-    QWidget *window = QApplication::activeWindow();
-    if (window) {
-        str.append(QString("%1\n").arg(window->metaObject()->className()));
-    }
-    str.append("\nFocused widget: \n");
-    QWidget *focus = QApplication::focusWidget();
-    if (focus) {
-        str.append(QString("%1\n").arg(focus->metaObject()->className()));
-    }
-    str.append("\nAll Widgets: \n");
-    QWidgetList widgets = QApplication::allWidgets();
-    for (int i = 0; i < widgets.size(); ++i) {
-        str.append(QString("%1\n").arg(widgets[i]->metaObject()->className()));
-    }
-    str.append("\nReading View State: \n");
-    QWidgetList visWidgets = QApplication::allWidgets();
-    for (int i = 0; i < visWidgets.size(); ++i) {
-        if (!QString(visWidgets[i]->metaObject()->className()).compare("ReadingView")) {
-            if (!visWidgets[i]->isHidden()) {
-                str.append("visible\n");
-            }
-            str.append("\nReadingView Hierachy: ");
-            QWidget *w = visWidgets[i];
-            while (w) {
-                str.append(QString("%1 -> ").arg(w->metaObject()->className()));
-                w = w->parentWidget();
-            }
-            str.append("\n");
-        }
-    }
-    str.append("\nStacked Widgets: \n");
-    for (int i = 0; i < visWidgets.size(); ++i) {
-        if (!QString(visWidgets[i]->metaObject()->className()).compare("QStackedWidget")) {
-            str.append("\nWidgets in Stack: \n");
-            QStackedWidget *sw = static_cast<QStackedWidget *>(visWidgets[i]);
-            for (int j = 0; j < sw->count(); ++j) {
-                if (QWidget *w = sw->widget(j)) {
-                    str.append(QString("%1\n").arg(w->metaObject()->className()));
-                }
-            }
-        }
-    }
-
-    // foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-    //     if (!widget->isHidden())
-    //         str.append("%1").arg(widget->metaObject()->className());
-    // }
-    return str;
 }
 
 /*!
