@@ -269,6 +269,10 @@ bool NDB::ndbSignalConnected(QString const &signalName) {
     return connectedSignals.contains(signalName);
 }
 
+/*!
+ * \internal
+ * \brief Print details gleaned from the QApplication instance
+ */
 QString NDB::ndbNickelWidgets() {
     QString str = QString("Active Modal: \n");
     QWidget *modal = QApplication::activeModalWidget();
