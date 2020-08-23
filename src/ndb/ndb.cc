@@ -75,21 +75,6 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     // Toast
     ndbResolveSymbol("_ZN20MainWindowController14sharedInstanceEv", nh_symoutptr(nSym.MainWindowController_sharedInstance));
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
-
-    // See if QStackedWidget with HomePageView exists yet
-    QWidgetList wl = QApplication::allWidgets();
-    for (int i = 0; i < wl.size(); ++i) {
-        if (!QString(wl[i]->metaObject()->className()).compare("QStackedWidget")) {
-            QStackedWidget *sw = static_cast<QStackedWidget*>(wl[i]);
-            for (int j = 0; j < sw->count(); ++j) {
-                if (QWidget *w = sw->widget(j)) {
-                    if (!QString(w->metaObject()->className()).compare("HomePageView")) {
-                        nh_log("NickelDBus: HomePageView exists during init");
-                    }
-                }
-            }
-        }
-    }
 }
 
 /*!
