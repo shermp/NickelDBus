@@ -161,6 +161,12 @@ void NDB::handleQSWTimer() {
     emit ndbViewChanged(ndbCurrentView());
 }
 
+/*!
+ * \brief Get the class name of the current view.
+ * 
+ * Some class name examples are \c HomePageView \c ReadingView
+ * \c N3Dialog among others. Experiment :D
+ */
 QString NDB::ndbCurrentView() {
     // The ReadingView widget can be found in the same QStackedWidget
     // as the HomePageView widget. We can search for it using the
@@ -708,4 +714,11 @@ void NDB::pwrAction(const char *action) {
  * \brief (todo: figure this out)
  * 
  * \a mac address
+ */
+
+/*!
+ * \fn void NDB::ndbViewChanged(QString newView)
+ * \brief The signal that is emitted when the current view changes
+ * 
+ * \a newView is the class name of the new view. \sa ndbCurrentView
  */
