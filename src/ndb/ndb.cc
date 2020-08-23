@@ -242,15 +242,15 @@ QString NDB::getNickelMetaObjectDetails(const QMetaObject* nmo) {
  * \brief Print available details from nickel classes
  * 
  * This method attempts to dlsym then parse the staticMetaObject
- * property available from the mangeled \a staticMmetaobjectSymbol
+ * property available from the mangeled \a staticMetaobjectSymbol
  * 
  * A formatted string of available signals and slots is returned.
  */
-QString NDB::ndbNickelClassDetails(QString const& staticMmetaobjectSymbol) {
+QString NDB::ndbNickelClassDetails(QString const& staticMetaobjectSymbol) {
     NDB_DBUS_USB_ASSERT(QString(""));
     typedef QMetaObject NickelMetaObject;
-    NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, staticMmetaobjectSymbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
-    QByteArray sym = staticMmetaobjectSymbol.toLatin1();
+    NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, staticMetaobjectSymbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    QByteArray sym = staticMetaobjectSymbol.toLatin1();
     NickelMetaObject *nmo;
     reinterpret_cast<void*&>(nmo) = dlsym(libnickel, sym.constData());
     NDB_DBUS_ASSERT(QString(""), QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
