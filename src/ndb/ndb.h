@@ -111,7 +111,7 @@ class NDB : public QObject, protected QDBusContext {
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
-            QLabel* (*N3Dialog__getTitleLarge)(N3Dialog*);
+            QWidget* (*N3Dialog__content)(N3Dialog*);
         } nSym;
 
         void ndbResolveSymbol(const char *name, void** sym);

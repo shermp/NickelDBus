@@ -75,8 +75,8 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     // Toast
     ndbResolveSymbol("_ZN20MainWindowController14sharedInstanceEv", nh_symoutptr(nSym.MainWindowController_sharedInstance));
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
-
-    ndbResolveSymbol("_ZNK8N3Dialog13getTitleLargeEv", nh_symoutptr(nSym.N3Dialog__getTitleLarge));
+    // Get N3Dialog content
+    ndbResolveSymbol("_ZN8N3Dialog7contentEv", nh_symoutptr(nSym.N3Dialog__content));
 }
 
 /*!
@@ -171,11 +171,7 @@ void NDB::handleQSWTimer() {
  * \brief Get the class name of the current view.
  * 
  * Some class name examples are \c HomePageView \c ReadingView
- * \c N3Dialog among others.
- * 
- * Note, for \c N3Dialog specifically, the dialog title is
- * also appended, in the format \c N3Dialog|<title> so that
- * you can know which dialog is being shown.
+ * among others.
  */
 QString NDB::ndbCurrentView() {
     // The ReadingView widget can be found in the same QStackedWidget
@@ -206,9 +202,9 @@ QString NDB::ndbCurrentView() {
     NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, w, "QStackedWidget has no current widget");
     QString name = QString(w->metaObject()->className());
     if (!name.compare("N3Dialog")) {
-        NDB_DBUS_SYM_ASSERT(name, nSym.N3Dialog__getTitleLarge);
-        if (QLabel *title = nSym.N3Dialog__getTitleLarge(w)) {
-            name += "|" + title->text();
+        NDB_DBUS_SYM_ASSERT(name, nSym.N3Dialog__content);
+        if (QWidget *c = nSym.N3Dialog__content(w)) {
+            name = c->objectName();
         }
     }
     return name;
@@ -744,8 +740,7 @@ void NDB::pwrAction(const char *action) {
  * \fn void NDB::ndbViewChanged(QString newView)
  * \brief The signal that is emitted when the current view changes
  * 
- * \a newView is the class name of the new view. As in \l ndbCurrentView
- * \c N3Dialog has the dialog title appended.
+ * \a newView is the class name of the new view.
  * 
  * \sa ndbCurrentView
  */
