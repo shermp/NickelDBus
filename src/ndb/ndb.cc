@@ -203,8 +203,9 @@ QString NDB::ndbCurrentView() {
     QString name = QString(w->metaObject()->className());
     if (!name.compare("N3Dialog")) {
         NDB_DBUS_SYM_ASSERT(name, nSym.N3Dialog__getTitleLarge);
-        QLabel *title = nSym.N3Dialog__getTitleLarge(w);
-        name = title->text();
+        if (QLabel *title = nSym.N3Dialog__getTitleLarge(w)) {
+            name += "|" + title->text();
+        }
     }
     return name;
 }
