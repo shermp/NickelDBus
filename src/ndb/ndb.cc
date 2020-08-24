@@ -75,6 +75,8 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     // Toast
     ndbResolveSymbol("_ZN20MainWindowController14sharedInstanceEv", nh_symoutptr(nSym.MainWindowController_sharedInstance));
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
+
+    ndbResolveSymbol("_ZNK8N3Dialog13getTitleLargeEv", nh_symoutptr(nSym.N3Dialog__getTitleLarge));
 }
 
 /*!
@@ -198,7 +200,13 @@ QString NDB::ndbCurrentView() {
     NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, stackedWidget, "unable to retrieve HomePageView stacked widget");
     QWidget *w = stackedWidget->currentWidget();
     NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, w, "QStackedWidget has no current widget");
-    return QString(w->metaObject()->className());
+    QString name = QString(w->metaObject()->className());
+    if (!name.compare("N3Dialog")) {
+        NDB_DBUS_SYM_ASSERT(name, nSym.N3Dialog__getTitleLarge);
+        QLabel *title = nSym.N3Dialog__getTitleLarge(w);
+        name = title->text();
+    }
+    return name;
 }
 
 bool NDB::ndbInUSBMS() {

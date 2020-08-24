@@ -7,12 +7,14 @@
 #include <QStackedWidget>
 #include <QtDBus>
 #include <QDBusContext>
+#include <QLabel>
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
 typedef QObject WirelessManager;
 typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
+typedef QWidget N3Dialog;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
@@ -109,6 +111,7 @@ class NDB : public QObject, protected QDBusContext {
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
+            QLabel* (*N3Dialog__getTitleLarge)(N3Dialog*);
         } nSym;
 
         void ndbResolveSymbol(const char *name, void** sym);
