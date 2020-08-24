@@ -184,7 +184,7 @@ QString NDB::ndbCurrentView() {
                 QStackedWidget *sw = static_cast<QStackedWidget*>(wl[i]);
                 for (int j = 0; j < sw->count(); ++j) {
                     if (QWidget *w = sw->widget(j)) {
-                        if (!QString(w->metaObject()->className()).compare("HomePageView")) {
+                        if (!QString(w->objectName()).compare("HomePageView")) {
                             stackedWidget = sw;
                             QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDB::handleQSWCurrentChanged);
                             // Just in case Nickel ever decides to destroy the stacked widget, we'll connect its destroyed()
@@ -200,7 +200,7 @@ QString NDB::ndbCurrentView() {
     NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, stackedWidget, "unable to retrieve HomePageView stacked widget");
     QWidget *w = stackedWidget->currentWidget();
     NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, w, "QStackedWidget has no current widget");
-    QString name = QString(w->metaObject()->className());
+    QString name = QString(w->objectName());
     if (!name.compare("N3Dialog")) {
         NDB_DBUS_SYM_ASSERT(name, nSym.N3Dialog__content);
         if (QWidget *c = nSym.N3Dialog__content(w)) {
