@@ -169,6 +169,8 @@ void NDB::handleQSWCurrentChanged(int index) {
         // I'd rather emit the ndbViewChanged signal here, but it's
         // not reliable, so it seems it needs to wait until the signal
         // handler completes. Hence the timer.
+        // This does give us a chance to filter out duplicate change
+        // signals, as some firmware versions appear to do.
         if (!viewTimer->isActive()) {
             viewTimer->start(10);
         }
