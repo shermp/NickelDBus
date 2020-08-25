@@ -2,7 +2,6 @@
 #include <QApplication>
 #include <QString>
 #include <QWidget>
-#include <QTimer>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
@@ -61,6 +60,16 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
         initSucceeded = false;
         return;
     }
+    // Setup view change timer
+    viewTimer = new QTimer(this);
+    if (!viewTimer) {
+        nh_log("failed to create viewTimer");
+        initSucceeded = false;
+        return;
+    }
+    viewTimer->setSingleShot(true);
+    QObject::connect(viewTimer, &QTimer::timeout, this, &NDB::handleQSWTimer);
+
     // Resolve the rest of the Nickel symbols up-front
     // PlugWorkFlowManager
     ndbResolveSymbol("_ZN19PlugWorkflowManager14sharedInstanceEv", nh_symoutptr(nSym.PlugWorkflowManager_sharedInstance));
@@ -84,6 +93,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
  * \brief Destroy the NDB::NDB object
  */
 NDB::~NDB() {
+    delete viewTimer;
     conn.unregisterService(NDB_DBUS_IFACE_NAME);
     conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
 }
@@ -159,7 +169,9 @@ void NDB::handleQSWCurrentChanged(int index) {
         // I'd rather emit the ndbViewChanged signal here, but it's
         // not reliable, so it seems it needs to wait until the signal
         // handler completes. Hence the timer.
-        QTimer::singleShot(10, this, &NDB::handleQSWTimer);
+        if (!viewTimer->isActive()) {
+            viewTimer->start(10);
+        }
     }
 }
 

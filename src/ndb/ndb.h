@@ -8,6 +8,7 @@
 #include <QtDBus>
 #include <QDBusContext>
 #include <QLabel>
+#include <QTimer>
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
@@ -113,6 +114,7 @@ class NDB : public QObject, protected QDBusContext {
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
             QWidget* (*N3Dialog__content)(N3Dialog*);
         } nSym;
+        QTimer *viewTimer;
 
         void ndbResolveSymbol(const char *name, void** sym);
         bool ndbInUSBMS();
