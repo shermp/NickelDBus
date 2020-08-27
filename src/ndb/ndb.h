@@ -16,6 +16,7 @@ typedef QObject WirelessManager;
 typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
 typedef QWidget N3Dialog;
+typedef void Device;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
@@ -62,6 +63,7 @@ class NDB : public QObject, protected QDBusContext {
         QString ndbNickelClassDetails(QString const& staticMmetaobjectSymbol);
         QString ndbNickelWidgets();
         QString ndbCurrentView();
+        QString ndbFirmwareVersion();
         // misc
         bool ndbSignalConnected(QString const& signalName);
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
@@ -99,7 +101,7 @@ class NDB : public QObject, protected QDBusContext {
         bool allowDlg = true;
         QSet<QString> connectedSignals;
         QStackedWidget *stackedWidget = nullptr;
-        
+        QString fwVersion;
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);
             PlugManager *(*PlugManager__sharedInstance)();
@@ -113,6 +115,8 @@ class NDB : public QObject, protected QDBusContext {
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
             QWidget* (*N3Dialog__content)(N3Dialog*);
+            Device *(*Device__getCurrentDevice)();
+            QByteArray (*Device__userAgent)(Device*);
         } nSym;
         QTimer *viewTimer;
 

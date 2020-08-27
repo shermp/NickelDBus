@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QString>
 #include <QWidget>
+#include <QRegExp>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
@@ -86,6 +87,9 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
     // Get N3Dialog content
     ndbResolveSymbol("_ZN8N3Dialog7contentEv", nh_symoutptr(nSym.N3Dialog__content));
+    // Device (for FW version)
+    ndbResolveSymbol("_ZN6Device16getCurrentDeviceEv", nh_symoutptr(nSym.Device__getCurrentDevice));
+    ndbResolveSymbol("_ZNK6Device9userAgentEv", nh_symoutptr(nSym.Device__userAgent));
 }
 
 /*!
@@ -351,6 +355,26 @@ QString NDB::ndbNickelWidgets() {
     //         str.append("%1").arg(widget->metaObject()->className());
     // }
     return str;
+}
+
+/*!
+ * \brief Get the current firmware version
+ * 
+ * Get the current firmware version as found in the user agent string
+ */
+QString NDB::ndbFirmwareVersion() {
+    NDB_DBUS_USB_ASSERT(fwVersion);
+    if (fwVersion.isEmpty()) {
+        NDB_DBUS_SYM_ASSERT(fwVersion, nSym.Device__getCurrentDevice);
+        NDB_DBUS_SYM_ASSERT(fwVersion, nSym.Device__userAgent);
+        Device *d = nSym.Device__getCurrentDevice();
+        NDB_DBUS_ASSERT(fwVersion, QDBusError::InternalError, d, "unable to get current device");
+        QString ua = QString::fromUtf8(nSym.Device__userAgent(d));
+        QRegExp fwRegex = QRegExp("^.+\\(Kobo Touch (\\d+)/([\\d\\.]+)\\)$");
+        NDB_DBUS_ASSERT(fwVersion, QDBusError::InternalError, (fwRegex.indexIn(ua) != -1 && fwRegex.captureCount() == 2), "could not get fw version from ua string");
+        fwVersion = fwRegex.cap(2);
+    }
+    return fwVersion;
 }
 
 /*!
