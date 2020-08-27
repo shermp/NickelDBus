@@ -4,14 +4,18 @@
 #include <QObject>
 #include <QString>
 #include <QSet>
+#include <QStackedWidget>
 #include <QtDBus>
 #include <QDBusContext>
+#include <QLabel>
+#include <QTimer>
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
 typedef QObject WirelessManager;
 typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
+typedef QWidget N3Dialog;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
@@ -51,12 +55,15 @@ class NDB : public QObject, protected QDBusContext {
         void wmWifiEnabled(bool enabled);
         void wmLinkQualityForConnectedNetwork(double quality);
         void wmMacAddressAvailable(QString mac);
+        void ndbViewChanged(QString newView);
 
     public Q_SLOTS:
         QString ndbVersion();
-        QString miscNickelClassDetails(QString const& staticMmetaobjectSymbol);
+        QString ndbNickelClassDetails(QString const& staticMmetaobjectSymbol);
+        QString ndbNickelWidgets();
+        QString ndbCurrentView();
         // misc
-        bool miscSignalConnected(QString const& signalName);
+        bool ndbSignalConnected(QString const& signalName);
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
         void mwcHome();
         // Confirmation Dialogs
@@ -84,10 +91,14 @@ class NDB : public QObject, protected QDBusContext {
         void pwrReboot();
     protected Q_SLOTS:
         void allowDialog();
+        void handleQSWCurrentChanged(int index);
+        void handleQSWTimer();
+        void handleStackedWidgetDestroyed();
     private:
         void *libnickel;
         bool allowDlg = true;
         QSet<QString> connectedSignals;
+        QStackedWidget *stackedWidget = nullptr;
         
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);
@@ -101,7 +112,9 @@ class NDB : public QObject, protected QDBusContext {
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
+            QWidget* (*N3Dialog__content)(N3Dialog*);
         } nSym;
+        QTimer *viewTimer;
 
         void ndbResolveSymbol(const char *name, void** sym);
         bool ndbInUSBMS();

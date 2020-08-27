@@ -1,5 +1,7 @@
 #include <dlfcn.h>
+#include <QApplication>
 #include <QString>
+#include <QWidget>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
@@ -50,10 +52,24 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     // The following symbols are required. If they can't be resolved, bail out
     ndbResolveSymbol("_ZN11PlugManager14sharedInstanceEv", nh_symoutptr(nSym.PlugManager__sharedInstance));
     ndbResolveSymbol("_ZNK11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
+    if (!nSym.PlugManager__gadgetMode) {
+        // Older firmware versions use a slightly different mangled symbol
+        ndbResolveSymbol("_ZN11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
+    }
     if (!nSym.PlugManager__sharedInstance || !nSym.PlugManager__gadgetMode) {
         initSucceeded = false;
         return;
     }
+    // Setup view change timer
+    viewTimer = new QTimer(this);
+    if (!viewTimer) {
+        nh_log("failed to create viewTimer");
+        initSucceeded = false;
+        return;
+    }
+    viewTimer->setSingleShot(true);
+    QObject::connect(viewTimer, &QTimer::timeout, this, &NDB::handleQSWTimer);
+
     // Resolve the rest of the Nickel symbols up-front
     // PlugWorkFlowManager
     ndbResolveSymbol("_ZN19PlugWorkflowManager14sharedInstanceEv", nh_symoutptr(nSym.PlugWorkflowManager_sharedInstance));
@@ -68,6 +84,8 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     // Toast
     ndbResolveSymbol("_ZN20MainWindowController14sharedInstanceEv", nh_symoutptr(nSym.MainWindowController_sharedInstance));
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
+    // Get N3Dialog content
+    ndbResolveSymbol("_ZN8N3Dialog7contentEv", nh_symoutptr(nSym.N3Dialog__content));
 }
 
 /*!
@@ -75,6 +93,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
  * \brief Destroy the NDB::NDB object
  */
 NDB::~NDB() {
+    delete viewTimer;
     conn.unregisterService(NDB_DBUS_IFACE_NAME);
     conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
 }
@@ -141,6 +160,70 @@ QString NDB::ndbVersion() {
     return QStringLiteral(NH_VERSION);
 }
 
+void NDB::handleStackedWidgetDestroyed() {
+    stackedWidget = nullptr;
+}
+
+void NDB::handleQSWCurrentChanged(int index) {
+    if (index >= 0) {
+        // I'd rather emit the ndbViewChanged signal here, but it's
+        // not reliable, so it seems it needs to wait until the signal
+        // handler completes. Hence the timer.
+        // This does give us a chance to filter out duplicate change
+        // signals, as some firmware versions appear to do.
+        if (!viewTimer->isActive()) {
+            viewTimer->start(10);
+        }
+    }
+}
+
+void NDB::handleQSWTimer() {
+    emit ndbViewChanged(ndbCurrentView());
+}
+
+/*!
+ * \brief Get the class name of the current view.
+ * 
+ * Some class name examples are \c HomePageView \c ReadingView
+ * among others.
+ */
+QString NDB::ndbCurrentView() {
+    // The ReadingView widget can be found in the same QStackedWidget
+    // as the HomePageView widget. We can search for it using the
+    // appropriate QApplication static methods
+    if (!stackedWidget) {
+        QWidgetList wl = QApplication::allWidgets();
+        for (int i = 0; i < wl.size(); ++i) {
+            if (!QString(wl[i]->metaObject()->className()).compare("QStackedWidget")) {
+                QStackedWidget *sw = static_cast<QStackedWidget*>(wl[i]);
+                for (int j = 0; j < sw->count(); ++j) {
+                    if (QWidget *w = sw->widget(j)) {
+                        if (!QString(w->objectName()).compare("HomePageView")) {
+                            stackedWidget = sw;
+                            QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDB::handleQSWCurrentChanged);
+                            // Just in case Nickel ever decides to destroy the stacked widget, we'll connect its destroyed()
+                            // signal to make sure we aren't left with a dangling pointer.
+                            QObject::connect(stackedWidget, &QObject::destroyed, this, &NDB::handleStackedWidgetDestroyed);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, stackedWidget, "unable to retrieve HomePageView stacked widget");
+    QWidget *w = stackedWidget->currentWidget();
+    NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, w, "QStackedWidget has no current widget");
+    QString name = QString(w->objectName());
+    if (!name.compare("N3Dialog")) {
+        NDB_DBUS_SYM_ASSERT(name, nSym.N3Dialog__content);
+        if (QWidget *c = nSym.N3Dialog__content(w)) {
+            name = c->objectName();
+        }
+    }
+    return name;
+}
+
 bool NDB::ndbInUSBMS() {
     return nSym.PlugManager__gadgetMode(nSym.PlugManager__sharedInstance());
 }
@@ -182,19 +265,92 @@ QString NDB::getNickelMetaObjectDetails(const QMetaObject* nmo) {
  * \brief Print available details from nickel classes
  * 
  * This method attempts to dlsym then parse the staticMetaObject
- * property available from the mangeled \a staticMmetaobjectSymbol
+ * property available from the mangeled \a staticMetaobjectSymbol
  * 
  * A formatted string of available signals and slots is returned.
  */
-QString NDB::miscNickelClassDetails(QString const& staticMmetaobjectSymbol) {
+QString NDB::ndbNickelClassDetails(QString const& staticMetaobjectSymbol) {
     NDB_DBUS_USB_ASSERT(QString(""));
     typedef QMetaObject NickelMetaObject;
-    NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, staticMmetaobjectSymbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
-    QByteArray sym = staticMmetaobjectSymbol.toLatin1();
+    NDB_DBUS_ASSERT(QString(""),QDBusError::InvalidArgs, staticMetaobjectSymbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
+    QByteArray sym = staticMetaobjectSymbol.toLatin1();
     NickelMetaObject *nmo;
     reinterpret_cast<void*&>(nmo) = dlsym(libnickel, sym.constData());
     NDB_DBUS_ASSERT(QString(""), QDBusError::InternalError, nmo, "could not dlsym staticMetaObject function for symbol %s", sym.constData());
     return getNickelMetaObjectDetails((const NickelMetaObject*)nmo);
+}
+
+/*!
+ * \brief Check if a signal was successfully connected
+ * 
+ * Check if \a signalName is connected. \a signalName must be provided
+ * without parentheses and parameters.
+ * 
+ * Returns \c 1 if exists, or \c 0 otherwise
+ */
+bool NDB::ndbSignalConnected(QString const &signalName) {
+    return connectedSignals.contains(signalName);
+}
+
+/*!
+ * \internal
+ * \brief Print details gleaned from the QApplication instance
+ */
+QString NDB::ndbNickelWidgets() {
+    QString str = QString("Active Modal: \n");
+    QWidget *modal = QApplication::activeModalWidget();
+    if (modal) {
+        str.append(QString("%1\n").arg(modal->metaObject()->className()));
+    }
+    str.append("\nActive Window: \n");
+    QWidget *window = QApplication::activeWindow();
+    if (window) {
+        str.append(QString("%1\n").arg(window->metaObject()->className()));
+    }
+    str.append("\nFocused widget: \n");
+    QWidget *focus = QApplication::focusWidget();
+    if (focus) {
+        str.append(QString("%1\n").arg(focus->metaObject()->className()));
+    }
+    str.append("\nAll Widgets: \n");
+    QWidgetList widgets = QApplication::allWidgets();
+    for (int i = 0; i < widgets.size(); ++i) {
+        str.append(QString("%1\n").arg(widgets[i]->metaObject()->className()));
+    }
+    str.append("\nReading View State: \n");
+    QWidgetList visWidgets = QApplication::allWidgets();
+    for (int i = 0; i < visWidgets.size(); ++i) {
+        if (!QString(visWidgets[i]->metaObject()->className()).compare("ReadingView")) {
+            if (!visWidgets[i]->isHidden()) {
+                str.append("visible\n");
+            }
+            str.append("\nReadingView Hierachy: ");
+            QWidget *w = visWidgets[i];
+            while (w) {
+                str.append(QString("%1 -> ").arg(w->metaObject()->className()));
+                w = w->parentWidget();
+            }
+            str.append("\n");
+        }
+    }
+    str.append("\nStacked Widgets: \n");
+    for (int i = 0; i < visWidgets.size(); ++i) {
+        if (!QString(visWidgets[i]->metaObject()->className()).compare("QStackedWidget")) {
+            str.append("\nWidgets in Stack: \n");
+            QStackedWidget *sw = static_cast<QStackedWidget *>(visWidgets[i]);
+            for (int j = 0; j < sw->count(); ++j) {
+                if (QWidget *w = sw->widget(j)) {
+                    str.append(QString("%1\n").arg(w->metaObject()->className()));
+                }
+            }
+        }
+    }
+
+    // foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+    //     if (!widget->isHidden())
+    //         str.append("%1").arg(widget->metaObject()->className());
+    // }
+    return str;
 }
 
 /*!
@@ -277,18 +433,6 @@ void NDB::dlgConfirmReject(QString const& title, QString const& body, QString co
  */
 void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     return dlgConfirmation(title, body, acceptText, rejectText);
-}
-
-/*!
- * \brief Check if a signal was successfully connected
- * 
- * Check if \a signalName is connected. \a signalName must be provided
- * without parentheses and parameters.
- * 
- * Returns \c 1 if exists, or \c 0 otherwise
- */
-bool NDB::miscSignalConnected(QString const &signalName) {
-    return connectedSignals.contains(signalName);
 }
 
 /*!
@@ -604,4 +748,13 @@ void NDB::pwrAction(const char *action) {
  * \brief (todo: figure this out)
  * 
  * \a mac address
+ */
+
+/*!
+ * \fn void NDB::ndbViewChanged(QString newView)
+ * \brief The signal that is emitted when the current view changes
+ * 
+ * \a newView is the class name of the new view.
+ * 
+ * \sa ndbCurrentView
  */
