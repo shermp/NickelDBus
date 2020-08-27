@@ -780,5 +780,5 @@ void NDB::pwrAction(const char *action) {
  * 
  * \a newView is the class name of the new view.
  * 
- * \sa ndbCurrentView
+ * \sa NDB::ndbCurrentView()
  */

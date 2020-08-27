@@ -52,6 +52,11 @@
 
     \section1 Developer Documentation
 
+    \note Please do not directly install NickelDBus when installing your own
+    application. If you wish to include NickelDBus as a convenience for 
+    your users, consider performing an install or upgrade (never downgrade) 
+    during your application start-up process.
+
     NickelDBus presents itself on the d-bus \c system bus. It has an interface
     of \c com.github.shermp.nickeldbus and a path of \c /nickeldbus.
 
