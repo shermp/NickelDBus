@@ -16,6 +16,7 @@ compile_commands.json
 /src/interface/ndb_proxy.h
 /src/interface/ndb_proxy.cpp
 /src/interface/com.github.shermp.nickeldbus.xml
+/res/ndb_version
 /KoboRoot.tgz
 /libndb.so
 /NickelMenu/src/util.o

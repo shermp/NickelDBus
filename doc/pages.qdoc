@@ -38,6 +38,9 @@
 
     \note NickelDBus should survive factory resets.
 
+    \note to check what version of NickelDBus you have installed, open the file 
+    `.adds/nickeldbus` in a text editor.
+
     \section1 Upgrading
 
     To upgrade NickelDBus, simply follow the same procedure as installing it.
@@ -45,8 +48,8 @@
     \section1 Uninstallation
 
     If you ever want to remove NickelDBus, simply connect your Kobo to your
-    computer over USB and create a file (can be empty) called \c ndb_uninstall
-    on the root of the drive.
+    computer over USB and delete the file called \c nickeldbus in the \c .adds 
+    directory.
 
     Then disconnect your Kobo, and reboot. NickelDBus should now be removed.
 

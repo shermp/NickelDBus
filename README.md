@@ -10,9 +10,11 @@ Grab the latest release from the releases page, and copy the the KoboRoot.tgz to
 
 No configuration is required.
 
+Note, to check what version of NickelDBus you have installed, open the file `.adds/nickeldbus` in a text editor.
+
 ## Uninstalling
 
-To uninstall NickelDBus, simply create a file called `ndb_uninstall` in the USB root (AKA `/mnt/onboard`) and reboot your Kobo.
+To uninstall NickelDBus, simply delete the file called `nickeldbus` in the `.adds` directory, and reboot your Kobo.
 
 ## Usage
 

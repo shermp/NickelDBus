@@ -25,19 +25,20 @@ override PROXY    := $(IFACE_DIR)/ndb_proxy.h
 
 override KOBOROOT += res/$(DBUS_IFACE_CFG):/etc/dbus-1/system.d/$(DBUS_IFACE_CFG)
 override KOBOROOT += src/cli/qndb:/usr/bin/qndb
+override KOBOROOT += $(UNINSTALL_FILE):/mnt/onboard/.adds/nickeldbus
 
-override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML)
+override UNINSTALL_FILE := res/ndb_version
+
+override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML) $(UNINSTALL_FILE)
 
 override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) doc/html
 
-.PHONY: interface
+.PHONY: cli clean-cli gitignore-cli doc dbuscfg interface uninstall-file
+
 interface: $(ADAPTER) $(PROXY)
 
-.PHONY: dbuscfg
 dbuscfg:
 	script/make-dbus-conf.sh res/$(DBUS_IFACE_CFG) $(DBUS_IFACE_NAME)
-
-.PHONY: cli clean-cli gitignore-cli doc
 
 cli: interface
 	cd src/cli && $(MAKE)
@@ -54,6 +55,11 @@ gitignore: gitignore-cli
 
 doc:
 	cd doc/config && qdoc ndb.qdocconf
+
+uninstall-file:
+	echo "$(VERSION)" > $(UNINSTALL_FILE)
+
+all: uninstall-file
 
 $(SOURCES): $(ADAPTER)
 
