@@ -175,6 +175,7 @@ void NDBCli::connectSignals() {
     NDBCLI_SIG_CONNECT(wmTryingToConnect, handleSignalParam0);
     NDBCLI_SIG_CONNECT(wmWifiEnabled, handleSignalParam1);
     NDBCLI_SIG_CONNECT(ndbViewChanged, handleSignalParam1);
+    NDBCLI_SIG_CONNECT(rvPageChanged, handleSignalParam1);
 }
 
 void NDBCli::handleSignalParam0() {

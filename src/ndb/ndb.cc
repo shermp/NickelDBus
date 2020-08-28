@@ -224,6 +224,8 @@ QString NDB::ndbCurrentView() {
         if (QWidget *c = nSym.N3Dialog__content(w)) {
             name = c->objectName();
         }
+    } else if (!name.compare("ReadingView")) {
+        rvConnectSignals(w);
     }
     return name;
 }
@@ -687,6 +689,12 @@ void NDB::pwrAction(const char *action) {
     nm_action_result_free(res);
 }
 
+void NDB::rvConnectSignals(QWidget* rv) {
+    // Just connecting pageChanged(int) for now. Others may or may not 
+    // come in the future.
+    QObject::connect(rv, SIGNAL(pageChanged(int)), this, SIGNAL(rvPageChanged(int)), Qt::UniqueConnection);
+}
+
 /* Signal Documentation */
 
 /*!
@@ -782,3 +790,11 @@ void NDB::pwrAction(const char *action) {
  * 
  * \sa NDB::ndbCurrentView()
  */
+
+/*!
+ * \fn void NDB::rvPageChanged(int pageNum)
+ * \brief The signal that is emitted when the current book changes page
+ * 
+ * \a pageNum is kepub or epub page number of the new page.
+ */
+

@@ -57,6 +57,7 @@ class NDB : public QObject, protected QDBusContext {
         void wmLinkQualityForConnectedNetwork(double quality);
         void wmMacAddressAvailable(QString mac);
         void ndbViewChanged(QString newView);
+        void rvPageChanged(int pageNum);
 
     public Q_SLOTS:
         QString ndbVersion();
@@ -131,6 +132,7 @@ class NDB : public QObject, protected QDBusContext {
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
         void dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
         void pwrAction(const char *action);
+        void rvConnectSignals(QWidget* rv);
 };
 
 #endif
