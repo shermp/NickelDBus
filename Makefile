@@ -31,7 +31,7 @@ override UNINSTALL_FILE := res/ndb_version
 
 override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML) $(UNINSTALL_FILE)
 
-override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o)
+override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) doc/html
 
 .PHONY: cli clean-cli gitignore-cli doc dbuscfg interface uninstall-file
 
@@ -53,9 +53,8 @@ clean: clean-cli
 
 gitignore: gitignore-cli
 
-doc: | docs/
-	cd qdoc/config && qdoc ndb.qdocconf
-	touch docs/.nojekyll
+doc:
+	cd doc/config && qdoc ndb.qdocconf
 
 uninstall-file:
 	echo "$(VERSION)" > $(UNINSTALL_FILE)
@@ -75,8 +74,5 @@ $(PROXY) &: $(DBUS_IFACE_XML)
 
 $(IFACE_DIR):
 	mkdir $@
-
-docs/:
-	mkdir docs/
 
 include NickelHook/NickelHook.mk

@@ -74,7 +74,6 @@
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#ndbViewChanged">ndbViewChanged</a></b>(QString<i> newView</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pfmAboutToConnect">pfmAboutToConnect</a></b>()</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pfmDoneProcessing">pfmDoneProcessing</a></b>()</td></tr>
-<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#rvPageChanged">rvPageChanged</a></b>(int<i> pageNum</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmLinkQualityForConnectedNetwork">wmLinkQualityForConnectedNetwork</a></b>(double<i> quality</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmMacAddressAvailable">wmMacAddressAvailable</a></b>(QString<i> mac</i>)</td></tr>
 <tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmNetworkConnected">wmNetworkConnected</a></b>()</td></tr>
@@ -186,7 +185,7 @@
 <!-- $$$ndbViewChanged[overload1]$$$ndbViewChangedQString -->
 <h3 class="fn"><a name="ndbViewChanged"></a><span class="type">void</span> NDB::<span class="name">ndbViewChanged</span>(<span class="type">QString</span><i> newView</i>)<tt> [signal]</tt></h3>
 <p>The signal that is emitted when the current view changes</p>
-<p>This signal is only emitted if <a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>() has been called at least once by an application. <i>newView</i> is the class name of the new view.</p>
+<p><i>newView</i> is the class name of the new view.</p>
 <p><b>See also </b><a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>().</p>
 <!-- @@@ndbViewChanged -->
 <!-- $$$nsAutoUSBGadget[overload1]$$$nsAutoUSBGadgetQStringconst& -->
@@ -239,12 +238,6 @@
 <h3 class="fn"><a name="pwrShutdown"></a><span class="type">void</span> NDB::<span class="name">pwrShutdown</span>()<tt> [slot]</tt></h3>
 <p>Shutdown Kobo</p>
 <!-- @@@pwrShutdown -->
-<!-- $$$rvPageChanged[overload1]$$$rvPageChangedint -->
-<h3 class="fn"><a name="rvPageChanged"></a><span class="type">void</span> NDB::<span class="name">rvPageChanged</span>(<span class="type">int</span><i> pageNum</i>)<tt> [signal]</tt></h3>
-<p>The signal that is emitted when the current book changes page</p>
-<p>This signal is only emitted if <a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>() has been called at least once by an application. <i>pageNum</i> is kepub or epub page number of the new page.</p>
-<p><b>See also </b><a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>().</p>
-<!-- @@@rvPageChanged -->
 <!-- $$$wfmConnectWireless[overload1]$$$wfmConnectWireless -->
 <h3 class="fn"><a name="wfmConnectWireless"></a><span class="type">void</span> NDB::<span class="name">wfmConnectWireless</span>()<tt> [slot]</tt></h3>
 <p>Connect to WiFi network.</p>

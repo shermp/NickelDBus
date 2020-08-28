@@ -22,7 +22,7 @@ sources.fileextensions  = "*.cpp *.cc *.qml *.qdoc"
 
 # The outputdir variable specifies the directory
 # where QDoc will put the generated documentation.
-outputdir   = ../../docs
+outputdir   = ../html
 
 # The headerdirs variable specifies the directories
 # containing the header files associated
