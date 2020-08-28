@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- pages.qdoc -->
+  <title>NickelDBus | Qt </title>
+  <link rel="stylesheet" type="text/css" href="style/online.css" />
+</head>
+<body>
+<div class="header" id="qtdocheader"></div>
+    <div class="main">
+    <div class="main-rounded">
+        <div class="navigationbar">
+            <ul>
+<li>NickelDBus</li>
+<li id="buildversion">
+</li>
+            </ul>
+        </div>
+<div class="content">
+    <div class="line">
+        <div class="content mainContent">
+  <link rel="next" href="ndb.html" />
+  <link rel="start" href="NickelDBus" />
+<p class="naviNextPrevious headerNavi">
+<a class="nextPage" href="ndb.html">API Documentation</a>
+</p><p/>
+<h1 class="title">NickelDBus</h1>
+<span class="subtitle"></span>
+<!-- $$$index.html-description -->
+<div class="descr"> <a name="details"></a>
+<a name="introduction"></a>
+<h2>Introduction</h2>
+<p>NickelDBus is a mod for Kobo e-readers. Heavily inspired by <a href="https://github.com/pgaskin/NickelMenu">NickelMenu</a>, it allows developers to perform many of the same actions as NickelMenu, but from scripts or programs, instead of from the UI.</p>
+<p>As well as the ability to trigger actions, NickelDBus also allows you to wait on a limited selection of signals. Such signals include knowing when the content import process has completed, or whether WiFi has connected, among others.</p>
+<p>This is all achieved through the magic of d-bus. NickelDBus registers itself on the <tt>system</tt> bus.</p>
+<a name="installation"></a>
+<h2>Installation</h2>
+<p>Installing NickelDBus is simple. Simply go to the <a href="https://github.com/shermp/NickelDBus/releases">releases</a> page and download the latest release.</p>
+<p>Copy the downloaded <tt>KoboRoot.tgz</tt> to the <tt>.kobo</tt> directory on the root of your kobo when plugged into USB. Eject/disconnect your Kobo, and it will automatically install itself.</p>
+<p>There is no need to configure anything after installation.</p>
+<p><b>Note: </b>NickelDBus should survive factory resets.</p><p><b>Note: </b>to check what version of NickelDBus you have installed, open the file `.adds/nickeldbus` in a text editor. Applications should use the provided <tt>ndbVersion</tt> method to get the current NickelDBus version instead of parsing this file.</p><a name="upgrading"></a>
+<h2>Upgrading</h2>
+<p>To upgrade NickelDBus, simply follow the same procedure as installing it.</p>
+<a name="uninstallation"></a>
+<h2>Uninstallation</h2>
+<p>If you ever want to remove NickelDBus, simply connect your Kobo to your computer over USB and delete the file called <tt>nickeldbus</tt> in the <tt>.adds</tt> directory.</p>
+<p>Then disconnect your Kobo, and reboot. NickelDBus should now be removed.</p>
+<a name="developer-documentation"></a>
+<h2>Developer Documentation</h2>
+<p><b>Note: </b>Please do not directly install NickelDBus when installing your own application. If you wish to include NickelDBus as a convenience for your users, consider performing an install or upgrade (never downgrade) during your application start-up process.</p><p>NickelDBus presents itself on the d-bus <tt>system</tt> bus. It has an interface of <tt>com.github.shermp.nickeldbus</tt> and a path of <tt>/nickeldbus</tt>.</p>
+<p>To interact with NickelDBus, you can use language bindings for your favourite programming language. Most if not all languages have bindings available.</p>
+<a name="usage"></a>
+<h3>Usage</h3>
+<a name="cli-tools"></a>
+<h4>CLI Tools</h4>
+<p>Shell script users may use the standard <tt>dbus-send</tt> and <tt>dbus-monitor</tt> tools. Programs like qdbus and gdbus are also available.</p>
+<p>Alternatively, NickelDBus installs a small tool called <tt>qndb</tt> if you wish to use it. <tt>qndb</tt> allows you to call a method, or wait for a signal, or call a method then wait for a signal.</p>
+<a name="qndb"></a>
+<h5>qndb</h5>
+<p>The <tt>qndb</tt> usage is as follows:</p>
+<pre class="cpp">Usage: qndb <span class="operator">[</span>options<span class="operator">]</span> <span class="operator">[</span>args<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span><span class="operator">]</span>
+<span class="type">Qt</span> CLI <span class="keyword">for</span> NickelDBus
+
+Options:
+  <span class="operator">-</span>h<span class="operator">,</span> <span class="operator">-</span><span class="operator">-</span>help                  Displays <span class="keyword">this</span> help<span class="operator">.</span>
+  <span class="operator">-</span>v<span class="operator">,</span> <span class="operator">-</span><span class="operator">-</span>version               Displays version information<span class="operator">.</span>
+  <span class="operator">-</span>s<span class="operator">,</span> <span class="operator">-</span><span class="operator">-</span>signal <span class="operator">&lt;</span>signal name<span class="operator">&gt;</span>  Wait <span class="keyword">for</span> signal<span class="operator">,</span> and prints its output<span class="operator">,</span> <span class="keyword">if</span> any<span class="operator">.</span>
+  <span class="operator">-</span>t<span class="operator">,</span> <span class="operator">-</span><span class="operator">-</span>timeout <span class="operator">&lt;</span>timeout ms<span class="operator">&gt;</span>  Signal timeout in milliseconds<span class="operator">.</span>
+  <span class="operator">-</span>m<span class="operator">,</span> <span class="operator">-</span><span class="operator">-</span>method <span class="operator">&lt;</span>method name<span class="operator">&gt;</span>  Method to invoke<span class="operator">.</span>
+  <span class="operator">-</span>a<span class="operator">,</span> <span class="operator">-</span><span class="operator">-</span>api                   Print API usage
+
+Arguments:
+ arguments                   Arguments to pass to method<span class="operator">.</span> Have no affect when
+                             a method is <span class="keyword">not</span> set<span class="operator">.</span></pre>
+<p>And here are a few examples:</p>
+<p>Print the current NickelDBus version</p>
+<pre class="cpp">qndb <span class="operator">-</span>m ndbVersion</pre>
+<p>Show a toast on-screen for 3 seconds, with message 'Hello World!':</p>
+<pre class="cpp">qndb <span class="operator">-</span>m mwcToast <span class="number">3000</span> <span class="string">&quot;Hello World&quot;</span></pre>
+<p>Trigger library rescan, and wait for content import to complete, with a 30 second timeout:</p>
+<pre class="cpp">qndb <span class="operator">-</span>t <span class="number">30000</span> <span class="operator">-</span>s pfmDoneProcessing <span class="operator">-</span>m pfmRescanBooksFull</pre>
+<p><b>Note: </b>Even though <tt>qndb</tt> may time out, the content import process will not be aborted.</p><a name="language-bindings"></a>
+<h4>Language Bindings</h4>
+<p>Most languages will have d-bus bindings available. NickelDBus and <tt>qndb</tt> were written in Qt using QtDBus.</p>
+<a name="api-documentation"></a>
+<h4>API Documentation</h4>
+<p>The API is documented <a href="ndb.html">here</a>. It is Qt based documentation, but it should be easy to determine what's needed for other languages or CLI tools.</p>
+<a name="compiling-nickeldbus"></a>
+<h3>Compiling NickelDBus</h3>
+<p>NickelDBus is a Qt and C++ based project. It was designed to be used with <a href="https://github.com/pgaskin/NickelTC">NickelTC</a>. As such, the Makefile expects that to be available.</p>
+<p>To build everything from scratch, run:</p>
+<pre class="cpp">make clean <span class="operator">&amp;</span><span class="operator">&amp;</span> make <span class="operator">&amp;</span><span class="operator">&amp;</span> make cli <span class="operator">&amp;</span><span class="operator">&amp;</span> make koboroot</pre>
+<p>That will compile the library, <tt>qndb</tt> and package it up into a <tt>KoboRoot.tgz</tt> ready to be installed onto a Kobo.</p>
+<p>To make this documentation, run</p>
+<pre class="cpp">make doc</pre>
+<p>If you are developing NickelDBus, you will probably want to run</p>
+<pre class="cpp">make interface</pre>
+<p>if you haven't already run <tt>make</tt> so that you have the auto-generated adapter and proxy code and header files.</p>
+</div>
+<!-- @@@index.html -->
+<p class="naviNextPrevious footerNavi">
+<a class="nextPage" href="ndb.html">API Documentation</a>
+</p>
+</body>
+</html>

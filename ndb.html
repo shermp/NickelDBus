@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- ndb.cc -->
+  <title>NDB Class | Qt </title>
+  <link rel="stylesheet" type="text/css" href="style/online.css" />
+</head>
+<body>
+<div class="header" id="qtdocheader"></div>
+    <div class="main">
+    <div class="main-rounded">
+        <div class="navigationbar">
+            <ul>
+<li>NDB</li>
+<li id="buildversion">
+</li>
+            </ul>
+        </div>
+<div class="content">
+    <div class="line">
+        <div class="content mainContent">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-slots">Public Slots</a></li>
+<li class="level1"><a href="#signals">Signals</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<h1 class="title">NDB Class</h1>
+<!-- $$$NDB-brief -->
+<p>The NDB class registers a service on d-bus of Kobo e-readers. <a href="#details">More...</a></p>
+<!-- @@@NDB -->
+<table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign"> </b><tt><span class="preprocessor">#include &lt;NDB&gt;</span>
+</tt></td></tr></table><ul>
+<li><a href="ndb-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-slots"></a>
+<h2>Public Slots</h2>
+<table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#bwmOpenBrowser">bwmOpenBrowser</a></b>(bool<i> modal</i> = false, QString const &amp;<i> url</i> = QString(), QString const &amp;<i> css</i> = QString())</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#dlgConfirmAccept">dlgConfirmAccept</a></b>(QString const &amp;<i> title</i>, QString const &amp;<i> body</i>, QString const &amp;<i> acceptText</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#dlgConfirmAcceptReject">dlgConfirmAcceptReject</a></b>(QString const &amp;<i> title</i>, QString const &amp;<i> body</i>, QString const &amp;<i> acceptText</i>, QString const &amp;<i> rejectText</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#dlgConfirmNoBtn">dlgConfirmNoBtn</a></b>(QString const &amp;<i> title</i>, QString const &amp;<i> body</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#dlgConfirmReject">dlgConfirmReject</a></b>(QString const &amp;<i> title</i>, QString const &amp;<i> body</i>, QString const &amp;<i> rejectText</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#mwcHome">mwcHome</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#mwcToast">mwcToast</a></b>(int<i> toastDuration</i>, QString const &amp;<i> msgMain</i>, QString const &amp;<i> msgSub</i> = QStringLiteral( &quot;&quot; ))</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> QString </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#ndbCurrentView">ndbCurrentView</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> QString </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#ndbFirmwareVersion">ndbFirmwareVersion</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> QString </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#ndbNickelClassDetails">ndbNickelClassDetails</a></b>(QString const &amp;<i> staticMetaobjectSymbol</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#ndbSignalConnected">ndbSignalConnected</a></b>(QString const &amp;<i> signalName</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> QString </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#ndbVersion">ndbVersion</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#nsAutoUSBGadget">nsAutoUSBGadget</a></b>(QString const &amp;<i> action</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#nsForceWifi">nsForceWifi</a></b>(QString const &amp;<i> action</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#nsInvert">nsInvert</a></b>(QString const &amp;<i> action</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#nsLockscreen">nsLockscreen</a></b>(QString const &amp;<i> action</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#nsScreenshots">nsScreenshots</a></b>(QString const &amp;<i> action</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pfmRescanBooks">pfmRescanBooks</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pfmRescanBooksFull">pfmRescanBooksFull</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pwrReboot">pwrReboot</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pwrShutdown">pwrShutdown</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wfmConnectWireless">wfmConnectWireless</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wfmConnectWirelessSilently">wfmConnectWirelessSilently</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wfmSetAirplaneMode">wfmSetAirplaneMode</a></b>(QString const &amp;<i> action</i>)</td></tr>
+</table>
+<a name="signals"></a>
+<h2>Signals</h2>
+<table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#dlgConfirmResult">dlgConfirmResult</a></b>(int<i> result</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#ndbViewChanged">ndbViewChanged</a></b>(QString<i> newView</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pfmAboutToConnect">pfmAboutToConnect</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#pfmDoneProcessing">pfmDoneProcessing</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#rvPageChanged">rvPageChanged</a></b>(int<i> pageNum</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmLinkQualityForConnectedNetwork">wmLinkQualityForConnectedNetwork</a></b>(double<i> quality</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmMacAddressAvailable">wmMacAddressAvailable</a></b>(QString<i> mac</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmNetworkConnected">wmNetworkConnected</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmNetworkDisconnected">wmNetworkDisconnected</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmNetworkFailedToConnect">wmNetworkFailedToConnect</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmNetworkForgotten">wmNetworkForgotten</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmScanningAborted">wmScanningAborted</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmScanningFinished">wmScanningFinished</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmScanningStarted">wmScanningStarted</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmTryingToConnect">wmTryingToConnect</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="ndb.html#wmWifiEnabled">wmWifiEnabled</a></b>(bool<i> enabled</i>)</td></tr>
+</table>
+<a name="details"></a>
+<!-- $$$NDB-description -->
+<div class="descr">
+<h2>Detailed Description</h2>
+<p>The NDB class registers a service on d-bus of Kobo e-readers.</p>
+<p>NDB provides a bridge between Kobo's proprietary software, libnickel, and other software running on Kobo e-readers. It registers itself as a service on d-bus, and provides methods and signals to monitor and interact with nickel.</p>
+</div>
+<!-- @@@NDB -->
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$bwmOpenBrowser[overload1]$$$bwmOpenBrowserboolQStringconst&QStringconst& -->
+<h3 class="fn"><a name="bwmOpenBrowser"></a><span class="type">void</span> NDB::<span class="name">bwmOpenBrowser</span>(<span class="type">bool</span><i> modal</i> = false, <span class="type">QString</span> const &amp;<i> url</i> = QString(), <span class="type">QString</span> const &amp;<i> css</i> = QString())<tt> [slot]</tt></h3>
+<p>Open the web browser.</p>
+<p>Note, this is the same as the NickelMenu browser options</p>
+<p>Opens the web browser to the default homepage. if <i>modal</i> is <tt>true</tt> then the browser will be opened as a modal box with a close button. If <i>url</i> is set, the browser will open it on open. If <i>css</i> is set, additional CSS is supplied to the browser</p>
+<!-- @@@bwmOpenBrowser -->
+<!-- $$$dlgConfirmAccept[overload1]$$$dlgConfirmAcceptQStringconst&QStringconst&QStringconst& -->
+<h3 class="fn"><a name="dlgConfirmAccept"></a><span class="type">void</span> NDB::<span class="name">dlgConfirmAccept</span>(<span class="type">QString</span> const &amp;<i> title</i>, <span class="type">QString</span> const &amp;<i> body</i>, <span class="type">QString</span> const &amp;<i> acceptText</i>)<tt> [slot]</tt></h3>
+<p>Show a confirmation dialog with accept and close buttons</p>
+<p>Create a dialog box with <i>title</i> and <i>body</i>. This dialog has a close button, and an accept button labeled with <i>acceptText</i></p>
+<p>When the dialog is closed, or the accept button is pressed, a <a href="ndb.html#dlgConfirmResult">dlgConfirmResult</a>() signal is emitted.</p>
+<!-- @@@dlgConfirmAccept -->
+<!-- $$$dlgConfirmAcceptReject[overload1]$$$dlgConfirmAcceptRejectQStringconst&QStringconst&QStringconst&QStringconst& -->
+<h3 class="fn"><a name="dlgConfirmAcceptReject"></a><span class="type">void</span> NDB::<span class="name">dlgConfirmAcceptReject</span>(<span class="type">QString</span> const &amp;<i> title</i>, <span class="type">QString</span> const &amp;<i> body</i>, <span class="type">QString</span> const &amp;<i> acceptText</i>, <span class="type">QString</span> const &amp;<i> rejectText</i>)<tt> [slot]</tt></h3>
+<p>Show a confirmation dialog with reject and close buttons</p>
+<p>Create a dialog box with <i>title</i> and <i>body</i>. This dialog has a close button, a reject button labeled with <i>rejectText</i>, and an accept button labeled with <i>acceptText</i>.</p>
+<p>When the dialog is closed, either button is pressed, a <a href="ndb.html#dlgConfirmResult">dlgConfirmResult</a>() signal is emitted.</p>
+<!-- @@@dlgConfirmAcceptReject -->
+<!-- $$$dlgConfirmNoBtn[overload1]$$$dlgConfirmNoBtnQStringconst&QStringconst& -->
+<h3 class="fn"><a name="dlgConfirmNoBtn"></a><span class="type">void</span> NDB::<span class="name">dlgConfirmNoBtn</span>(<span class="type">QString</span> const &amp;<i> title</i>, <span class="type">QString</span> const &amp;<i> body</i>)<tt> [slot]</tt></h3>
+<p>Show a confirmation dialog with no buttons (except close)</p>
+<p>Create a dialog box with <i>title</i> and <i>body</i>. This dialog only has a close button.</p>
+<p>When the dialog is closed, a <a href="ndb.html#dlgConfirmResult">dlgConfirmResult</a>() signal is emitted.</p>
+<!-- @@@dlgConfirmNoBtn -->
+<!-- $$$dlgConfirmReject[overload1]$$$dlgConfirmRejectQStringconst&QStringconst&QStringconst& -->
+<h3 class="fn"><a name="dlgConfirmReject"></a><span class="type">void</span> NDB::<span class="name">dlgConfirmReject</span>(<span class="type">QString</span> const &amp;<i> title</i>, <span class="type">QString</span> const &amp;<i> body</i>, <span class="type">QString</span> const &amp;<i> rejectText</i>)<tt> [slot]</tt></h3>
+<p>Show a confirmation dialog with reject and close buttons</p>
+<p>Create a dialog box with <i>title</i> and <i>body</i>. This dialog has a close button, and a reject button labeled with <i>rejectText</i></p>
+<p>When the dialog is closed, or the reject button is pressed, a <a href="ndb.html#dlgConfirmResult">dlgConfirmResult</a>() signal is emitted.</p>
+<!-- @@@dlgConfirmReject -->
+<!-- $$$dlgConfirmResult[overload1]$$$dlgConfirmResultint -->
+<h3 class="fn"><a name="dlgConfirmResult"></a><span class="type">void</span> NDB::<span class="name">dlgConfirmResult</span>(<span class="type">int</span><i> result</i>)<tt> [signal]</tt></h3>
+<p>The signal that is emitted when a confirmation dialog is dismissed</p>
+<p>When emitted, <i>result</i> will be <tt>1</tt> for ACCEPT or <tt>0</tt> for REJECT</p>
+<!-- @@@dlgConfirmResult -->
+<!-- $$$mwcHome[overload1]$$$mwcHome -->
+<h3 class="fn"><a name="mwcHome"></a><span class="type">void</span> NDB::<span class="name">mwcHome</span>()<tt> [slot]</tt></h3>
+<p>Navigate to the home screen</p>
+<!-- @@@mwcHome -->
+<!-- $$$mwcToast[overload1]$$$mwcToastintQStringconst&QStringconst& -->
+<h3 class="fn"><a name="mwcToast"></a><span class="type">void</span> NDB::<span class="name">mwcToast</span>(<span class="type">int</span><i> toastDuration</i>, <span class="type">QString</span> const &amp;<i> msgMain</i>, <span class="type">QString</span> const &amp;<i> msgSub</i> = QStringLiteral( &quot;&quot; ))<tt> [slot]</tt></h3>
+<p>Show a small, temporary text box with a message</p>
+<p>Show a text box on screen for <i>toastDuration</i> duration (in milliseconds) with <i>msgMain</i> as the body text, and an optional <i>msgSub</i></p>
+<!-- @@@mwcToast -->
+<!-- $$$ndbCurrentView[overload1]$$$ndbCurrentView -->
+<h3 class="fn"><a name="ndbCurrentView"></a><span class="type">QString</span> NDB::<span class="name">ndbCurrentView</span>()<tt> [slot]</tt></h3>
+<p>Get the class name of the current view.</p>
+<p>Some class name examples are <tt>HomePageView</tt> <tt>ReadingView</tt> among others.</p>
+<!-- @@@ndbCurrentView -->
+<!-- $$$ndbFirmwareVersion[overload1]$$$ndbFirmwareVersion -->
+<h3 class="fn"><a name="ndbFirmwareVersion"></a><span class="type">QString</span> NDB::<span class="name">ndbFirmwareVersion</span>()<tt> [slot]</tt></h3>
+<p>Get the current firmware version</p>
+<p>Get the current firmware version as found in the user agent string</p>
+<!-- @@@ndbFirmwareVersion -->
+<!-- $$$ndbNickelClassDetails[overload1]$$$ndbNickelClassDetailsQStringconst& -->
+<h3 class="fn"><a name="ndbNickelClassDetails"></a><span class="type">QString</span> NDB::<span class="name">ndbNickelClassDetails</span>(<span class="type">QString</span> const &amp;<i> staticMetaobjectSymbol</i>)<tt> [slot]</tt></h3>
+<p>Print available details from nickel classes</p>
+<p>This method attempts to dlsym then parse the staticMetaObject property available from the mangeled <i>staticMetaobjectSymbol</i></p>
+<p>A formatted string of available signals and slots is returned.</p>
+<!-- @@@ndbNickelClassDetails -->
+<!-- $$$ndbSignalConnected[overload1]$$$ndbSignalConnectedQStringconst& -->
+<h3 class="fn"><a name="ndbSignalConnected"></a><span class="type">bool</span> NDB::<span class="name">ndbSignalConnected</span>(<span class="type">QString</span> const &amp;<i> signalName</i>)<tt> [slot]</tt></h3>
+<p>Check if a signal was successfully connected</p>
+<p>Check if <i>signalName</i> is connected. <i>signalName</i> must be provided without parentheses and parameters.</p>
+<p>Returns <tt>1</tt> if exists, or <tt>0</tt> otherwise</p>
+<!-- @@@ndbSignalConnected -->
+<!-- $$$ndbVersion[overload1]$$$ndbVersion -->
+<h3 class="fn"><a name="ndbVersion"></a><span class="type">QString</span> NDB::<span class="name">ndbVersion</span>()<tt> [slot]</tt></h3>
+<p>Get the version of <a href="index.html">NickelDBus</a></p>
+<!-- @@@ndbVersion -->
+<!-- $$$ndbViewChanged[overload1]$$$ndbViewChangedQString -->
+<h3 class="fn"><a name="ndbViewChanged"></a><span class="type">void</span> NDB::<span class="name">ndbViewChanged</span>(<span class="type">QString</span><i> newView</i>)<tt> [signal]</tt></h3>
+<p>The signal that is emitted when the current view changes</p>
+<p>This signal is only emitted if <a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>() has been called at least once by an application. <i>newView</i> is the class name of the new view.</p>
+<p><b>See also </b><a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>().</p>
+<!-- @@@ndbViewChanged -->
+<!-- $$$nsAutoUSBGadget[overload1]$$$nsAutoUSBGadgetQStringconst& -->
+<h3 class="fn"><a name="nsAutoUSBGadget"></a><span class="type">void</span> NDB::<span class="name">nsAutoUSBGadget</span>(<span class="type">QString</span> const &amp;<i> action</i>)<tt> [slot]</tt></h3>
+<p>Sets the auto USB connect setting</p>
+<p>Set <i>action</i> to <tt>enable</tt>, <tt>disable</tt> or <tt>toggle</tt> auto USB connect.</p>
+<!-- @@@nsAutoUSBGadget -->
+<!-- $$$nsForceWifi[overload1]$$$nsForceWifiQStringconst& -->
+<h3 class="fn"><a name="nsForceWifi"></a><span class="type">void</span> NDB::<span class="name">nsForceWifi</span>(<span class="type">QString</span> const &amp;<i> action</i>)<tt> [slot]</tt></h3>
+<p>Sets the developer ForceWifiOn setting</p>
+<p>Set <i>action</i> to <tt>enable</tt>, <tt>disable</tt> or <tt>toggle</tt> ForceWifiOn.</p>
+<!-- @@@nsForceWifi -->
+<!-- $$$nsInvert[overload1]$$$nsInvertQStringconst& -->
+<h3 class="fn"><a name="nsInvert"></a><span class="type">void</span> NDB::<span class="name">nsInvert</span>(<span class="type">QString</span> const &amp;<i> action</i>)<tt> [slot]</tt></h3>
+<p>Invert the screen</p>
+<p>Set <i>action</i> to <tt>enable</tt>, <tt>disable</tt> or <tt>toggle</tt> inversion.</p>
+<!-- @@@nsInvert -->
+<!-- $$$nsLockscreen[overload1]$$$nsLockscreenQStringconst& -->
+<h3 class="fn"><a name="nsLockscreen"></a><span class="type">void</span> NDB::<span class="name">nsLockscreen</span>(<span class="type">QString</span> const &amp;<i> action</i>)<tt> [slot]</tt></h3>
+<p>Set UnlockEnabled</p>
+<p>Set <i>action</i> to <tt>enable</tt>, <tt>disable</tt> or <tt>toggle</tt> UnlockEnabled.</p>
+<!-- @@@nsLockscreen -->
+<!-- $$$nsScreenshots[overload1]$$$nsScreenshotsQStringconst& -->
+<h3 class="fn"><a name="nsScreenshots"></a><span class="type">void</span> NDB::<span class="name">nsScreenshots</span>(<span class="type">QString</span> const &amp;<i> action</i>)<tt> [slot]</tt></h3>
+<p>Set screenshot setting</p>
+<p>Set <i>action</i> to <tt>enable</tt>, <tt>disable</tt> or <tt>toggle</tt> screenshots.</p>
+<!-- @@@nsScreenshots -->
+<!-- $$$pfmAboutToConnect[overload1]$$$pfmAboutToConnect -->
+<h3 class="fn"><a name="pfmAboutToConnect"></a><span class="type">void</span> NDB::<span class="name">pfmAboutToConnect</span>()<tt> [signal]</tt></h3>
+<p>The signal that nickel emits when it is about to start the USB connection</p>
+<!-- @@@pfmAboutToConnect -->
+<!-- $$$pfmDoneProcessing[overload1]$$$pfmDoneProcessing -->
+<h3 class="fn"><a name="pfmDoneProcessing"></a><span class="type">void</span> NDB::<span class="name">pfmDoneProcessing</span>()<tt> [signal]</tt></h3>
+<p>The signal that nickel emits when the content import process has completed.</p>
+<p>The signal will be emitted following the content import triggered whenever the user unplugs from the computer, when <tt>rescan_books</tt> / <tt>rescan_books_full</tt> actions are triggered from NickelMenu, or when <a href="ndb.html#pfmRescanBooks">NDB::pfmRescanBooks</a>() or <a href="ndb.html#pfmRescanBooksFull">NDB::pfmRescanBooksFull</a>() methods are called from NDB.</p>
+<!-- @@@pfmDoneProcessing -->
+<!-- $$$pfmRescanBooks[overload1]$$$pfmRescanBooks -->
+<h3 class="fn"><a name="pfmRescanBooks"></a><span class="type">void</span> NDB::<span class="name">pfmRescanBooks</span>()<tt> [slot]</tt></h3>
+<p>Begin an abbreviated book rescan. Same as 'rescan_books' from NickelMenu</p>
+<!-- @@@pfmRescanBooks -->
+<!-- $$$pfmRescanBooksFull[overload1]$$$pfmRescanBooksFull -->
+<h3 class="fn"><a name="pfmRescanBooksFull"></a><span class="type">void</span> NDB::<span class="name">pfmRescanBooksFull</span>()<tt> [slot]</tt></h3>
+<p>Begins a full book rescan. Same as 'rescan_books_full' from NickelMenu</p>
+<!-- @@@pfmRescanBooksFull -->
+<!-- $$$pwrReboot[overload1]$$$pwrReboot -->
+<h3 class="fn"><a name="pwrReboot"></a><span class="type">void</span> NDB::<span class="name">pwrReboot</span>()<tt> [slot]</tt></h3>
+<p>Reboot Kobo</p>
+<!-- @@@pwrReboot -->
+<!-- $$$pwrShutdown[overload1]$$$pwrShutdown -->
+<h3 class="fn"><a name="pwrShutdown"></a><span class="type">void</span> NDB::<span class="name">pwrShutdown</span>()<tt> [slot]</tt></h3>
+<p>Shutdown Kobo</p>
+<!-- @@@pwrShutdown -->
+<!-- $$$rvPageChanged[overload1]$$$rvPageChangedint -->
+<h3 class="fn"><a name="rvPageChanged"></a><span class="type">void</span> NDB::<span class="name">rvPageChanged</span>(<span class="type">int</span><i> pageNum</i>)<tt> [signal]</tt></h3>
+<p>The signal that is emitted when the current book changes page</p>
+<p>This signal is only emitted if <a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>() has been called at least once by an application. <i>pageNum</i> is kepub or epub page number of the new page.</p>
+<p><b>See also </b><a href="ndb.html#ndbCurrentView">NDB::ndbCurrentView</a>().</p>
+<!-- @@@rvPageChanged -->
+<!-- $$$wfmConnectWireless[overload1]$$$wfmConnectWireless -->
+<h3 class="fn"><a name="wfmConnectWireless"></a><span class="type">void</span> NDB::<span class="name">wfmConnectWireless</span>()<tt> [slot]</tt></h3>
+<p>Connect to WiFi network.</p>
+<p>Note, this is the same as 'autoconnect' option from NickelMenu</p>
+<!-- @@@wfmConnectWireless -->
+<!-- $$$wfmConnectWirelessSilently[overload1]$$$wfmConnectWirelessSilently -->
+<h3 class="fn"><a name="wfmConnectWirelessSilently"></a><span class="type">void</span> NDB::<span class="name">wfmConnectWirelessSilently</span>()<tt> [slot]</tt></h3>
+<p>Connect silently to WiFi network.</p>
+<p>Note, this is the same as 'autoconnect_silent' from NickelMenu</p>
+<!-- @@@wfmConnectWirelessSilently -->
+<!-- $$$wfmSetAirplaneMode[overload1]$$$wfmSetAirplaneModeQStringconst& -->
+<h3 class="fn"><a name="wfmSetAirplaneMode"></a><span class="type">void</span> NDB::<span class="name">wfmSetAirplaneMode</span>(<span class="type">QString</span> const &amp;<i> action</i>)<tt> [slot]</tt></h3>
+<p>Enable/disable/toggle WiFi. Same as NickelMenu WiFi 'enable'/'disable'/'toggle' options</p>
+<p>Note, this is the same as NickelMenu WiFi 'enable'/'disable'/'toggle' options.</p>
+<p><i>action</i> should be one of <tt>enable</tt>, <tt>disable</tt>, <tt>toggle</tt></p>
+<!-- @@@wfmSetAirplaneMode -->
+<!-- $$$wmLinkQualityForConnectedNetwork[overload1]$$$wmLinkQualityForConnectedNetworkdouble -->
+<h3 class="fn"><a name="wmLinkQualityForConnectedNetwork"></a><span class="type">void</span> NDB::<span class="name">wmLinkQualityForConnectedNetwork</span>(<span class="type">double</span><i> quality</i>)<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<p>Shows the <i>quality</i> of the wifi signal</p>
+<!-- @@@wmLinkQualityForConnectedNetwork -->
+<!-- $$$wmMacAddressAvailable[overload1]$$$wmMacAddressAvailableQString -->
+<h3 class="fn"><a name="wmMacAddressAvailable"></a><span class="type">void</span> NDB::<span class="name">wmMacAddressAvailable</span>(<span class="type">QString</span><i> mac</i>)<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<p><i>mac</i> address</p>
+<!-- @@@wmMacAddressAvailable -->
+<!-- $$$wmNetworkConnected[overload1]$$$wmNetworkConnected -->
+<h3 class="fn"><a name="wmNetworkConnected"></a><span class="type">void</span> NDB::<span class="name">wmNetworkConnected</span>()<tt> [signal]</tt></h3>
+<p>This signal appears to be emitted when the network has successfully connected I'm unsure if this is emitted when the WiFi connects, or when a valid IP address is obtained.</p>
+<!-- @@@wmNetworkConnected -->
+<!-- $$$wmNetworkDisconnected[overload1]$$$wmNetworkDisconnected -->
+<h3 class="fn"><a name="wmNetworkDisconnected"></a><span class="type">void</span> NDB::<span class="name">wmNetworkDisconnected</span>()<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<!-- @@@wmNetworkDisconnected -->
+<!-- $$$wmNetworkFailedToConnect[overload1]$$$wmNetworkFailedToConnect -->
+<h3 class="fn"><a name="wmNetworkFailedToConnect"></a><span class="type">void</span> NDB::<span class="name">wmNetworkFailedToConnect</span>()<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<!-- @@@wmNetworkFailedToConnect -->
+<!-- $$$wmNetworkForgotten[overload1]$$$wmNetworkForgotten -->
+<h3 class="fn"><a name="wmNetworkForgotten"></a><span class="type">void</span> NDB::<span class="name">wmNetworkForgotten</span>()<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<!-- @@@wmNetworkForgotten -->
+<!-- $$$wmScanningAborted[overload1]$$$wmScanningAborted -->
+<h3 class="fn"><a name="wmScanningAborted"></a><span class="type">void</span> NDB::<span class="name">wmScanningAborted</span>()<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<!-- @@@wmScanningAborted -->
+<!-- $$$wmScanningFinished[overload1]$$$wmScanningFinished -->
+<h3 class="fn"><a name="wmScanningFinished"></a><span class="type">void</span> NDB::<span class="name">wmScanningFinished</span>()<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<!-- @@@wmScanningFinished -->
+<!-- $$$wmScanningStarted[overload1]$$$wmScanningStarted -->
+<h3 class="fn"><a name="wmScanningStarted"></a><span class="type">void</span> NDB::<span class="name">wmScanningStarted</span>()<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<!-- @@@wmScanningStarted -->
+<!-- $$$wmTryingToConnect[overload1]$$$wmTryingToConnect -->
+<h3 class="fn"><a name="wmTryingToConnect"></a><span class="type">void</span> NDB::<span class="name">wmTryingToConnect</span>()<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<!-- @@@wmTryingToConnect -->
+<!-- $$$wmWifiEnabled[overload1]$$$wmWifiEnabledbool -->
+<h3 class="fn"><a name="wmWifiEnabled"></a><span class="type">void</span> NDB::<span class="name">wmWifiEnabled</span>(<span class="type">bool</span><i> enabled</i>)<tt> [signal]</tt></h3>
+<p>(todo: figure this out)</p>
+<p>Is wifi <i>enabled</i> ?</p>
+<!-- @@@wmWifiEnabled -->
+</div>
+</body>
+</html>
