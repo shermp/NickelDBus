@@ -782,7 +782,8 @@ void NDB::rvConnectSignals(QWidget* rv) {
  * \fn void NDB::ndbViewChanged(QString newView)
  * \brief The signal that is emitted when the current view changes
  * 
- * \a newView is the class name of the new view.
+ * This signal is only emitted if \l NDB::ndbCurrentView() has been called 
+ * at least once by an application. \a newView is the class name of the new view.
  * 
  * \sa NDB::ndbCurrentView()
  */
@@ -791,6 +792,10 @@ void NDB::rvConnectSignals(QWidget* rv) {
  * \fn void NDB::rvPageChanged(int pageNum)
  * \brief The signal that is emitted when the current book changes page
  * 
- * \a pageNum is kepub or epub page number of the new page.
+ * This signal is only emitted if \l NDB::ndbCurrentView() has been called 
+ * at least once by an application. \a pageNum is kepub or epub page 
+ * number of the new page.
+ * 
+ * \sa NDB::ndbCurrentView()
  */
 
