@@ -27,7 +27,7 @@ And can be found at the following path:
 
 You can use the included `qndb` command line tool to get started with.
 
-Documentation can be found [here](https://shermp.github.io/nickeldbus)
+Documentation can be found [here](https://shermp.github.io/NickelDBus/)
 
 ## Compiling
 
