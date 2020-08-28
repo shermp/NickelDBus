@@ -115,6 +115,7 @@ class NDB : public QObject, protected QDBusContext {
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
+            QWidget *(*MainWindowController_currentView)(MainWindowController*);
             QWidget* (*N3Dialog__content)(N3Dialog*);
             Device *(*Device__getCurrentDevice)();
             QByteArray (*Device__userAgent)(Device*);

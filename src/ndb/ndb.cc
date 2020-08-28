@@ -90,6 +90,12 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     // Device (for FW version)
     ndbResolveSymbol("_ZN6Device16getCurrentDeviceEv", nh_symoutptr(nSym.Device__getCurrentDevice));
     ndbResolveSymbol("_ZNK6Device9userAgentEv", nh_symoutptr(nSym.Device__userAgent));
+    // MWC views
+    ndbResolveSymbol("_ZNK20MainWindowController11currentViewEv", nh_symoutptr(nSym.MainWindowController_currentView));
+    if (!nSym.MainWindowController_currentView) {
+        // Older firmware versions use a slightly different mangled symbol name
+        ndbResolveSymbol("_ZN20MainWindowController11currentViewEv", nh_symoutptr(nSym.MainWindowController_currentView));
+    }
 }
 
 /*!
@@ -192,40 +198,30 @@ void NDB::handleQSWTimer() {
  * among others.
  */
 QString NDB::ndbCurrentView() {
-    // The ReadingView widget can be found in the same QStackedWidget
-    // as the HomePageView widget. We can search for it using the
-    // appropriate QApplication static methods
+    QString name = QString();
+    NDB_DBUS_SYM_ASSERT(name, nSym.MainWindowController_sharedInstance);
+    NDB_DBUS_SYM_ASSERT(name, nSym.MainWindowController_currentView);
+    MainWindowController *mwc = nSym.MainWindowController_sharedInstance();
+    NDB_DBUS_ASSERT(name, QDBusError::InternalError, mwc, "unable to get shared MainWindowController instance");
+    QWidget *cv = nSym.MainWindowController_currentView(mwc);
+    NDB_DBUS_ASSERT(name, QDBusError::InternalError, cv, "unable to get current view from MainWindowController");
     if (!stackedWidget) {
-        QWidgetList wl = QApplication::allWidgets();
-        for (int i = 0; i < wl.size(); ++i) {
-            if (!QString(wl[i]->metaObject()->className()).compare("QStackedWidget")) {
-                QStackedWidget *sw = static_cast<QStackedWidget*>(wl[i]);
-                for (int j = 0; j < sw->count(); ++j) {
-                    if (QWidget *w = sw->widget(j)) {
-                        if (!QString(w->objectName()).compare("HomePageView")) {
-                            stackedWidget = sw;
-                            QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDB::handleQSWCurrentChanged);
-                            // Just in case Nickel ever decides to destroy the stacked widget, we'll connect its destroyed()
-                            // signal to make sure we aren't left with a dangling pointer.
-                            QObject::connect(stackedWidget, &QObject::destroyed, this, &NDB::handleStackedWidgetDestroyed);
-                            break;
-                        }
-                    }
-                }
-            }
+        if (QString(cv->parentWidget()->metaObject()->className()) == "QStackedWidget") {
+            stackedWidget = static_cast<QStackedWidget*>(cv->parentWidget());
+            QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDB::handleQSWCurrentChanged);
+            QObject::connect(stackedWidget, &QObject::destroyed, this, &NDB::handleStackedWidgetDestroyed);
+        } else {
+            nh_log("expected QStackedWidget, got %s", cv->parentWidget()->metaObject()->className());
         }
     }
-    NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, stackedWidget, "unable to retrieve HomePageView stacked widget");
-    QWidget *w = stackedWidget->currentWidget();
-    NDB_DBUS_ASSERT(QString(), QDBusError::InternalError, w, "QStackedWidget has no current widget");
-    QString name = QString(w->objectName());
-    if (!name.compare("N3Dialog")) {
+    name = cv->objectName();
+    if (name == "N3Dialog") {
         NDB_DBUS_SYM_ASSERT(name, nSym.N3Dialog__content);
-        if (QWidget *c = nSym.N3Dialog__content(w)) {
+        if (QWidget *c = nSym.N3Dialog__content(cv)) {
             name = c->objectName();
         }
-    } else if (!name.compare("ReadingView")) {
-        rvConnectSignals(w);
+    } else if (name == "ReadingView") {
+        rvConnectSignals(cv);
     }
     return name;
 }
