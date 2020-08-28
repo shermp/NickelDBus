@@ -24,11 +24,14 @@
     This is all achieved through the magic of d-bus. NickelDBus registers itself
     on the \c system bus.
 
+    You can follow the development of NickelDBus at the 
+    \l {https://github.com/shermp/NickelDBus}{GitHub repository}. 
+
     \section1 Installation
 
     Installing NickelDBus is simple. Simply go to the 
-    \l {https://github.com/shermp/NickelDBus/releases}{releases} page and
-    download the latest release. 
+    \l {https://github.com/shermp/NickelDBus/releases/latest}{latest release} page and
+    download the \c KoboRoot.tgz file.
 
     Copy the downloaded \c KoboRoot.tgz to the \c .kobo directory on the root
     of your kobo when plugged into USB. Eject/disconnect your Kobo, and it will
