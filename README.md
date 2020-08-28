@@ -10,7 +10,7 @@ Grab the latest release from the releases page, and copy the the KoboRoot.tgz to
 
 No configuration is required.
 
-Note, to check what version of NickelDBus you have installed, open the file `.adds/nickeldbus` in a text editor.
+Note, to check what version of NickelDBus you have installed, open the file `.adds/nickeldbus` in a text editor. Applications should use the provided `ndbVersion` method instead to get the current version.
 
 ## Uninstalling
 

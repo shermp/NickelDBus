@@ -170,10 +170,20 @@ QString NDB::ndbVersion() {
     return QStringLiteral(NH_VERSION);
 }
 
+/*!
+ * \internal
+ * \brief Set stackedWidget pointer to null if widget ever destroyed by Nickel
+ */
 void NDB::handleStackedWidgetDestroyed() {
     stackedWidget = nullptr;
 }
 
+/*!
+ * \internal
+ * \brief Handle the QStackedWidget currentChanged event
+ * 
+ * \a index is the index of the new widget.
+ */
 void NDB::handleQSWCurrentChanged(int index) {
     if (index >= 0) {
         // I'd rather emit the ndbViewChanged signal here, but it's
@@ -187,6 +197,10 @@ void NDB::handleQSWCurrentChanged(int index) {
     }
 }
 
+/*!
+ * \internal
+ * \brief Emits ndbViewChanged() after a small timeout
+ */
 void NDB::handleQSWTimer() {
     emit ndbViewChanged(ndbCurrentView());
 }

@@ -31,7 +31,7 @@ override UNINSTALL_FILE := res/ndb_version
 
 override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML) $(UNINSTALL_FILE)
 
-override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) doc/html
+override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) qdoc/html/
 
 .PHONY: cli clean-cli gitignore-cli doc dbuscfg interface uninstall-file
 
@@ -54,7 +54,7 @@ clean: clean-cli
 gitignore: gitignore-cli
 
 doc:
-	cd doc/config && qdoc ndb.qdocconf
+	cd qdoc/config && qdoc ndb.qdocconf
 
 uninstall-file:
 	echo "$(VERSION)" > $(UNINSTALL_FILE)

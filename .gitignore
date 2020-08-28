@@ -2,7 +2,7 @@
 src/interface/ndb_proxy.moc
 src/interface/ndb_proxy.o
 src/interface/ndb_proxy.moc.o
-doc/html
+qdoc/html/
 .kdev4/
 *.kdev4
 .kateconfig
