@@ -31,7 +31,7 @@ Documentation can be found [here](https://shermp.github.io/NickelDBus/)
 
 ## Compiling
 
-This library was designed to be compiled with [NickelTC](https://github.com/geek1011/NickelTC).
+This library was designed to be compiled with [NickelTC](https://github.com/pgaskin/NickelTC).
 
 A KoboRoot.tgz that can be installed on your Kobo can be generated with `make koboroot`.
 
