@@ -97,12 +97,14 @@ class NDB : public QObject, protected QDBusContext {
         void pwrReboot();
     protected Q_SLOTS:
         void allowDialog();
+        void allowPersistentDialog();
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
     private:
         void *libnickel;
         bool allowDlg = true;
+        bool allowPersistentDlg = true;
         QSet<QString> connectedSignals;
         QStackedWidget *stackedWidget = nullptr;
         QString fwVersion;

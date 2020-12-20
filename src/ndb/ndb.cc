@@ -400,6 +400,10 @@ void NDB::allowDialog() {
     allowDlg = true;
 }
 
+void NDB::allowPersistentDialog() {
+    allowPersistentDlg = true;
+}
+
 /*!
  * \brief Show dialog without buttons that can be programatically dismissed
  * 
@@ -409,8 +413,8 @@ void NDB::allowDialog() {
  * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmPersistentShow(QString const& title, QString const& body) {
-    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
-    allowDlg = false;
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowPersistentDlg, "dialog already showing");
+    allowPersistentDlg = false;
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
         nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__showCloseButton && nSym.ConfirmationDialog__setRejectOnOutsideTap);
@@ -421,7 +425,7 @@ void NDB::dlgConfirmPersistentShow(QString const& title, QString const& body) {
     // This makes the dialog a true modal, where you cannot tap outside it to dismiss
     nSym.ConfirmationDialog__setRejectOnOutsideTap(persistentDlg, false);
     persistentDlg->setModal(true);
-    QObject::connect(persistentDlg, &QDialog::finished, this, &NDB::allowDialog);
+    QObject::connect(persistentDlg, &QDialog::finished, this, &NDB::allowPersistentDialog);
     QObject::connect(persistentDlg, &QDialog::finished, persistentDlg, &QDialog::deleteLater);
     persistentDlg->open();
 }
@@ -433,7 +437,7 @@ void NDB::dlgConfirmPersistentShow(QString const& title, QString const& body) {
  * replacing the existing body text.
  */ 
 void NDB::dlgConfirmPersistentChange(QString const& body) {
-    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowPersistentDlg, "dialog not showing");
     NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialog__setText);
     nSym.ConfirmationDialog__setText(persistentDlg, body);
 }
@@ -445,7 +449,7 @@ void NDB::dlgConfirmPersistentChange(QString const& body) {
  * error if the dialog has already been closed by the user.
  */
 void NDB::dlgConfirmPersistentClose() {
-    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowPersistentDlg, "dialog not showing");
     persistentDlg->accept();
 }
 
