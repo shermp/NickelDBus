@@ -404,11 +404,11 @@ void NDB::allowDialog() {
  * \brief Show dialog without buttons that can be programatically dismissed
  * 
  * Create a dialog box with \a title and \a body. This dialog has no close
- * button, and is expected to be closed by \l dlgConfirmClosePersistent
+ * button, and is expected to be closed by \l dlgConfirmPersistentClose
  * 
  * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
  */
-void NDB::dlgConfirmShowPersistent(QString const& title, QString const& body) {
+void NDB::dlgConfirmPersistentShow(QString const& title, QString const& body) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
     allowDlg = false;
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -427,12 +427,24 @@ void NDB::dlgConfirmShowPersistent(QString const& title, QString const& body) {
 }
 
 /*!
- * \brief Close dialog created by \l dlgConfirmShowPersistent
+ * \brief Change body text of currently displayed persistent dialog
  * 
- * Closes the dialog created by \l dlgConfirmShowPersistent. Will return an
+ * Set the body text of the currently displayed persistent dialog to \a body
+ * replacing the existing body text.
+ */ 
+void NDB::dlgConfirmPersistentChange(QString const& body) {
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
+    NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialog__setText);
+    nSym.ConfirmationDialog__setText(persistentDlg, body);
+}
+
+/*!
+ * \brief Close dialog created by \l dlgConfirmPersistentShow
+ * 
+ * Closes the dialog created by \l dlgConfirmPersistentShow. Will return an
  * error if the dialog has already been closed by the user.
  */
-void NDB::dlgConfirmClosePersistent() {
+void NDB::dlgConfirmPersistentClose() {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
     persistentDlg->accept();
 }

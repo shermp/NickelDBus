@@ -71,6 +71,7 @@ class NDB : public QObject, protected QDBusContext {
         void mwcHome();
         // Confirmation Dialogs
         void dlgConfirmPersistentShow(QString const& title, QString const& body);
+        void dlgConfirmPersistentChange(QString const& body);
         void dlgConfirmPersistentClose();
         void dlgConfirmNoBtn(QString const& title, QString const& body);
         void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
