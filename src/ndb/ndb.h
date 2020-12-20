@@ -70,6 +70,8 @@ class NDB : public QObject, protected QDBusContext {
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
         void mwcHome();
         // Confirmation Dialogs
+        void dlgConfirmShowPersistent(QString const& title, QString const& body);
+        void dlgConfirmClosePersistent();
         void dlgConfirmNoBtn(QString const& title, QString const& body);
         void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
         void dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText);
@@ -113,6 +115,8 @@ class NDB : public QObject, protected QDBusContext {
             void (*ConfirmationDialog__setText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__setAcceptButtonText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
+            void (*ConfirmationDialog__showCloseButton)(ConfirmationDialog* _this, bool show);
+            void (*ConfirmationDialog__setRejectOnOutsideTap)(ConfirmationDialog* _this, bool setReject);
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
             QWidget *(*MainWindowController_currentView)(MainWindowController*);
@@ -134,6 +138,7 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
+        ConfirmationDialog* persistentDlg;
 };
 
 #endif

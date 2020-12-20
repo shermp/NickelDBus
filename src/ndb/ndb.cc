@@ -50,6 +50,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
         initSucceeded = false;
         return;
     }
+    persistentDlg = nullptr;
     // The following symbols are required. If they can't be resolved, bail out
     ndbResolveSymbol("_ZN11PlugManager14sharedInstanceEv", nh_symoutptr(nSym.PlugManager__sharedInstance));
     ndbResolveSymbol("_ZNK11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
@@ -82,6 +83,8 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     ndbResolveSymbol("_ZN18ConfirmationDialog7setTextERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setText));
     ndbResolveSymbol("_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setAcceptButtonText));
     ndbResolveSymbol("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setRejectButtonText));
+    ndbResolveSymbol("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(nSym.ConfirmationDialog__showCloseButton));
+    ndbResolveSymbol("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb",nh_symoutptr(nSym.ConfirmationDialog__setRejectOnOutsideTap));
     // Toast
     ndbResolveSymbol("_ZN20MainWindowController14sharedInstanceEv", nh_symoutptr(nSym.MainWindowController_sharedInstance));
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
@@ -395,6 +398,43 @@ QString NDB::ndbFirmwareVersion() {
  */
 void NDB::allowDialog() {
     allowDlg = true;
+}
+
+/*!
+ * \brief Show dialog without buttons that can be programatically dismissed
+ * 
+ * Create a dialog box with \a title and \a body. This dialog has no close
+ * button, and is expected to be closed by \l dlgConfirmClosePersistent
+ * 
+ * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
+ */
+void NDB::dlgConfirmShowPersistent(QString const& title, QString const& body) {
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
+    allowDlg = false;
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
+        nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__showCloseButton && nSym.ConfirmationDialog__setRejectOnOutsideTap);
+    persistentDlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, persistentDlg, "error getting confirmation dialog");
+    nSym.ConfirmationDialog__setTitle(persistentDlg, title);
+    nSym.ConfirmationDialog__setText(persistentDlg, body);
+    // This makes the dialog a true modal, where you cannot tap outside it to dismiss
+    nSym.ConfirmationDialog__setRejectOnOutsideTap(persistentDlg, false);
+    persistentDlg->setModal(true);
+    QObject::connect(persistentDlg, &QDialog::finished, this, &NDB::allowDialog);
+    QObject::connect(persistentDlg, &QDialog::finished, persistentDlg, &QDialog::deleteLater);
+    persistentDlg->open();
+}
+
+/*!
+ * \brief Close dialog created by \l dlgConfirmShowPersistent
+ * 
+ * Closes the dialog created by \l dlgConfirmShowPersistent. Will return an
+ * error if the dialog has already been closed by the user.
+ */
+void NDB::dlgConfirmClosePersistent() {
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
+    persistentDlg->done(QDialog::Accepted);
 }
 
 void NDB::dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
