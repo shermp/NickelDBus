@@ -434,7 +434,7 @@ void NDB::dlgConfirmShowPersistent(QString const& title, QString const& body) {
  */
 void NDB::dlgConfirmClosePersistent() {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
-    persistentDlg->done(QDialog::Accepted);
+    persistentDlg->accept();
 }
 
 void NDB::dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
