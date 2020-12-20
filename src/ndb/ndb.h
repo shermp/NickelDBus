@@ -70,8 +70,8 @@ class NDB : public QObject, protected QDBusContext {
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
         void mwcHome();
         // Confirmation Dialogs
-        void dlgConfirmShowPersistent(QString const& title, QString const& body);
-        void dlgConfirmClosePersistent();
+        void dlgConfirmPersistentShow(QString const& title, QString const& body);
+        void dlgConfirmPersistentClose();
         void dlgConfirmNoBtn(QString const& title, QString const& body);
         void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
         void dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText);
