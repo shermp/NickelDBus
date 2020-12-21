@@ -435,6 +435,8 @@ void NDB::dlgConfirmPersistentShow(QString const& title, QString const& body) {
  * 
  * Set the body text of the currently displayed persistent dialog to \a body
  * replacing the existing body text.
+ * 
+ * There will be an error if the user has closed the dialog.
  */ 
 void NDB::dlgConfirmPersistentChange(QString const& body) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowPersistentDlg, "dialog not showing");
