@@ -414,12 +414,12 @@ void NDB::allowPersistentDialog() {
  */
 void NDB::dlgConfirmPersistentShow(QString const& title, QString const& body) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowPersistentDlg, "dialog already showing");
-    allowPersistentDlg = false;
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
         nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__showCloseButton && nSym.ConfirmationDialog__setRejectOnOutsideTap);
     persistentDlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
     NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, persistentDlg, "error getting confirmation dialog");
+    allowPersistentDlg = false;
     nSym.ConfirmationDialog__setTitle(persistentDlg, title);
     nSym.ConfirmationDialog__setText(persistentDlg, body);
     // This makes the dialog a true modal, where you cannot tap outside it to dismiss
@@ -457,12 +457,12 @@ void NDB::dlgConfirmPersistentClose() {
 
 void NDB::dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
-    allowDlg = false;
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
         nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__setAcceptButtonText && nSym.ConfirmationDialog__setRejectButtonText);
     ConfirmationDialog *dlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
     NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, dlg, "error getting confirmation dialog");
+    allowDlg = false;
     
     nSym.ConfirmationDialog__setTitle(dlg, title);
     nSym.ConfirmationDialog__setText(dlg, body);
