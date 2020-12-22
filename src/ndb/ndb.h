@@ -70,13 +70,13 @@ class NDB : public QObject, protected QDBusContext {
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
         void mwcHome();
         // Confirmation Dialogs
-        void dlgConfirmPersistentShow(QString const& title, QString const& body);
-        void dlgConfirmPersistentChange(QString const& body);
-        void dlgConfirmPersistentClose();
         void dlgConfirmNoBtn(QString const& title, QString const& body);
         void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
         void dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText);
         void dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
+        void dlgConfirmModalMessage(QString const& title, QString const& body);
+        void dlgConfirmChangeBody(QString const& body);
+        void dlgConfirmClose();
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -97,14 +97,13 @@ class NDB : public QObject, protected QDBusContext {
         void pwrReboot();
     protected Q_SLOTS:
         void allowDialog();
-        void allowPersistentDialog();
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
     private:
         void *libnickel;
         bool allowDlg = true;
-        bool allowPersistentDlg = true;
+        ConfirmationDialog* confirmDlg;
         QSet<QString> connectedSignals;
         QStackedWidget *stackedWidget = nullptr;
         QString fwVersion;
@@ -138,10 +137,9 @@ class NDB : public QObject, protected QDBusContext {
         QString getNickelMetaObjectDetails(const QMetaObject* nmo);
         template <typename T>
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
-        void dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
+        void dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText, bool tapOutsideClose, bool sendSignal);
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
-        ConfirmationDialog* persistentDlg;
 };
 
 #endif

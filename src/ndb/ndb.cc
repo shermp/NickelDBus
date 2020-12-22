@@ -50,7 +50,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
         initSucceeded = false;
         return;
     }
-    persistentDlg = nullptr;
+    confirmDlg = nullptr;
     // The following symbols are required. If they can't be resolved, bail out
     ndbResolveSymbol("_ZN11PlugManager14sharedInstanceEv", nh_symoutptr(nSym.PlugManager__sharedInstance));
     ndbResolveSymbol("_ZNK11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
@@ -400,81 +400,32 @@ void NDB::allowDialog() {
     allowDlg = true;
 }
 
-void NDB::allowPersistentDialog() {
-    allowPersistentDlg = true;
-}
-
-/*!
- * \brief Show dialog without buttons that can be programatically dismissed
- * 
- * Create a dialog box with \a title and \a body. This dialog has no close
- * button, and is expected to be closed by \l dlgConfirmPersistentClose
- * 
- * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
- */
-void NDB::dlgConfirmPersistentShow(QString const& title, QString const& body) {
-    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowPersistentDlg, "dialog already showing");
-    NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
-        nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__showCloseButton && nSym.ConfirmationDialog__setRejectOnOutsideTap);
-    persistentDlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
-    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, persistentDlg, "error getting confirmation dialog");
-    allowPersistentDlg = false;
-    nSym.ConfirmationDialog__setTitle(persistentDlg, title);
-    nSym.ConfirmationDialog__setText(persistentDlg, body);
-    // This makes the dialog a true modal, where you cannot tap outside it to dismiss
-    nSym.ConfirmationDialog__setRejectOnOutsideTap(persistentDlg, false);
-    persistentDlg->setModal(true);
-    QObject::connect(persistentDlg, &QDialog::finished, this, &NDB::allowPersistentDialog);
-    QObject::connect(persistentDlg, &QDialog::finished, persistentDlg, &QDialog::deleteLater);
-    persistentDlg->open();
-}
-
-/*!
- * \brief Change body text of currently displayed persistent dialog
- * 
- * Set the body text of the currently displayed persistent dialog to \a body
- * replacing the existing body text.
- * 
- * There will be an error if the user has closed the dialog.
- */ 
-void NDB::dlgConfirmPersistentChange(QString const& body) {
-    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowPersistentDlg, "dialog not showing");
-    NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialog__setText);
-    nSym.ConfirmationDialog__setText(persistentDlg, body);
-}
-
-/*!
- * \brief Close dialog created by \l dlgConfirmPersistentShow
- * 
- * Closes the dialog created by \l dlgConfirmPersistentShow. Will return an
- * error if the dialog has already been closed by the user.
- */
-void NDB::dlgConfirmPersistentClose() {
-    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowPersistentDlg, "dialog not showing");
-    persistentDlg->accept();
-}
-
-void NDB::dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
+void NDB::dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText, bool tapOutsideClose, bool sendSignal) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialogFactory_getConfirmationDialog && nSym.ConfirmationDialog__setTitle &&
-        nSym.ConfirmationDialog__setText && nSym.ConfirmationDialog__setAcceptButtonText && nSym.ConfirmationDialog__setRejectButtonText);
-    ConfirmationDialog *dlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
-    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, dlg, "error getting confirmation dialog");
+    NDB_DBUS_SYM_ASSERT((void) 0, 
+        nSym.ConfirmationDialogFactory_getConfirmationDialog && 
+        nSym.ConfirmationDialog__setTitle &&
+        nSym.ConfirmationDialog__setText && 
+        nSym.ConfirmationDialog__setAcceptButtonText && 
+        nSym.ConfirmationDialog__setRejectButtonText && 
+        nSym.ConfirmationDialog__setRejectOnOutsideTap);
+    confirmDlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, confirmDlg, "error getting confirmation dialog");
     allowDlg = false;
     
-    nSym.ConfirmationDialog__setTitle(dlg, title);
-    nSym.ConfirmationDialog__setText(dlg, body);
+    nSym.ConfirmationDialog__setTitle(confirmDlg, title);
+    nSym.ConfirmationDialog__setText(confirmDlg, body);
+    nSym.ConfirmationDialog__setRejectOnOutsideTap(confirmDlg, tapOutsideClose);
 
-    if (!acceptText.isEmpty()) { nSym.ConfirmationDialog__setAcceptButtonText(dlg, acceptText); }
-    if (!rejectText.isEmpty()) { nSym.ConfirmationDialog__setRejectButtonText(dlg, rejectText); }
+    if (!acceptText.isEmpty()) { nSym.ConfirmationDialog__setAcceptButtonText(confirmDlg, acceptText); }
+    if (!rejectText.isEmpty()) { nSym.ConfirmationDialog__setRejectButtonText(confirmDlg, rejectText); }
 
-    dlg->setModal(true);
-    QObject::connect(dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
-    QObject::connect(dlg, &QDialog::finished, this, &NDB::allowDialog);
-    QObject::connect(dlg, &QDialog::finished, dlg, &QDialog::deleteLater);
-    dlg->open();
+    confirmDlg->setModal(true);
+    if (sendSignal) { QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::dlgConfirmResult); }
+    QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::allowDialog);
+    QObject::connect(confirmDlg, &QDialog::finished, confirmDlg, &QDialog::deleteLater);
+    confirmDlg->open();
 }
 
 /*!
@@ -486,7 +437,7 @@ void NDB::dlgConfirmation(QString const& title, QString const& body, QString con
  * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
-    return dlgConfirmation(title, body, QString(""), QString(""));
+    return dlgConfirmation(title, body, QString(""), QString(""), true, true);
 }
 
 /*!
@@ -499,7 +450,7 @@ void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
  * \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
-    return dlgConfirmation(title, body, acceptText, QString(""));
+    return dlgConfirmation(title, body, acceptText, QString(""), true, true);
 }
 
 /*!
@@ -512,7 +463,7 @@ void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString co
  * \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
-    return dlgConfirmation(title, body, QString(""), rejectText);
+    return dlgConfirmation(title, body, QString(""), rejectText, true, true);
 }
 
 /*!
@@ -526,7 +477,50 @@ void NDB::dlgConfirmReject(QString const& title, QString const& body, QString co
  * \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
-    return dlgConfirmation(title, body, acceptText, rejectText);
+    return dlgConfirmation(title, body, acceptText, rejectText, true, true);
+}
+
+/*!
+ * \brief Show confirmation dialog without buttons that can only be closed with close button, or programatically
+ * 
+ * Create a dialog box with \a title and \a body. This dialog has a close
+ * button for safety, but is expected to be closed by \l dlgConfirmClose
+ * 
+ * No signal is emitted when the dialog is closed
+ * 
+ * \since 0.2.0
+ */
+void NDB::dlgConfirmModalMessage(QString const& title, QString const& body) {
+    return dlgConfirmation(title, body, QString(""), QString(""), false, false);
+}
+
+/*!
+ * \brief Change body text of currently displayed dialog
+ * 
+ * Set the body text of the currently displayed dialog to \a body
+ * replacing the existing body text.
+ * 
+ * There will be an error if the user has closed the dialog.
+ * 
+ * \since 0.2.0
+ */ 
+void NDB::dlgConfirmChangeBody(QString const& body) {
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
+    NDB_DBUS_SYM_ASSERT((void) 0, nSym.ConfirmationDialog__setText);
+    nSym.ConfirmationDialog__setText(confirmDlg, body);
+}
+
+/*!
+ * \brief Close the currently opened dialog
+ * 
+ * Closes the currently open dialog. Will return an
+ * error if the dialog has already been closed by the user.
+ * 
+ * \since 0.2.0
+ */
+void NDB::dlgConfirmClose() {
+    NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
+    confirmDlg->accept();
 }
 
 /*!
