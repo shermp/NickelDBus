@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QString>
 #include <QWidget>
+#include <QFrame>
 #include <QRegExp>
 #include <unistd.h>
 #include <string.h>
@@ -51,6 +52,8 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
         return;
     }
     confirmDlg = nullptr;
+    kr = nullptr;
+    tle = nullptr;
     // The following symbols are required. If they can't be resolved, bail out
     ndbResolveSymbol("_ZN11PlugManager14sharedInstanceEv", nh_symoutptr(nSym.PlugManager__sharedInstance));
     ndbResolveSymbol("_ZNK11PlugManager10gadgetModeEv", nh_symoutptr(nSym.PlugManager__gadgetMode));
@@ -85,6 +88,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     ndbResolveSymbol("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(nSym.ConfirmationDialog__setRejectButtonText));
     ndbResolveSymbol("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(nSym.ConfirmationDialog__showCloseButton));
     ndbResolveSymbol("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb",nh_symoutptr(nSym.ConfirmationDialog__setRejectOnOutsideTap));
+    ndbResolveSymbol("_ZN18ConfirmationDialog9addWidgetEP7QWidget", nh_symoutptr(nSym.ConfirmationDialog__addWidget));
     // Toast
     ndbResolveSymbol("_ZN20MainWindowController14sharedInstanceEv", nh_symoutptr(nSym.MainWindowController_sharedInstance));
     ndbResolveSymbol("_ZN20MainWindowController5toastERK7QStringS2_i", nh_symoutptr(nSym.MainWindowController_toast));
@@ -99,6 +103,15 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
         // Older firmware versions use a slightly different mangled symbol name
         ndbResolveSymbol("_ZN20MainWindowController11currentViewEv", nh_symoutptr(nSym.MainWindowController_currentView));
     }
+    // Keyboard stuff
+    ndbResolveSymbol("_ZN31SearchKeyboardControllerFactory17localizedKeyboardEP7QWidget14KeyboardScriptRK7QLocale", nh_symoutptr(nSym.SearchKeyboardControllerFactory__localizedKeyboard));
+    ndbResolveSymbol("_ZN24SearchKeyboardController11setReceiverEP16KeyboardReceiverb", nh_symoutptr(nSym.SearchKeyboardController__setReceiver));
+    ndbResolveSymbol("_ZN24SearchKeyboardController8loadViewEv", nh_symoutptr(nSym.SearchKeyboardController__loadView));
+    ndbResolveSymbol("_ZN24SearchKeyboardController10setEnabledEb", nh_symoutptr(nSym.SearchKeyboardController__setEnabled));
+    ndbResolveSymbol("_ZN13KeyboardFrameC1EP7QWidget", nh_symoutptr(nSym.KeyboardFrame__KeyboardFrame));
+    ndbResolveSymbol("_ZN13KeyboardFrame14createKeyboardE14KeyboardScriptRK7QLocale", nh_symoutptr(nSym.KeyboardFrame_createKeyboard));
+    ndbResolveSymbol("_ZN16KeyboardReceiverC1EP9QLineEditb", nh_symoutptr(nSym.KeyboardReceiver__KeyboardReceiver_lineEdit));
+    ndbResolveSymbol("_ZN13TouchLineEditC1EP7QWidget", nh_symoutptr(nSym.TouchLineEdit__TouchLineEdit));
 }
 
 /*!
@@ -400,6 +413,15 @@ void NDB::allowDialog() {
     allowDlg = true;
 }
 
+void NDB::detatchDialogTextLineEdit() {
+    if (tle) { tle->setParent(nullptr); }
+}
+
+void NDB::emitDialogLineEditInput(int result) {
+    if (result && tle) { emit dlgConfirmTextInput(tle->text()); }
+    else { emit dlgConfirmTextInput(QString("")); }
+}
+
 void NDB::dlgConfirmationCreate(
     QString const& title, 
     QString const& body, 
@@ -434,14 +456,39 @@ void NDB::dlgConfirmationCreate(
     case NDB::DlgConfirmationResult:
         QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
         break;
+    case NDB::DlgConfirmationLineInput:
+        QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::emitDialogLineEditInput);
+        QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::detatchDialogTextLineEdit);
+        break;
     default:
         break;
     }
     QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::allowDialog);
     QObject::connect(confirmDlg, &QDialog::finished, confirmDlg, &QDialog::deleteLater);
-    confirmDlg->open();
 }
 
+bool NDB::dlgConfirmationAddWidget(QWidget* w) {
+    if (allowDlg || !nSym.ConfirmationDialog__addWidget) { return false; }
+    nSym.ConfirmationDialog__addWidget(confirmDlg, w);
+    return true;
+}
+
+bool NDB::dlgConfirmationShowKeyboard(KeyboardReceiver* kr) {
+    if (
+        allowDlg ||
+        !nSym.KeyboardFrame_createKeyboard ||
+        !nSym.SearchKeyboardController__setReceiver
+    ) { return false; }
+    QLocale loc;
+    QObject *d = reinterpret_cast<QObject*>(confirmDlg);
+    KeyboardFrame* kbf = d->findChild<KeyboardFrame*>(QString("keyboardFrame"));
+    if (!kbf) { return false; }
+    SearchKeyboardController *skc = nSym.KeyboardFrame_createKeyboard(kbf, 0, loc);
+    if (!skc) { return false; }
+    nSym.SearchKeyboardController__setReceiver(skc, kr);
+    kbf->show();
+    return true;
+}
 /*!
  * \brief Show a confirmation dialog with no buttons (except close)
  * 
@@ -540,6 +587,29 @@ void NDB::dlgConfirmChangeBody(QString const& body) {
 void NDB::dlgConfirmClose() {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, !allowDlg, "dialog not showing");
     confirmDlg->accept();
+}
+
+void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText) {
+    NDB_DBUS_SYM_ASSERT((void) 0, 
+        nSym.TouchLineEdit__TouchLineEdit &&
+        nSym.KeyboardReceiver__KeyboardReceiver_lineEdit
+    );
+    QLocale loc;
+    if (!tle) { 
+        tle = (QLineEdit*)calloc(1, sizeof(QLineEdit) * 2);
+        NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, tle, "error allocating TouchLineEdit");
+        nSym.TouchLineEdit__TouchLineEdit(tle, nullptr);
+    }
+    if (!kr) { 
+        kr = calloc(1, sizeof(QFrame) * 2);
+        NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, kr, "error allocating KeyboardReciever");
+        nSym.KeyboardReceiver__KeyboardReceiver_lineEdit(kr, tle, true);
+    }
+    tle->clear();
+    dlgConfirmationCreate(title, QString(""), acceptText, QString(""), true, NDB::DlgConfirmationLineInput);
+    dlgConfirmationAddWidget((QWidget*)tle);
+    dlgConfirmationShowKeyboard(kr);
+    confirmDlg->open();
 }
 
 /*!

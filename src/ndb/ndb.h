@@ -9,6 +9,8 @@
 #include <QDBusContext>
 #include <QLabel>
 #include <QTimer>
+#include <QLocale>
+#include <QLineEdit>
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
@@ -17,6 +19,11 @@ typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
 typedef QWidget N3Dialog;
 typedef void Device;
+typedef void SearchKeyboardController;
+typedef int KeyboardScript;
+typedef QFrame KeyboardFrame;
+typedef void KeyboardReceiver;
+typedef QLineEdit TouchLineEdit;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
@@ -41,6 +48,7 @@ class NDB : public QObject, protected QDBusContext {
 
     Q_SIGNALS:
         void dlgConfirmResult(int result);
+        void dlgConfirmTextInput(QString input);
         // PlugworkFlowManager signals
         void pfmDoneProcessing();
         void pfmAboutToConnect();
@@ -77,6 +85,7 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmModalMessage(QString const& title, QString const& body);
         void dlgConfirmChangeBody(QString const& body);
         void dlgConfirmClose();
+        void dlgConfirmLineEdit(QString const& title, QString const& acceptText);
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -97,12 +106,16 @@ class NDB : public QObject, protected QDBusContext {
         void pwrReboot();
     protected Q_SLOTS:
         void allowDialog();
+        void detatchDialogTextLineEdit();
+        void emitDialogLineEditInput(int result);
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
     private:
         void *libnickel;
         bool allowDlg = true;
+        KeyboardReceiver* kr;
+        TouchLineEdit* tle;
         ConfirmationDialog* confirmDlg;
         QSet<QString> connectedSignals;
         QStackedWidget *stackedWidget = nullptr;
@@ -120,12 +133,21 @@ class NDB : public QObject, protected QDBusContext {
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__showCloseButton)(ConfirmationDialog* _this, bool show);
             void (*ConfirmationDialog__setRejectOnOutsideTap)(ConfirmationDialog* _this, bool setReject);
+            void (*ConfirmationDialog__addWidget)(ConfirmationDialog* _this, QWidget* addWidget);
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
             QWidget *(*MainWindowController_currentView)(MainWindowController*);
             QWidget* (*N3Dialog__content)(N3Dialog*);
             Device *(*Device__getCurrentDevice)();
             QByteArray (*Device__userAgent)(Device*);
+            SearchKeyboardController *(*SearchKeyboardControllerFactory__localizedKeyboard)(QWidget*, int, QLocale const&);
+            void (*SearchKeyboardController__setReceiver)(SearchKeyboardController* _this, KeyboardReceiver* receiver);
+            void (*SearchKeyboardController__loadView)(SearchKeyboardController* _this);
+            void (*SearchKeyboardController__setEnabled)(SearchKeyboardController* _this, bool enabled);
+            KeyboardFrame *(*KeyboardFrame__KeyboardFrame)(KeyboardFrame* _this, QWidget* parent);
+            SearchKeyboardController *(*KeyboardFrame_createKeyboard)(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
+            KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);
+            TouchLineEdit *(*TouchLineEdit__TouchLineEdit)(TouchLineEdit* _this, QWidget* parent);
         } nSym;
         QTimer *viewTimer;
 
@@ -147,6 +169,7 @@ class NDB : public QObject, protected QDBusContext {
             enum dlgConfirmationFinishedMethod finishedMethod
         );
         bool dlgConfirmationAddWidget(QWidget* w);
+        bool dlgConfirmationShowKeyboard(KeyboardReceiver* kr);
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
 };
