@@ -107,6 +107,7 @@ class NDB : public QObject, protected QDBusContext {
         QSet<QString> connectedSignals;
         QStackedWidget *stackedWidget = nullptr;
         QString fwVersion;
+        enum dlgConfirmationFinishedMethod {DlgConfirmationNone, DlgConfirmationResult, DlgConfirmationLineInput};
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);
             PlugManager *(*PlugManager__sharedInstance)();
@@ -137,7 +138,15 @@ class NDB : public QObject, protected QDBusContext {
         QString getNickelMetaObjectDetails(const QMetaObject* nmo);
         template <typename T>
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
-        void dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText, bool tapOutsideClose, bool sendSignal);
+        void dlgConfirmationCreate(
+            QString const& title, 
+            QString const& body, 
+            QString const& acceptText, 
+            QString const& rejectText, 
+            bool tapOutsideClose, 
+            enum dlgConfirmationFinishedMethod finishedMethod
+        );
+        bool dlgConfirmationAddWidget(QWidget* w);
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
 };

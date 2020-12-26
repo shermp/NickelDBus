@@ -400,7 +400,14 @@ void NDB::allowDialog() {
     allowDlg = true;
 }
 
-void NDB::dlgConfirmation(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText, bool tapOutsideClose, bool sendSignal) {
+void NDB::dlgConfirmationCreate(
+    QString const& title, 
+    QString const& body, 
+    QString const& acceptText, 
+    QString const& rejectText, 
+    bool tapOutsideClose, 
+    enum dlgConfirmationFinishedMethod finishedMethod
+) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::AccessDenied, allowDlg, "dialog already showing");
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DBUS_SYM_ASSERT((void) 0, 
@@ -409,7 +416,8 @@ void NDB::dlgConfirmation(QString const& title, QString const& body, QString con
         nSym.ConfirmationDialog__setText && 
         nSym.ConfirmationDialog__setAcceptButtonText && 
         nSym.ConfirmationDialog__setRejectButtonText && 
-        nSym.ConfirmationDialog__setRejectOnOutsideTap);
+        nSym.ConfirmationDialog__setRejectOnOutsideTap
+    );
     confirmDlg = nSym.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
     NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, confirmDlg, "error getting confirmation dialog");
     allowDlg = false;
@@ -422,7 +430,13 @@ void NDB::dlgConfirmation(QString const& title, QString const& body, QString con
     if (!rejectText.isEmpty()) { nSym.ConfirmationDialog__setRejectButtonText(confirmDlg, rejectText); }
 
     confirmDlg->setModal(true);
-    if (sendSignal) { QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::dlgConfirmResult); }
+    switch (finishedMethod) {
+    case NDB::DlgConfirmationResult:
+        QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
+        break;
+    default:
+        break;
+    }
     QObject::connect(confirmDlg, &QDialog::finished, this, &NDB::allowDialog);
     QObject::connect(confirmDlg, &QDialog::finished, confirmDlg, &QDialog::deleteLater);
     confirmDlg->open();
@@ -437,7 +451,8 @@ void NDB::dlgConfirmation(QString const& title, QString const& body, QString con
  * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
-    return dlgConfirmation(title, body, QString(""), QString(""), true, true);
+    dlgConfirmationCreate(title, body, QString(""), QString(""), true, NDB::DlgConfirmationResult);
+    confirmDlg->open();
 }
 
 /*!
@@ -450,7 +465,8 @@ void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
  * \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
-    return dlgConfirmation(title, body, acceptText, QString(""), true, true);
+    dlgConfirmationCreate(title, body, acceptText, QString(""), true, NDB::DlgConfirmationResult);
+    confirmDlg->open();
 }
 
 /*!
@@ -463,7 +479,8 @@ void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString co
  * \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
-    return dlgConfirmation(title, body, QString(""), rejectText, true, true);
+    dlgConfirmationCreate(title, body, QString(""), rejectText, true, NDB::DlgConfirmationResult);
+    confirmDlg->open();
 }
 
 /*!
@@ -477,7 +494,8 @@ void NDB::dlgConfirmReject(QString const& title, QString const& body, QString co
  * \l dlgConfirmResult() signal is emitted.
  */
 void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
-    return dlgConfirmation(title, body, acceptText, rejectText, true, true);
+    dlgConfirmationCreate(title, body, acceptText, rejectText, true, NDB::DlgConfirmationResult);
+    confirmDlg->open();
 }
 
 /*!
@@ -491,7 +509,8 @@ void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QStr
  * \since 0.2.0
  */
 void NDB::dlgConfirmModalMessage(QString const& title, QString const& body) {
-    return dlgConfirmation(title, body, QString(""), QString(""), false, false);
+    dlgConfirmationCreate(title, body, QString(""), QString(""), false, NDB::DlgConfirmationNone);
+    confirmDlg->open();
 }
 
 /*!
