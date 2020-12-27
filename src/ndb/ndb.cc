@@ -503,20 +503,29 @@ void NDB::dlgConfirmClose() {
     NDB_DLG_ASSERT((void) 0, (cfmDlg->closeDialog() == NDBCfmDlg::Ok));
 }
 
-void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText) {
+void NDB::dlgConfirmTextLineEdit(NDBCfmDlg::dialogType type, QString const& title, QString const& acceptText, QString const& setText) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, QString(""), acceptText, QString(""), true) == NDBCfmDlg::Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::emitDialogLineEditInput);
+    if (type == NDBCfmDlg::TypeLineEdit) {
     NDB_DLG_ASSERT((void) 0, (cfmDlg->addLineEdit() == NDBCfmDlg::Ok));
+    } else if (type == NDBCfmDlg::TypeTextEdit) {
+        NDB_DLG_ASSERT((void) 0, (cfmDlg->addTextEdit() == NDBCfmDlg::Ok));
+    }
+    if (!setText.isEmpty()) {
+        if (type == NDBCfmDlg::TypeLineEdit) { cfmDlg->setText(setText.simplified()); }
+        else { cfmDlg->setText(setText); }
+    }
     cfmDlg->showDialog();
 }
 
+void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText) {
+    dlgConfirmTextLineEdit(NDBCfmDlg::TypeLineEdit, title, acceptText, QString(""));
+}
+
 void NDB::dlgConfirmTextEdit(QString const& title, QString const& acceptText) {
-    NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, QString(""), acceptText, QString(""), true) == NDBCfmDlg::Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::emitDialogLineEditInput);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->addTextEdit() == NDBCfmDlg::Ok));
-    cfmDlg->showDialog();
+    dlgConfirmTextLineEdit(NDBCfmDlg::TypeTextEdit, title, acceptText, QString(""));
+}
 }
 
 /*!
