@@ -128,12 +128,12 @@ enum NDBCfmDlg::result NDBCfmDlg::addLineEdit() {
         "could not find symbols"
     );
     if (!lineEdit.te) { 
-        lineEdit.te = (QLineEdit*)calloc(1, sizeof(QLineEdit) * 2);
+        lineEdit.te = (TouchLineEdit*)calloc(1, sizeof(QLineEdit) * 4);
         DLG_ASSERT(NullError, lineEdit.te, "could not allocate TouchLineEdit");
         symbols.TouchLineEdit__TouchLineEdit(lineEdit.te, nullptr);
     }
     if (!lineEdit.kr) { 
-        lineEdit.kr = calloc(1, sizeof(QFrame) * 2);
+        lineEdit.kr = (KeyboardFrame*)calloc(1, sizeof(QFrame) * 4);
         DLG_ASSERT(NullError, lineEdit.kr, "could not allocate KeyboardReceiver for TouchLineEdit");
         symbols.KeyboardReceiver__KeyboardReceiver_lineEdit(lineEdit.kr, lineEdit.te, true);
     }
