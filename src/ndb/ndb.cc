@@ -508,7 +508,7 @@ void NDB::dlgConfirmTextLineEdit(NDBCfmDlg::dialogType type, QString const& titl
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, QString(""), acceptText, QString(""), true) == NDBCfmDlg::Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::emitDialogLineEditInput);
     if (type == NDBCfmDlg::TypeLineEdit) {
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->addLineEdit() == NDBCfmDlg::Ok));
+        NDB_DLG_ASSERT((void) 0, (cfmDlg->addLineEdit() == NDBCfmDlg::Ok));
     } else if (type == NDBCfmDlg::TypeTextEdit) {
         NDB_DLG_ASSERT((void) 0, (cfmDlg->addTextEdit() == NDBCfmDlg::Ok));
     }
@@ -523,9 +523,16 @@ void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText) {
     dlgConfirmTextLineEdit(NDBCfmDlg::TypeLineEdit, title, acceptText, QString(""));
 }
 
+void NDB::dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& setText) {
+    dlgConfirmTextLineEdit(NDBCfmDlg::TypeLineEdit, title, acceptText, setText);
+}
+
 void NDB::dlgConfirmTextEdit(QString const& title, QString const& acceptText) {
     dlgConfirmTextLineEdit(NDBCfmDlg::TypeTextEdit, title, acceptText, QString(""));
 }
+
+void NDB::dlgConfirmTextEditSet(QString const& title, QString const& acceptText, QString const& setText) {
+    dlgConfirmTextLineEdit(NDBCfmDlg::TypeTextEdit, title, acceptText, setText);
 }
 
 /*!

@@ -195,3 +195,12 @@ QString NDBCfmDlg::getText() {
     }
     return ret;
 }
+
+void NDBCfmDlg::setText(QString const& text) {
+    DLG_ASSERT((void) 0, active, "dialog not active");
+    if (currActiveType == TypeLineEdit) {
+        lineEdit.te->setText(text);
+    } else if (currActiveType == TypeTextEdit) {
+        textEdit.qte->setPlainText(text);
+    }
+}

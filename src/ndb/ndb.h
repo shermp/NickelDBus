@@ -87,7 +87,9 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmChangeBody(QString const& body);
         void dlgConfirmClose();
         void dlgConfirmLineEdit(QString const& title, QString const& acceptText);
+        void dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& setText);
         void dlgConfirmTextEdit(QString const& title, QString const& acceptText);
+        void dlgConfirmTextEditSet(QString const& title, QString const& acceptText, QString const& setText);
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -140,6 +142,7 @@ class NDB : public QObject, protected QDBusContext {
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
+        void dlgConfirmTextLineEdit(NDBCfmDlg::dialogType type, QString const& title, QString const& acceptText, QString const& setText);
 };
 
 #endif

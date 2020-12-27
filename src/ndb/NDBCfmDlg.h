@@ -18,6 +18,7 @@ class NDBCfmDlg : public QObject {
     Q_OBJECT
     public:
         enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError};
+        enum dialogType {TypeStd, TypeLineEdit, TypeTextEdit};
         enum result initResult;
         NDBCfmDlg(QObject* parent, void* libnickel);
         ~NDBCfmDlg();
@@ -36,12 +37,11 @@ class NDBCfmDlg : public QObject {
         enum result closeDialog();
         enum result updateBody(QString const& body);
         QString getText();
+        void setText(QString const& text);
     protected Q_SLOTS:
         void deactivateDialog();
         void detatchDialogTextLineEdit();
     private:
-        enum finishedMethod {MethodNone, MethodResult, MethodLineInput};
-        enum dialogType {TypeStd, TypeLineEdit, TypeTextEdit};
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
             void (*ConfirmationDialog__setTitle)(ConfirmationDialog* _this, QString const&);
