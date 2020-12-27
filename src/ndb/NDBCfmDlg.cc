@@ -88,7 +88,7 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
             "could not find one or more symbols"
         )
         KeyboardReceiver *kbrc = (currActiveType == TypeLineEdit) ? lineEdit.kr : textEdit.kr;
-        QLocale loc;
+        QLocale loc(QLocale::English);
         KeyboardFrame* kbf = dlg->findChild<KeyboardFrame*>(QString("keyboardFrame"));
         DLG_ASSERT(NullError, kbf, "could not find KeyboardFrame");
         SearchKeyboardController *skc = symbols.KeyboardFrame_createKeyboard(kbf, 0, loc);
