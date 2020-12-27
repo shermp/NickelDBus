@@ -20,3 +20,7 @@
 #define NDB_DBUS_USB_ASSERT(ret) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, !ndbInUSBMS(), "not calling method %s: in usbms session", __func__)
 // Shorthand for the common nickel symbol resolve assertion
 #define NDB_DBUS_SYM_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, "%s: required symbol(s) not resolved", __func__)
+
+#define NDB_RESOLVE_SYMBOL(name, fn) ndbResolveSymbol(libnickel, name, fn)
+
+void ndbResolveSymbol(void* libnickel, const char *name, void **fn);

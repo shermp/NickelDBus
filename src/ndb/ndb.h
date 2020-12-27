@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QLocale>
 #include <QLineEdit>
+#include "NDBCfmDlg.h"
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
@@ -105,53 +106,29 @@ class NDB : public QObject, protected QDBusContext {
         void pwrShutdown();
         void pwrReboot();
     protected Q_SLOTS:
-        void allowDialog();
-        void detatchDialogTextLineEdit();
         void emitDialogLineEditInput(int result);
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
     private:
         void *libnickel;
-        bool allowDlg = true;
-        KeyboardReceiver* kr;
-        TouchLineEdit* tle;
-        ConfirmationDialog* confirmDlg;
         QSet<QString> connectedSignals;
         QStackedWidget *stackedWidget = nullptr;
         QString fwVersion;
-        enum dlgConfirmationFinishedMethod {DlgConfirmationNone, DlgConfirmationResult, DlgConfirmationLineInput};
+        NDBCfmDlg *cfmDlg;
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);
             PlugManager *(*PlugManager__sharedInstance)();
             PlugWorkflowManager *(*PlugWorkflowManager_sharedInstance)();
             WirelessManager *(*WirelesManager_sharedInstance)();
-            ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
-            void (*ConfirmationDialog__setTitle)(ConfirmationDialog* _this, QString const&);
-            void (*ConfirmationDialog__setText)(ConfirmationDialog* _this, QString const&);
-            void (*ConfirmationDialog__setAcceptButtonText)(ConfirmationDialog* _this, QString const&);
-            void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
-            void (*ConfirmationDialog__showCloseButton)(ConfirmationDialog* _this, bool show);
-            void (*ConfirmationDialog__setRejectOnOutsideTap)(ConfirmationDialog* _this, bool setReject);
-            void (*ConfirmationDialog__addWidget)(ConfirmationDialog* _this, QWidget* addWidget);
             MainWindowController *(*MainWindowController_sharedInstance)();
             void (*MainWindowController_toast)(MainWindowController*, QString const&, QString const&, int);
             QWidget *(*MainWindowController_currentView)(MainWindowController*);
             QWidget* (*N3Dialog__content)(N3Dialog*);
             Device *(*Device__getCurrentDevice)();
             QByteArray (*Device__userAgent)(Device*);
-            SearchKeyboardController *(*SearchKeyboardControllerFactory__localizedKeyboard)(QWidget*, int, QLocale const&);
-            void (*SearchKeyboardController__setReceiver)(SearchKeyboardController* _this, KeyboardReceiver* receiver);
-            void (*SearchKeyboardController__loadView)(SearchKeyboardController* _this);
-            void (*SearchKeyboardController__setEnabled)(SearchKeyboardController* _this, bool enabled);
-            KeyboardFrame *(*KeyboardFrame__KeyboardFrame)(KeyboardFrame* _this, QWidget* parent);
-            SearchKeyboardController *(*KeyboardFrame_createKeyboard)(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
-            KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);
-            TouchLineEdit *(*TouchLineEdit__TouchLineEdit)(TouchLineEdit* _this, QWidget* parent);
         } nSym;
         QTimer *viewTimer;
-
-        void ndbResolveSymbol(const char *name, void** sym);
         bool ndbInUSBMS();
         bool ndbActionStrValid(QString const& actStr);
         void ndbWireless(const char *act);
@@ -160,16 +137,6 @@ class NDB : public QObject, protected QDBusContext {
         QString getNickelMetaObjectDetails(const QMetaObject* nmo);
         template <typename T>
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
-        void dlgConfirmationCreate(
-            QString const& title, 
-            QString const& body, 
-            QString const& acceptText, 
-            QString const& rejectText, 
-            bool tapOutsideClose, 
-            enum dlgConfirmationFinishedMethod finishedMethod
-        );
-        bool dlgConfirmationAddWidget(QWidget* w);
-        bool dlgConfirmationShowKeyboard(KeyboardReceiver* kr);
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
 };
