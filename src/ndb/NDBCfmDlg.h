@@ -55,6 +55,7 @@ class NDBCfmDlg : public QObject {
             void (*SearchKeyboardController__setReceiver)(SearchKeyboardController* _this, KeyboardReceiver* receiver);
             void (*SearchKeyboardController__loadView)(SearchKeyboardController* _this);
             void (*SearchKeyboardController__setEnabled)(SearchKeyboardController* _this, bool enabled);
+            void (*SearchKeyboardController__setMultiLineEntry)(SearchKeyboardController* _this, bool enabled);
             KeyboardFrame *(*KeyboardFrame__KeyboardFrame)(KeyboardFrame* _this, QWidget* parent);
             SearchKeyboardController *(*KeyboardFrame_createKeyboard)(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
             KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);

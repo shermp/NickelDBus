@@ -32,6 +32,7 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
     NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController11setReceiverEP16KeyboardReceiverb", nh_symoutptr(symbols.SearchKeyboardController__setReceiver));
     NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController8loadViewEv", nh_symoutptr(symbols.SearchKeyboardController__loadView));
     NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController10setEnabledEb", nh_symoutptr(symbols.SearchKeyboardController__setEnabled));
+    NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController17setMultiLineEntryEb", nh_symoutptr(symbols.SearchKeyboardController__setMultiLineEntry));
     NDB_RESOLVE_SYMBOL("_ZN13KeyboardFrameC1EP7QWidget", nh_symoutptr(symbols.KeyboardFrame__KeyboardFrame));
     NDB_RESOLVE_SYMBOL("_ZN13KeyboardFrame14createKeyboardE14KeyboardScriptRK7QLocale", nh_symoutptr(symbols.KeyboardFrame_createKeyboard));
     NDB_RESOLVE_SYMBOL("_ZN16KeyboardReceiverC1EP9QLineEditb", nh_symoutptr(symbols.KeyboardReceiver__KeyboardReceiver_lineEdit));
@@ -79,7 +80,13 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
 
 enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
     if (currActiveType == TypeLineEdit || currActiveType == TypeTextEdit) {
-        DLG_ASSERT(SymbolError, symbols.KeyboardFrame_createKeyboard && symbols.SearchKeyboardController__setReceiver, "could not find one or more symbols")
+        DLG_ASSERT(
+            SymbolError, 
+            symbols.KeyboardFrame_createKeyboard && 
+            symbols.SearchKeyboardController__setReceiver &&
+            symbols.SearchKeyboardController__setMultiLineEntry, 
+            "could not find one or more symbols"
+        )
         KeyboardReceiver *kbrc = (currActiveType == TypeLineEdit) ? lineEdit.kr : textEdit.kr;
         QLocale loc;
         KeyboardFrame* kbf = dlg->findChild<KeyboardFrame*>(QString("keyboardFrame"));
@@ -87,6 +94,9 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
         SearchKeyboardController *skc = symbols.KeyboardFrame_createKeyboard(kbf, 0, loc);
         DLG_ASSERT(NullError, skc, "could not get SearchKeyboardController");
         symbols.SearchKeyboardController__setReceiver(skc, kbrc);
+        if (currActiveType == TypeTextEdit) {
+            symbols.SearchKeyboardController__setMultiLineEntry(skc, true);
+        }
         kbf->show();
     }
     QObject::connect(dlg, &QDialog::finished, this, &NDBCfmDlg::deactivateDialog);
