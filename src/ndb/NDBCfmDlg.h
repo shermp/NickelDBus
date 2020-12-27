@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QFrame>
 #include <QLineEdit>
+#include <QTextEdit>
 
 typedef QDialog ConfirmationDialog;
 typedef void SearchKeyboardController;
@@ -11,6 +12,7 @@ typedef int KeyboardScript;
 typedef QFrame KeyboardFrame;
 typedef void KeyboardReceiver;
 typedef QLineEdit TouchLineEdit;
+typedef QFrame TouchTextEdit;
 
 class NDBCfmDlg : public QObject {
     Q_OBJECT
@@ -56,15 +58,22 @@ class NDBCfmDlg : public QObject {
             KeyboardFrame *(*KeyboardFrame__KeyboardFrame)(KeyboardFrame* _this, QWidget* parent);
             SearchKeyboardController *(*KeyboardFrame_createKeyboard)(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
             KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);
+            KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_textEdit)(KeyboardReceiver* _this, QTextEdit* text, bool dunno);
             TouchLineEdit *(*TouchLineEdit__TouchLineEdit)(TouchLineEdit* _this, QWidget* parent);
+            TouchTextEdit *(*TouchTextEdit__TouchTextEdit)(TouchTextEdit* _this, QWidget* parent);
+            QTextEdit *(*TouchTextEdit__textEdit)(TouchTextEdit* _this);
         } symbols;
         bool active = false;
         enum dialogType currActiveType;
         struct {
-            bool active = true;
             TouchLineEdit* te;
             KeyboardReceiver* kr;
         } lineEdit;
+        struct {
+            TouchTextEdit* tte;
+            QTextEdit* qte;
+            KeyboardReceiver* kr;
+        } textEdit;
 };
 
 #endif // NDB_CONFIRM_DLG_H

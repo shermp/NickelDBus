@@ -35,7 +35,10 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
     NDB_RESOLVE_SYMBOL("_ZN13KeyboardFrameC1EP7QWidget", nh_symoutptr(symbols.KeyboardFrame__KeyboardFrame));
     NDB_RESOLVE_SYMBOL("_ZN13KeyboardFrame14createKeyboardE14KeyboardScriptRK7QLocale", nh_symoutptr(symbols.KeyboardFrame_createKeyboard));
     NDB_RESOLVE_SYMBOL("_ZN16KeyboardReceiverC1EP9QLineEditb", nh_symoutptr(symbols.KeyboardReceiver__KeyboardReceiver_lineEdit));
+    NDB_RESOLVE_SYMBOL("_ZN16KeyboardReceiverC1EP9QTextEditb", nh_symoutptr(symbols.KeyboardReceiver__KeyboardReceiver_textEdit));
     NDB_RESOLVE_SYMBOL("_ZN13TouchLineEditC1EP7QWidget", nh_symoutptr(symbols.TouchLineEdit__TouchLineEdit));
+    NDB_RESOLVE_SYMBOL("_ZN13TouchTextEditC1EP7QWidget", nh_symoutptr(symbols.TouchTextEdit__TouchTextEdit));
+    NDB_RESOLVE_SYMBOL("_ZN13TouchTextEdit8textEditEv", nh_symoutptr(symbols.TouchTextEdit__textEdit));
 }
 
 NDBCfmDlg::~NDBCfmDlg() {
@@ -77,7 +80,7 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
 enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
     if (currActiveType == TypeLineEdit || currActiveType == TypeTextEdit) {
         DLG_ASSERT(SymbolError, symbols.KeyboardFrame_createKeyboard && symbols.SearchKeyboardController__setReceiver, "could not find one or more symbols")
-        KeyboardReceiver *kbrc = lineEdit.kr;
+        KeyboardReceiver *kbrc = (currActiveType == TypeLineEdit) ? lineEdit.kr : textEdit.kr;
         QLocale loc;
         KeyboardFrame* kbf = dlg->findChild<KeyboardFrame*>(QString("keyboardFrame"));
         DLG_ASSERT(NullError, kbf, "could not find KeyboardFrame");
@@ -120,6 +123,7 @@ enum NDBCfmDlg::result NDBCfmDlg::updateBody(QString const& body) {
 
 enum NDBCfmDlg::result NDBCfmDlg::addLineEdit() {
     DLG_ASSERT(ForbiddenError, active, "dialog not active");
+    DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "dialog must not already have text or line edit set");
     DLG_ASSERT(
         SymbolError, 
         symbols.TouchLineEdit__TouchLineEdit &&
@@ -144,13 +148,40 @@ enum NDBCfmDlg::result NDBCfmDlg::addLineEdit() {
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::addTextEdit() {
-    return NotImplemented;
+    DLG_ASSERT(ForbiddenError, active, "dialog not active");
+    DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "dialog must not already have text or line edit set");
+    DLG_ASSERT(
+        SymbolError, 
+        symbols.TouchTextEdit__TouchTextEdit &&
+        symbols.TouchTextEdit__textEdit &&
+        symbols.KeyboardReceiver__KeyboardReceiver_textEdit &&
+        symbols.ConfirmationDialog__addWidget,
+        "could not find symbols"
+    );
+    if (!textEdit.tte) {
+        textEdit.tte = (TouchTextEdit*)calloc(1, sizeof(QFrame) * 4);
+        DLG_ASSERT(NullError, textEdit.tte, "could not allocate TouchTextEdit");
+        symbols.TouchTextEdit__TouchTextEdit(textEdit.tte, nullptr);
+        textEdit.qte = symbols.TouchTextEdit__textEdit(textEdit.tte);
+    }
+    if (!textEdit.kr) {
+        textEdit.kr = (KeyboardFrame*)calloc(1, sizeof(QFrame) * 4);
+        DLG_ASSERT(NullError, textEdit.kr, "could not allocate KeyboardReceiver for TouchTextEdit");
+        symbols.KeyboardReceiver__KeyboardReceiver_textEdit(textEdit.kr, textEdit.qte, true);
+    }
+    textEdit.qte->clear();
+    symbols.ConfirmationDialog__addWidget(dlg, textEdit.tte);
+    currActiveType = TypeTextEdit;
+    return Ok;
 }
 
 QString NDBCfmDlg::getText() {
-    DLG_ASSERT(QString(""), active, "dialog not active");
+    QString ret("");
+    DLG_ASSERT(ret, active, "dialog not active");
     if (currActiveType == TypeLineEdit) {
-        return lineEdit.te->text();
+        ret = lineEdit.te->text();
+    } else if (currActiveType == TypeTextEdit) {
+        ret = textEdit.qte->toPlainText();
     }
-    return QString("");
+    return ret;
 }

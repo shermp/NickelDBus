@@ -511,6 +511,14 @@ void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText) {
     cfmDlg->showDialog();
 }
 
+void NDB::dlgConfirmTextEdit(QString const& title, QString const& acceptText) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, QString(""), acceptText, QString(""), true) == NDBCfmDlg::Ok));
+    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::emitDialogLineEditInput);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->addTextEdit() == NDBCfmDlg::Ok));
+    cfmDlg->showDialog();
+}
+
 /*!
  * \brief Show a small, temporary text box with a message 
  * 
