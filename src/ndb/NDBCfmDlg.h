@@ -65,6 +65,7 @@ class NDBCfmDlg : public QObject {
             QTextEdit *(*TouchTextEdit__textEdit)(TouchTextEdit* _this);
         } symbols;
         bool active = false;
+        bool showing = false;
         enum dialogType currActiveType;
         struct {
             TouchLineEdit* te;
@@ -75,6 +76,8 @@ class NDBCfmDlg : public QObject {
             QTextEdit* qte;
             KeyboardReceiver* kr;
         } textEdit;
+
+        void connectStdSignals();
 };
 
 #endif // NDB_CONFIRM_DLG_H

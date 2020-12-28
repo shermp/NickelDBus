@@ -3,9 +3,14 @@
 #include "util.h"
 #include "NDBCfmDlg.h"
 
-#define DLG_ASSERT(ret, cond, str) if (!(cond)) {           \
+#define DLG_ASSERT(ret, cond, str) if (!(cond)) {         \
     errString = QString("%1: %2").arg(__func__).arg(str); \
-    return (ret); }
+    if (active && !showing) {                             \
+        connectStdSignals();                              \
+        closeDialog();                                    \
+    }                                                     \
+    return (ret);                                         \
+}
 
 NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
     initResult = Ok;
@@ -45,6 +50,14 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
 NDBCfmDlg::~NDBCfmDlg() {
 }
 
+void NDBCfmDlg::connectStdSignals() {
+    if (active) {
+        QObject::connect(dlg, &QDialog::finished, this, &NDBCfmDlg::deactivateDialog);
+        QObject::connect(dlg, &QDialog::finished, this, &NDBCfmDlg::detatchDialogTextLineEdit);
+        QObject::connect(dlg, &QDialog::finished, dlg, &QDialog::deleteLater);
+    }
+}
+
 enum NDBCfmDlg::result NDBCfmDlg::createDialog(
     QString const& title, 
     QString const& body, 
@@ -52,6 +65,7 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
     QString const& rejectText, 
     bool tapOutsideClose
 ) {
+    showing = false;
     DLG_ASSERT(ForbiddenError, !active, "dialog already open");
     DLG_ASSERT(
         SymbolError, 
@@ -99,10 +113,9 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
         }
         kbf->show();
     }
-    QObject::connect(dlg, &QDialog::finished, this, &NDBCfmDlg::deactivateDialog);
-    QObject::connect(dlg, &QDialog::finished, this, &NDBCfmDlg::detatchDialogTextLineEdit);
-    QObject::connect(dlg, &QDialog::finished, dlg, &QDialog::deleteLater);
+    connectStdSignals();
     dlg->open();
+    showing = true;
     return Ok;
 }
 
@@ -114,6 +127,7 @@ enum NDBCfmDlg::result NDBCfmDlg::closeDialog() {
 
 void NDBCfmDlg::deactivateDialog() {
     active = false;
+    showing = false;
 }
 
 void NDBCfmDlg::detatchDialogTextLineEdit() {
