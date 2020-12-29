@@ -86,10 +86,8 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmModalMessage(QString const& title, QString const& body);
         void dlgConfirmChangeBody(QString const& body);
         void dlgConfirmClose();
-        void dlgConfirmLineEdit(QString const& title, QString const& acceptText);
-        void dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& setText);
-        void dlgConfirmTextEdit(QString const& title, QString const& acceptText);
-        void dlgConfirmTextEditSet(QString const& title, QString const& acceptText, QString const& setText);
+        void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);
+        void dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -109,7 +107,8 @@ class NDB : public QObject, protected QDBusContext {
         void pwrShutdown();
         void pwrReboot();
     protected Q_SLOTS:
-        void emitDialogLineEditInput(int result);
+        void emitDialogLineEditInput();
+        void emitConfirmDialogResultReject();
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
@@ -142,7 +141,7 @@ class NDB : public QObject, protected QDBusContext {
         void ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest);
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
-        void dlgConfirmTextLineEdit(NDBCfmDlg::dialogType type, QString const& title, QString const& acceptText, QString const& setText);
+        void dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
 };
 
 #endif

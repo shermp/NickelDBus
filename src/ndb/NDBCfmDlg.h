@@ -5,6 +5,7 @@
 #include <QFrame>
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QWidget>
 
 typedef QDialog ConfirmationDialog;
 typedef void SearchKeyboardController;
@@ -13,69 +14,54 @@ typedef QFrame KeyboardFrame;
 typedef void KeyboardReceiver;
 typedef QLineEdit TouchLineEdit;
 typedef QFrame TouchTextEdit;
+typedef QWidget N3ConfirmationTextEditField;
 
 class NDBCfmDlg : public QObject {
     Q_OBJECT
     public:
         enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError};
-        enum dialogType {TypeStd, TypeLineEdit, TypeTextEdit};
+        enum dialogType {TypeStd, TypeLineEdit};
         enum result initResult;
         NDBCfmDlg(QObject* parent, void* libnickel);
         ~NDBCfmDlg();
         QString errString;
         ConfirmationDialog* dlg;
         enum result createDialog(
+            enum dialogType dlgType,
             QString const& title, 
             QString const& body, 
             QString const& acceptText, 
             QString const& rejectText, 
             bool tapOutsideClose
         );
-        enum result addLineEdit();
-        enum result addTextEdit();
         enum result showDialog();
         enum result closeDialog();
         enum result updateBody(QString const& body);
+        void setPassword(bool isPassword);
         QString getText();
         void setText(QString const& text);
     protected Q_SLOTS:
         void deactivateDialog();
-        void detatchDialogTextLineEdit();
     private:
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
+            ConfirmationDialog *(*ConfirmationDialogFactory_showTextEditDialog)(QString const& title);
             void (*ConfirmationDialog__setTitle)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__setText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__setAcceptButtonText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__showCloseButton)(ConfirmationDialog* _this, bool show);
             void (*ConfirmationDialog__setRejectOnOutsideTap)(ConfirmationDialog* _this, bool setReject);
-            void (*ConfirmationDialog__addWidget)(ConfirmationDialog* _this, QWidget* addWidget);
-            SearchKeyboardController *(*SearchKeyboardControllerFactory__localizedKeyboard)(QWidget*, int, QLocale const&);
-            void (*SearchKeyboardController__setReceiver)(SearchKeyboardController* _this, KeyboardReceiver* receiver);
-            void (*SearchKeyboardController__loadView)(SearchKeyboardController* _this);
-            void (*SearchKeyboardController__setEnabled)(SearchKeyboardController* _this, bool enabled);
-            void (*SearchKeyboardController__setMultiLineEntry)(SearchKeyboardController* _this, bool enabled);
-            KeyboardFrame *(*KeyboardFrame__KeyboardFrame)(KeyboardFrame* _this, QWidget* parent);
-            SearchKeyboardController *(*KeyboardFrame_createKeyboard)(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
-            KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);
-            KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_textEdit)(KeyboardReceiver* _this, QTextEdit* text, bool dunno);
-            TouchLineEdit *(*TouchLineEdit__TouchLineEdit)(TouchLineEdit* _this, QWidget* parent);
-            TouchTextEdit *(*TouchTextEdit__TouchTextEdit)(TouchTextEdit* _this, QWidget* parent);
-            QTextEdit *(*TouchTextEdit__textEdit)(TouchTextEdit* _this);
+            N3ConfirmationTextEditField *(*N3ConfirmationTextEditField__N3ConfirmationTextEditField)(
+                N3ConfirmationTextEditField* _this, 
+                ConfirmationDialog* dlg, 
+                KeyboardScript ks);
+            TouchLineEdit *(*N3ConfirmationTextEditField__textEdit)(N3ConfirmationTextEditField* _this);
         } symbols;
         bool active = false;
         bool showing = false;
         enum dialogType currActiveType;
-        struct {
-            TouchLineEdit* te;
-            KeyboardReceiver* kr;
-        } lineEdit;
-        struct {
-            TouchTextEdit* tte;
-            QTextEdit* qte;
-            KeyboardReceiver* kr;
-        } textEdit;
+        TouchLineEdit* tle;
 
         void connectStdSignals();
 };

@@ -20,31 +20,20 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
     }
     currActiveType = TypeStd;
     dlg = nullptr;
-    lineEdit.te = nullptr;
-    lineEdit.kr = nullptr;
+    tle = nullptr;
     /* Resolve symbols */
     // Confirmation Dialog
     NDB_RESOLVE_SYMBOL("_ZN25ConfirmationDialogFactory21getConfirmationDialogEP7QWidget", nh_symoutptr(symbols.ConfirmationDialogFactory_getConfirmationDialog));
+    NDB_RESOLVE_SYMBOL("_ZN25ConfirmationDialogFactory18showTextEditDialogERK7QString", nh_symoutptr(symbols.ConfirmationDialogFactory_showTextEditDialog));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog8setTitleERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setTitle));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog7setTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setText));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setAcceptButtonText));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setRejectButtonText));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(symbols.ConfirmationDialog__showCloseButton));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb",nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
-    NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog9addWidgetEP7QWidget", nh_symoutptr(symbols.ConfirmationDialog__addWidget));
     // Keyboard stuff
-    NDB_RESOLVE_SYMBOL("_ZN31SearchKeyboardControllerFactory17localizedKeyboardEP7QWidget14KeyboardScriptRK7QLocale", nh_symoutptr(symbols.SearchKeyboardControllerFactory__localizedKeyboard));
-    NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController11setReceiverEP16KeyboardReceiverb", nh_symoutptr(symbols.SearchKeyboardController__setReceiver));
-    NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController8loadViewEv", nh_symoutptr(symbols.SearchKeyboardController__loadView));
-    NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController10setEnabledEb", nh_symoutptr(symbols.SearchKeyboardController__setEnabled));
-    NDB_RESOLVE_SYMBOL("_ZN24SearchKeyboardController17setMultiLineEntryEb", nh_symoutptr(symbols.SearchKeyboardController__setMultiLineEntry));
-    NDB_RESOLVE_SYMBOL("_ZN13KeyboardFrameC1EP7QWidget", nh_symoutptr(symbols.KeyboardFrame__KeyboardFrame));
-    NDB_RESOLVE_SYMBOL("_ZN13KeyboardFrame14createKeyboardE14KeyboardScriptRK7QLocale", nh_symoutptr(symbols.KeyboardFrame_createKeyboard));
-    NDB_RESOLVE_SYMBOL("_ZN16KeyboardReceiverC1EP9QLineEditb", nh_symoutptr(symbols.KeyboardReceiver__KeyboardReceiver_lineEdit));
-    NDB_RESOLVE_SYMBOL("_ZN16KeyboardReceiverC1EP9QTextEditb", nh_symoutptr(symbols.KeyboardReceiver__KeyboardReceiver_textEdit));
-    NDB_RESOLVE_SYMBOL("_ZN13TouchLineEditC1EP7QWidget", nh_symoutptr(symbols.TouchLineEdit__TouchLineEdit));
-    NDB_RESOLVE_SYMBOL("_ZN13TouchTextEditC1EP7QWidget", nh_symoutptr(symbols.TouchTextEdit__TouchTextEdit));
-    NDB_RESOLVE_SYMBOL("_ZN13TouchTextEdit8textEditEv", nh_symoutptr(symbols.TouchTextEdit__textEdit));
+    NDB_RESOLVE_SYMBOL("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField));
+    NDB_RESOLVE_SYMBOL("_ZNK27N3ConfirmationTextEditField8textEditEv", nh_symoutptr(symbols.N3ConfirmationTextEditField__textEdit));
 }
 
 NDBCfmDlg::~NDBCfmDlg() {
@@ -52,24 +41,31 @@ NDBCfmDlg::~NDBCfmDlg() {
 
 void NDBCfmDlg::connectStdSignals() {
     if (active) {
-        QObject::connect(dlg, &QDialog::finished, this, &NDBCfmDlg::deactivateDialog);
-        QObject::connect(dlg, &QDialog::finished, this, &NDBCfmDlg::detatchDialogTextLineEdit);
-        QObject::connect(dlg, &QDialog::finished, dlg, &QDialog::deleteLater);
+        NDB_DEBUG("connecting standard signals");
+        // Connecting accept/reject signals instead of finished, because for some
+        // reason the dialog created by 'showTextEditDialog()' connects the accept
+        // button tap directly to the 'accepted' signal, instead of the 'accept' slot.
+        // If Kobo ever changes this behaviour, the following code should still work.
+        QObject::connect(dlg, &QDialog::accepted, this, &NDBCfmDlg::deactivateDialog);
+        QObject::connect(dlg, &QDialog::rejected, this, &NDBCfmDlg::deactivateDialog);
+        QObject::connect(dlg, &QDialog::accepted, dlg, &QDialog::deleteLater);
+        QObject::connect(dlg, &QDialog::rejected, dlg, &QDialog::deleteLater);
     }
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::createDialog(
+    enum dialogType dlgType,
     QString const& title, 
     QString const& body, 
     QString const& acceptText, 
     QString const& rejectText, 
     bool tapOutsideClose
 ) {
-    showing = false;
     DLG_ASSERT(ForbiddenError, !active, "dialog already open");
     DLG_ASSERT(
         SymbolError, 
         symbols.ConfirmationDialogFactory_getConfirmationDialog && 
+        symbols.ConfirmationDialogFactory_showTextEditDialog &&
         symbols.ConfirmationDialog__setTitle &&
         symbols.ConfirmationDialog__setText && 
         symbols.ConfirmationDialog__setAcceptButtonText && 
@@ -77,10 +73,30 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         symbols.ConfirmationDialog__setRejectOnOutsideTap,
         "could not find one or more standard dialog symbols"
     );
-    dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
-    DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
+    if (dlgType == TypeLineEdit) {
+        dlg = symbols.ConfirmationDialogFactory_showTextEditDialog(title);
+        DLG_ASSERT(NullError, dlg, "could not get line edit dialog");
+        DLG_ASSERT(
+            SymbolError,
+            symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField &&
+            symbols.N3ConfirmationTextEditField__textEdit,
+            "could not find symbols"
+        );
+        // Use ::operator new() instead of malloc/calloc so that Qt can call delete later
+        N3ConfirmationTextEditField* tef = reinterpret_cast<N3ConfirmationTextEditField*>(::operator new(128));
+        DLG_ASSERT(NullError, tef, "error getting text edit field");
+        memset(tef, 0, 128);
+        // Still don't know what 'KeyboardScript' is, but I've seen code in libnickel that uses 1 so...
+        symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(tef, dlg, 1);
+        tle = symbols.N3ConfirmationTextEditField__textEdit(tef);
+        DLG_ASSERT(NullError, tle, "error getting TouchLineEdit");
+        currActiveType = TypeLineEdit;
+    } else {
+        dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
+        DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
+        currActiveType = TypeStd;
+    }
     active = true;
-    currActiveType = TypeStd;
     symbols.ConfirmationDialog__setTitle(dlg, title);
     symbols.ConfirmationDialog__setText(dlg, body);
     symbols.ConfirmationDialog__setRejectOnOutsideTap(dlg, tapOutsideClose);
@@ -93,26 +109,6 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
-    if (currActiveType == TypeLineEdit || currActiveType == TypeTextEdit) {
-        DLG_ASSERT(
-            SymbolError, 
-            symbols.KeyboardFrame_createKeyboard && 
-            symbols.SearchKeyboardController__setReceiver &&
-            symbols.SearchKeyboardController__setMultiLineEntry, 
-            "could not find one or more symbols"
-        )
-        KeyboardReceiver *kbrc = (currActiveType == TypeLineEdit) ? lineEdit.kr : textEdit.kr;
-        QLocale loc(QLocale::English);
-        KeyboardFrame* kbf = dlg->findChild<KeyboardFrame*>(QString("keyboardFrame"));
-        DLG_ASSERT(NullError, kbf, "could not find KeyboardFrame");
-        SearchKeyboardController *skc = symbols.KeyboardFrame_createKeyboard(kbf, 0, loc);
-        DLG_ASSERT(NullError, skc, "could not get SearchKeyboardController");
-        symbols.SearchKeyboardController__setReceiver(skc, kbrc);
-        if (currActiveType == TypeTextEdit) {
-            symbols.SearchKeyboardController__setMultiLineEntry(skc, true);
-        }
-        kbf->show();
-    }
     connectStdSignals();
     dlg->open();
     showing = true;
@@ -126,15 +122,10 @@ enum NDBCfmDlg::result NDBCfmDlg::closeDialog() {
 }
 
 void NDBCfmDlg::deactivateDialog() {
+    NDB_DEBUG("deactivating dialog");
     active = false;
     showing = false;
-}
-
-void NDBCfmDlg::detatchDialogTextLineEdit() {
-    if (currActiveType == TypeLineEdit) {
-        lineEdit.te->setParent(nullptr); 
-        currActiveType = TypeStd;
-    }
+    tle = nullptr;
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::updateBody(QString const& body) {
@@ -145,76 +136,27 @@ enum NDBCfmDlg::result NDBCfmDlg::updateBody(QString const& body) {
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::addLineEdit() {
-    DLG_ASSERT(ForbiddenError, active, "dialog not active");
-    DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "dialog must not already have text or line edit set");
-    DLG_ASSERT(
-        SymbolError, 
-        symbols.TouchLineEdit__TouchLineEdit &&
-        symbols.KeyboardReceiver__KeyboardReceiver_lineEdit &&
-        symbols.ConfirmationDialog__addWidget,
-        "could not find symbols"
-    );
-    if (!lineEdit.te) { 
-        lineEdit.te = (TouchLineEdit*)calloc(1, sizeof(QLineEdit) * 4);
-        DLG_ASSERT(NullError, lineEdit.te, "could not allocate TouchLineEdit");
-        symbols.TouchLineEdit__TouchLineEdit(lineEdit.te, nullptr);
+void NDBCfmDlg::setPassword(bool isPassword) {
+    if (active && currActiveType == TypeLineEdit && tle) {
+        if (isPassword) {
+            tle->setEchoMode(QLineEdit::Password);
+        } else {
+            tle->setEchoMode(QLineEdit::Normal);
+        }
     }
-    if (!lineEdit.kr) { 
-        lineEdit.kr = (KeyboardFrame*)calloc(1, sizeof(QFrame) * 4);
-        DLG_ASSERT(NullError, lineEdit.kr, "could not allocate KeyboardReceiver for TouchLineEdit");
-        symbols.KeyboardReceiver__KeyboardReceiver_lineEdit(lineEdit.kr, lineEdit.te, true);
-    }
-    lineEdit.te->clear();
-    symbols.ConfirmationDialog__addWidget(dlg, lineEdit.te);
-    currActiveType = TypeLineEdit;
-    return Ok;
-}
-
-enum NDBCfmDlg::result NDBCfmDlg::addTextEdit() {
-    DLG_ASSERT(ForbiddenError, active, "dialog not active");
-    DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "dialog must not already have text or line edit set");
-    DLG_ASSERT(
-        SymbolError, 
-        symbols.TouchTextEdit__TouchTextEdit &&
-        symbols.TouchTextEdit__textEdit &&
-        symbols.KeyboardReceiver__KeyboardReceiver_textEdit &&
-        symbols.ConfirmationDialog__addWidget,
-        "could not find symbols"
-    );
-    if (!textEdit.tte) {
-        textEdit.tte = (TouchTextEdit*)calloc(1, sizeof(QFrame) * 4);
-        DLG_ASSERT(NullError, textEdit.tte, "could not allocate TouchTextEdit");
-        symbols.TouchTextEdit__TouchTextEdit(textEdit.tte, nullptr);
-        textEdit.qte = symbols.TouchTextEdit__textEdit(textEdit.tte);
-    }
-    if (!textEdit.kr) {
-        textEdit.kr = (KeyboardFrame*)calloc(1, sizeof(QFrame) * 4);
-        DLG_ASSERT(NullError, textEdit.kr, "could not allocate KeyboardReceiver for TouchTextEdit");
-        symbols.KeyboardReceiver__KeyboardReceiver_textEdit(textEdit.kr, textEdit.qte, true);
-    }
-    textEdit.qte->clear();
-    symbols.ConfirmationDialog__addWidget(dlg, textEdit.tte);
-    currActiveType = TypeTextEdit;
-    return Ok;
 }
 
 QString NDBCfmDlg::getText() {
     QString ret("");
     DLG_ASSERT(ret, active, "dialog not active");
-    if (currActiveType == TypeLineEdit) {
-        ret = lineEdit.te->text();
-    } else if (currActiveType == TypeTextEdit) {
-        ret = textEdit.qte->toPlainText();
+    if (currActiveType == TypeLineEdit && tle) {
+        ret = tle->text();
     }
     return ret;
 }
 
 void NDBCfmDlg::setText(QString const& text) {
-    DLG_ASSERT((void) 0, active, "dialog not active");
-    if (currActiveType == TypeLineEdit) {
-        lineEdit.te->setText(text);
-    } else if (currActiveType == TypeTextEdit) {
-        textEdit.qte->setPlainText(text);
+    if (active && currActiveType == TypeLineEdit && tle) {
+        tle->setPlaceholderText(text);
     }
 }

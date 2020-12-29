@@ -389,11 +389,13 @@ QString NDB::ndbFirmwareVersion() {
 
 #define NDB_DLG_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, (cfmDlg->errString.toUtf8().constData()))
 
-void NDB::emitDialogLineEditInput(int result) {
-    if (result) { emit dlgConfirmTextInput(cfmDlg->getText()); }
-    else { emit dlgConfirmTextInput(QString("")); }
+void NDB::emitDialogLineEditInput() {
+    emit dlgConfirmTextInput(cfmDlg->getText());
 }
 
+void NDB::emitConfirmDialogResultReject() {
+    emit dlgConfirmResult(QDialog::Rejected);
+}
 /*!
  * \brief Show a confirmation dialog with no buttons (except close)
  * 
@@ -404,7 +406,7 @@ void NDB::emitDialogLineEditInput(int result) {
  */
 void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, body, QString(""), QString(""), true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, QString(""), QString(""), true) == NDBCfmDlg::Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -420,7 +422,7 @@ void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
  */
 void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, body, acceptText, QString(""), true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, QString(""), true) == NDBCfmDlg::Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -436,7 +438,7 @@ void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString co
  */
 void NDB::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, body, QString(""), rejectText, true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, QString(""), rejectText, true) == NDBCfmDlg::Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -453,7 +455,7 @@ void NDB::dlgConfirmReject(QString const& title, QString const& body, QString co
  */
 void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, body, acceptText, rejectText, true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, rejectText, true) == NDBCfmDlg::Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -470,7 +472,7 @@ void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QStr
  */
 void NDB::dlgConfirmModalMessage(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, body, QString(""), QString(""), false) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, QString(""), QString(""), false) == NDBCfmDlg::Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -503,36 +505,22 @@ void NDB::dlgConfirmClose() {
     NDB_DLG_ASSERT((void) 0, (cfmDlg->closeDialog() == NDBCfmDlg::Ok));
 }
 
-void NDB::dlgConfirmTextLineEdit(NDBCfmDlg::dialogType type, QString const& title, QString const& acceptText, QString const& setText) {
+void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(title, QString(""), acceptText, QString(""), true) == NDBCfmDlg::Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::emitDialogLineEditInput);
-    if (type == NDBCfmDlg::TypeLineEdit) {
-        NDB_DLG_ASSERT((void) 0, (cfmDlg->addLineEdit() == NDBCfmDlg::Ok));
-    } else if (type == NDBCfmDlg::TypeTextEdit) {
-        NDB_DLG_ASSERT((void) 0, (cfmDlg->addTextEdit() == NDBCfmDlg::Ok));
-    }
-    if (!setText.isEmpty()) {
-        if (type == NDBCfmDlg::TypeLineEdit) { cfmDlg->setText(setText.simplified()); }
-        else { cfmDlg->setText(setText); }
-    }
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeLineEdit, title, QString(""), acceptText, rejectText, true) == NDBCfmDlg::Ok));
+    cfmDlg->setText(setText);
+    cfmDlg->setPassword(isPassword);
+    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDB::emitDialogLineEditInput);
+    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::emitConfirmDialogResultReject);
     cfmDlg->showDialog();
 }
 
-void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText) {
-    dlgConfirmTextLineEdit(NDBCfmDlg::TypeLineEdit, title, acceptText, QString(""));
+void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword) {
+    dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, QString(""));
 }
 
-void NDB::dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& setText) {
-    dlgConfirmTextLineEdit(NDBCfmDlg::TypeLineEdit, title, acceptText, setText);
-}
-
-void NDB::dlgConfirmTextEdit(QString const& title, QString const& acceptText) {
-    dlgConfirmTextLineEdit(NDBCfmDlg::TypeTextEdit, title, acceptText, QString(""));
-}
-
-void NDB::dlgConfirmTextEditSet(QString const& title, QString const& acceptText, QString const& setText) {
-    dlgConfirmTextLineEdit(NDBCfmDlg::TypeTextEdit, title, acceptText, setText);
+void NDB::dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
+    dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, setText);
 }
 
 /*!
