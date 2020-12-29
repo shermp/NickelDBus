@@ -540,7 +540,7 @@ void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QS
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
+void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, setText);
 }
 
