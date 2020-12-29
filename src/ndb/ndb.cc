@@ -515,10 +515,31 @@ void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText
     cfmDlg->showDialog();
 }
 
+/*!
+ * \brief Create dialog with single line text input
+ * 
+ * The dialog box will have a \a title, \a accept and \a reject buttons 
+ * and a single line text entry field. If \a isPassword is 'true', the
+ * text entry field will have its entry characters masked.
+ * 
+ * If the dialog is closed by tapping the 'accept' button, the 
+ * \l dlgConfirmTextInput signal will emit the contents of the text edit field.
+ * Otherwise, \l dlgConfirmResult will emit the result of 0
+ * 
+ * \since v0.2.0
+ */
 void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword) {
     dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, QString(""));
 }
 
+/*!
+ * \brief Create dialog with single line text input with placeholder text
+ * 
+ * This is the same as \l dlgConfirmLineEdit with the addition that placeholder
+ * text will be added to the text entry field. This placeholder text is set to \a setText
+ * 
+ * \since v0.2.0
+ */
 void NDB::dlgConfirmLineEditSet(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, setText);
 }
