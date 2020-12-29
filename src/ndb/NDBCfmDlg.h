@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QWidget>
+#include <QPointer>
 
 typedef QDialog ConfirmationDialog;
 typedef void SearchKeyboardController;
@@ -25,7 +26,7 @@ class NDBCfmDlg : public QObject {
         NDBCfmDlg(QObject* parent, void* libnickel);
         ~NDBCfmDlg();
         QString errString;
-        ConfirmationDialog* dlg;
+        QPointer<ConfirmationDialog> dlg;
         enum result createDialog(
             enum dialogType dlgType,
             QString const& title, 
@@ -40,8 +41,6 @@ class NDBCfmDlg : public QObject {
         void setPassword(bool isPassword);
         QString getText();
         void setText(QString const& text);
-    protected Q_SLOTS:
-        void deactivateDialog();
     private:
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
@@ -58,10 +57,8 @@ class NDBCfmDlg : public QObject {
                 KeyboardScript ks);
             TouchLineEdit *(*N3ConfirmationTextEditField__textEdit)(N3ConfirmationTextEditField* _this);
         } symbols;
-        bool active = false;
-        bool showing = false;
         enum dialogType currActiveType;
-        TouchLineEdit* tle;
+        QPointer<TouchLineEdit> tle;
 
         void connectStdSignals();
 };
