@@ -23,4 +23,10 @@
 
 #define NDB_RESOLVE_SYMBOL(name, fn) ndbResolveSymbol(libnickel, name, fn)
 
+#ifdef DEBUG
+#define NDB_DEBUG(fmt, ...) nh_log("[debug] %s:%d:%s() " fmt, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#else
+#define NDB_DEBUG(fmt, ...) do {} while (0)
+#endif
+
 void ndbResolveSymbol(void* libnickel, const char *name, void **fn);
