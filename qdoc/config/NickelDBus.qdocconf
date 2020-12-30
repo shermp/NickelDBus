@@ -4,6 +4,8 @@
 # include compat.qdocconf.
 
 project = NickelDBus
+description = Monitor and control aspects of Kobo's Nickel application
+
 include(compat.qdocconf)
 
 HTML.stylesheets =  template/style/online.css

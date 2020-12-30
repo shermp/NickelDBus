@@ -477,7 +477,7 @@ void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QStr
  * 
  * No signal is emitted when the dialog is closed
  * 
- * \since 0.2.0
+ * \since v0.2.0
  */
 void NDB::dlgConfirmModalMessage(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -494,7 +494,7 @@ void NDB::dlgConfirmModalMessage(QString const& title, QString const& body) {
  * 
  * There will be an error if the user has closed the dialog.
  * 
- * \since 0.2.0
+ * \since v0.2.0
  */ 
 void NDB::dlgConfirmChangeBody(QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -507,7 +507,7 @@ void NDB::dlgConfirmChangeBody(QString const& body) {
  * Closes the currently open dialog. Will return an
  * error if the dialog has already been closed by the user.
  * 
- * \since 0.2.0
+ * \since v0.2.0
  */
 void NDB::dlgConfirmClose() {
     NDB_DBUS_USB_ASSERT((void) 0);
