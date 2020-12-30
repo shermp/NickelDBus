@@ -17,6 +17,7 @@ typedef enum NDBCfmDlg::result CfmDlgResult;
 
 /*!
  * \class NDB
+ * \inmodule NickelDBus
  * \brief The NDB class registers a service on d-bus of Kobo e-readers.
  * 
  * NDB provides a bridge between Kobo's proprietary software, libnickel, 
@@ -389,10 +390,18 @@ QString NDB::ndbFirmwareVersion() {
 
 #define NDB_DLG_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, (cfmDlg->errString.toUtf8().constData()))
 
+/*!
+ * \internal
+ * \brief Emits user inputted text
+ */
 void NDB::emitDialogLineEditInput() {
     emit dlgConfirmTextInput(cfmDlg->getText());
 }
 
+/*!
+ * \internal
+ * \brief Emits \l dlgConfirmResult() when line edit dialog is canceled/closed
+ */
 void NDB::emitConfirmDialogResultReject() {
     emit dlgConfirmResult(QDialog::Rejected);
 }
@@ -464,7 +473,7 @@ void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QStr
  * \brief Show confirmation dialog without buttons that can only be closed with close button, or programatically
  * 
  * Create a dialog box with \a title and \a body. This dialog has a close
- * button for safety, but is expected to be closed by \l dlgConfirmClose
+ * button for safety, but is expected to be closed by \l dlgConfirmClose()
  * 
  * No signal is emitted when the dialog is closed
  * 
@@ -518,13 +527,13 @@ void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText
 /*!
  * \brief Create dialog with single line text input
  * 
- * The dialog box will have a \a title, \a accept and \a reject buttons 
- * and a single line text entry field. If \a isPassword is 'true', the
+ * The dialog box will have a \a title, \a acceptText and \a rejectText buttons 
+ * and a single line text entry field. If \a isPassword is \c {true}, the
  * text entry field will have its entry characters masked.
  * 
  * If the dialog is closed by tapping the 'accept' button, the 
- * \l dlgConfirmTextInput signal will emit the contents of the text edit field.
- * Otherwise, \l dlgConfirmResult will emit the result of 0
+ * \l dlgConfirmTextInput() signal will emit the contents of the text edit field.
+ * Otherwise, \l dlgConfirmResult() will emit the result of \c 0
  * 
  * \since v0.2.0
  */
@@ -535,8 +544,11 @@ void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QS
 /*!
  * \brief Create dialog with single line text input with placeholder text
  * 
- * This is the same as \l dlgConfirmLineEdit with the addition that placeholder
+ * This is the same as \l dlgConfirmLineEdit() with the addition that placeholder
  * text will be added to the text entry field. This placeholder text is set to \a setText
+ * 
+ * The parameters \a title, \a acceptText, \a rejectText and \a isPassword are all the
+ * same as \l dlgConfirmLineEdit()
  * 
  * \since v0.2.0
  */
@@ -785,6 +797,16 @@ void NDB::rvConnectSignals(QWidget* rv) {
  * \brief The signal that is emitted when a confirmation dialog is dismissed
  * 
  * When emitted, \a result will be \c 1 for ACCEPT or \c 0 for REJECT
+ */
+
+/*!
+ * \fn void NDB::dlgConfirmTextInput(QString input)
+ * \brief The signal that is emitted when text is entered by user
+ * 
+ * When emitted \a input will be the text the user inputted. This signal is
+ * only emitted when the user taps the \c accept button is tapped.
+ * 
+ * \since v0.2.0
  */
 
 /*!

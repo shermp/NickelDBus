@@ -33,7 +33,7 @@ override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS
 
 override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) qdoc/html/
 
-.PHONY: debug cli clean-cli gitignore-cli doc dbuscfg interface uninstall-file
+.PHONY: debug cli clean-cli gitignore-cli doc clean-doc dbuscfg interface uninstall-file
 
 interface: $(ADAPTER) $(PROXY)
 
@@ -55,6 +55,9 @@ gitignore: gitignore-cli
 
 doc:
 	cd qdoc/config && qdoc ndb.qdocconf
+
+clean-doc:
+	rm -rf qdoc/html
 
 uninstall-file:
 	echo "$(VERSION)" > $(UNINSTALL_FILE)
