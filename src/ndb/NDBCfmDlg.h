@@ -7,6 +7,7 @@
 #include <QTextEdit>
 #include <QWidget>
 #include <QPointer>
+#include <QCheckBox>
 
 typedef QDialog ConfirmationDialog;
 typedef void SearchKeyboardController;
@@ -16,6 +17,7 @@ typedef void KeyboardReceiver;
 typedef QLineEdit TouchLineEdit;
 typedef QFrame TouchTextEdit;
 typedef QWidget N3ConfirmationTextEditField;
+typedef QCheckBox TouchCheckBox;
 
 class NDBCfmDlg : public QObject {
     Q_OBJECT
@@ -59,7 +61,7 @@ class NDBCfmDlg : public QObject {
         } symbols;
         enum dialogType currActiveType;
         QPointer<TouchLineEdit> tle;
-
+        QPointer<N3ConfirmationTextEditField> tef;
         void connectStdSignals();
 };
 

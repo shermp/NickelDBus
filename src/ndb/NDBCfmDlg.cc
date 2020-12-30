@@ -81,13 +81,17 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         );
         // Use ::operator new() instead of malloc/calloc so that Qt can call delete later
         size_t tefSize = 128;
-        N3ConfirmationTextEditField* tef = reinterpret_cast<N3ConfirmationTextEditField*>(::operator new(tefSize));
-        DLG_ASSERT(NullError, tef, "error getting text edit field");
-        memset(tef, 0, tefSize);
+        // We can't directly allocate this memory to the 'tef' QPointer variable, because
+        // it is not yet a valid QObject
+        N3ConfirmationTextEditField* tf = reinterpret_cast<N3ConfirmationTextEditField*>(::operator new(tefSize));
+        DLG_ASSERT(NullError, tf, "error getting text edit field");
+        memset(tf, 0, tefSize);
         // Still don't know what 'KeyboardScript' is, but I've seen code in libnickel that uses 1 so...
-        symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(tef, dlg, 1);
-        tle = symbols.N3ConfirmationTextEditField__textEdit(tef);
+        symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(tf, dlg, 1);
+        tle = symbols.N3ConfirmationTextEditField__textEdit(tf);
         DLG_ASSERT(NullError, tle, "error getting TouchLineEdit");
+        // Keep a reference of the text edit field for later use. 
+        tef = tf;
         currActiveType = TypeLineEdit;
     } else {
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
@@ -127,11 +131,17 @@ enum NDBCfmDlg::result NDBCfmDlg::updateBody(QString const& body) {
 }
 
 void NDBCfmDlg::setPassword(bool isPassword) {
-    if (dlg && currActiveType == TypeLineEdit && tle) {
-        if (isPassword) {
-            tle->setEchoMode(QLineEdit::Password);
-        } else {
-            tle->setEchoMode(QLineEdit::Normal);
+    if (dlg && currActiveType == TypeLineEdit && tef) {
+        TouchCheckBox* tcb = tef->findChild<TouchCheckBox*>(QString("showPassword"));
+        if (tcb) {
+            if (isPassword) {
+                tcb->setChecked(false);
+                tcb->show();
+            }
+            else {
+                tcb->setChecked(true);
+                tcb->hide();
+            }
         }
     }
 }
