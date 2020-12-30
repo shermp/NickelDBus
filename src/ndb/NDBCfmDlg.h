@@ -10,12 +10,8 @@
 #include <QCheckBox>
 
 typedef QDialog ConfirmationDialog;
-typedef void SearchKeyboardController;
 typedef int KeyboardScript;
-typedef QFrame KeyboardFrame;
-typedef void KeyboardReceiver;
 typedef QLineEdit TouchLineEdit;
-typedef QFrame TouchTextEdit;
 typedef QWidget N3ConfirmationTextEditField;
 typedef QCheckBox TouchCheckBox;
 
