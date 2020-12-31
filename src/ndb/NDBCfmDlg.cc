@@ -79,13 +79,11 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
             symbols.N3ConfirmationTextEditField__textEdit,
             "could not find symbols"
         );
-        // Use ::operator new() instead of malloc/calloc so that Qt can call delete later
         size_t tefSize = 128;
         // We can't directly allocate this memory to the 'tef' QPointer variable, because
         // it is not yet a valid QObject
-        N3ConfirmationTextEditField* tf = reinterpret_cast<N3ConfirmationTextEditField*>(::operator new(tefSize));
+        N3ConfirmationTextEditField* tf = reinterpret_cast<N3ConfirmationTextEditField*>(calloc(1, tefSize));
         DLG_ASSERT(NullError, tf, "error getting text edit field");
-        memset(tf, 0, tefSize);
         // Still don't know what 'KeyboardScript' is, but I've seen code in libnickel that uses 1 so...
         symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(tf, dlg, 1);
         tle = symbols.N3ConfirmationTextEditField__textEdit(tf);
