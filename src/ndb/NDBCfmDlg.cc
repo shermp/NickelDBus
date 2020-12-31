@@ -97,7 +97,11 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         }
         tle = symbols.N3ConfirmationTextEditField__textEdit(tf);
         DLG_ASSERT(NullError, tle, "error getting TouchLineEdit");
-        // Keep a reference of the text edit field for later use. 
+        // Make the 'Go' key accept the dialog.
+        if (!QObject::connect(tf, SIGNAL(commitRequested()), dlg, SIGNAL(accepted()))) {
+            nh_log("unable to connect N3ConfirmationTextEditField::commitRequested() to ConfirmationDialog::accepted()");
+        }
+        // Keep a reference of the text edit field for later use.
         tef = tf;
         currActiveType = TypeLineEdit;
     } else {
