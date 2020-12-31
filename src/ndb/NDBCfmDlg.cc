@@ -29,7 +29,7 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setAcceptButtonText));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setRejectButtonText));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(symbols.ConfirmationDialog__showCloseButton));
-    NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb",nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
+    NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb", nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
     // Keyboard stuff
     NDB_RESOLVE_SYMBOL("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS));
     if (!symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
@@ -154,7 +154,7 @@ void NDBCfmDlg::setPassword(bool isPassword) {
 }
 
 QString NDBCfmDlg::getText() {
-    QString ret("");
+    QString ret;
     DLG_ASSERT(ret, dlg, "dialog not active");
     if (currActiveType == TypeLineEdit && tle) {
         ret = tle->text();
