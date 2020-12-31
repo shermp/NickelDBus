@@ -907,4 +907,3 @@ void NDB::rvConnectSignals(QWidget* rv) {
  * 
  * \sa NDB::ndbCurrentView()
  */
-
