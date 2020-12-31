@@ -49,10 +49,14 @@ class NDBCfmDlg : public QObject {
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__showCloseButton)(ConfirmationDialog* _this, bool show);
             void (*ConfirmationDialog__setRejectOnOutsideTap)(ConfirmationDialog* _this, bool setReject);
-            N3ConfirmationTextEditField *(*N3ConfirmationTextEditField__N3ConfirmationTextEditField)(
+            N3ConfirmationTextEditField *(*N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS)(
                 N3ConfirmationTextEditField* _this, 
                 ConfirmationDialog* dlg, 
                 KeyboardScript ks);
+            N3ConfirmationTextEditField *(*N3ConfirmationTextEditField__N3ConfirmationTextEditField)(
+                N3ConfirmationTextEditField* _this, 
+                ConfirmationDialog* dlg
+            );
             TouchLineEdit *(*N3ConfirmationTextEditField__textEdit)(N3ConfirmationTextEditField* _this);
         } symbols;
         enum dialogType currActiveType;

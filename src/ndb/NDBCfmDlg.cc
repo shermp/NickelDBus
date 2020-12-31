@@ -31,7 +31,11 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(symbols.ConfirmationDialog__showCloseButton));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb",nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
     // Keyboard stuff
-    NDB_RESOLVE_SYMBOL("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField));
+    NDB_RESOLVE_SYMBOL("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS));
+    if (!symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
+        // FW 4.6 has a slightly different constructor without the KeyboardScript stuff
+        NDB_RESOLVE_SYMBOL("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField));
+    }
     NDB_RESOLVE_SYMBOL("_ZNK27N3ConfirmationTextEditField8textEditEv", nh_symoutptr(symbols.N3ConfirmationTextEditField__textEdit));
 }
 
@@ -75,7 +79,8 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         DLG_ASSERT(NullError, dlg, "could not get line edit dialog");
         DLG_ASSERT(
             SymbolError,
-            symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField &&
+            (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS ||
+             symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField) &&
             symbols.N3ConfirmationTextEditField__textEdit,
             "could not find symbols"
         );
@@ -84,8 +89,12 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         // it is not yet a valid QObject
         N3ConfirmationTextEditField* tf = reinterpret_cast<N3ConfirmationTextEditField*>(calloc(1, tefSize));
         DLG_ASSERT(NullError, tf, "error getting text edit field");
-        // Still don't know what 'KeyboardScript' is, but I've seen code in libnickel that uses 1 so...
-        symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(tf, dlg, 1);
+        if (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
+            // Still don't know what 'KeyboardScript' is, but I've seen code in libnickel that uses 1 so...
+            symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS(tf, dlg, 1);
+        } else {
+            symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(tf, dlg);
+        }
         tle = symbols.N3ConfirmationTextEditField__textEdit(tf);
         DLG_ASSERT(NullError, tle, "error getting TouchLineEdit");
         // Keep a reference of the text edit field for later use. 
