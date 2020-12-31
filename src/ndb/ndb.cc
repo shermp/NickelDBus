@@ -532,8 +532,8 @@ void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText
  * text entry field will have its entry characters masked.
  * 
  * If the dialog is closed by tapping the 'accept' button, the 
- * \l dlgConfirmTextInput() signal will emit the contents of the text edit field.
- * Otherwise, \l dlgConfirmResult() will emit the result of \c 0
+ * \l dlgConfirmTextInput() signal will emit the contents of the text edit field 
+ * (which may be an empty string). Otherwise, \l dlgConfirmResult() will emit the result of \c 0
  * 
  * \since v0.2.0
  */
@@ -804,7 +804,8 @@ void NDB::rvConnectSignals(QWidget* rv) {
  * \brief The signal that is emitted when text is entered by user
  * 
  * When emitted \a input will be the text the user inputted. This signal is
- * only emitted when the user taps the \c accept button is tapped.
+ * only emitted when the user taps the \c accept button is tapped. \a input 
+ * may be an empty string.
  * 
  * \since v0.2.0
  */
