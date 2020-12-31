@@ -9,8 +9,6 @@
 #include <QDBusContext>
 #include <QLabel>
 #include <QTimer>
-#include <QLocale>
-#include <QLineEdit>
 #include "NDBCfmDlg.h"
 
 typedef void PlugManager;
@@ -20,11 +18,6 @@ typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
 typedef QWidget N3Dialog;
 typedef void Device;
-typedef void SearchKeyboardController;
-typedef int KeyboardScript;
-typedef QFrame KeyboardFrame;
-typedef void KeyboardReceiver;
-typedef QLineEdit TouchLineEdit;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
