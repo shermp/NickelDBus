@@ -30,6 +30,7 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent, void* libnickel) : QObject(parent) {
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setRejectButtonText));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(symbols.ConfirmationDialog__showCloseButton));
     NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb", nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
+    NDB_RESOLVE_SYMBOL("_ZN18ConfirmationDialog9addWidgetEP7QWidget", nh_symoutptr(symbols.ConfirmationDialog__addWidget));
     // Keyboard stuff
     NDB_RESOLVE_SYMBOL("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS));
     if (!symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
@@ -130,6 +131,14 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
 enum NDBCfmDlg::result NDBCfmDlg::closeDialog() {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     dlg->accept();
+    return Ok;
+}
+
+enum NDBCfmDlg::result NDBCfmDlg::addWidget(QWidget* w) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
+    DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__addWidget, "could not find addWidget symbol");
+    symbols.ConfirmationDialog__addWidget(dlg, w);
     return Ok;
 }
 

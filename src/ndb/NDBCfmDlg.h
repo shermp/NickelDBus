@@ -39,6 +39,7 @@ class NDBCfmDlg : public QObject {
         void setPassword(bool isPassword);
         QString getText();
         void setText(QString const& text);
+        enum result addWidget(QWidget* w);
     private:
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
@@ -49,6 +50,7 @@ class NDBCfmDlg : public QObject {
             void (*ConfirmationDialog__setRejectButtonText)(ConfirmationDialog* _this, QString const&);
             void (*ConfirmationDialog__showCloseButton)(ConfirmationDialog* _this, bool show);
             void (*ConfirmationDialog__setRejectOnOutsideTap)(ConfirmationDialog* _this, bool setReject);
+            void (*ConfirmationDialog__addWidget)(ConfirmationDialog* _this, QWidget* w);
             N3ConfirmationTextEditField *(*N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS)(
                 N3ConfirmationTextEditField* _this, 
                 ConfirmationDialog* dlg, 
