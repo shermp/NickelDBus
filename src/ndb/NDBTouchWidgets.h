@@ -8,10 +8,11 @@
 #include <QFlags>
 #include <QVariant>
 #include <QLocale>
+#include <QLabel>
 #include <QSet>
 #include <QSlider>
 
-typedef QWidget TouchLabel;
+typedef QLabel TouchLabel;
 typedef QWidget TouchDropDown;
 typedef QCheckBox TouchCheckBox;
 typedef QRadioButton TouchRadioButton;
