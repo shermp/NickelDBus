@@ -9,6 +9,7 @@
 #include <NickelHook.h>
 #include "../../NickelMenu/src/action.h"
 #include "../../NickelMenu/src/util.h"
+#include "NDBTouchWidgets.h"
 #include "util.h"
 #include "ndb.h"
 #include "../interface/ndb_adapter.h"
@@ -554,6 +555,25 @@ void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QS
  */
 void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, setText);
+}
+
+void NDB::dlgConfirmWidgetTest() {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, "addWidget", "", "", "", true) == NDBCfmDlg::Ok));
+    TouchDropDown *tdd = NDBTouchDropDown::create(nullptr, true);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, tdd, "could not create touch drop down");
+    NDBTouchDropDown::addItem(tdd, "test1", QVariant(1), false);
+    NDBTouchDropDown::addItem(tdd, "test2", QVariant(2), false);
+    NDBTouchDropDown::setCurrentIndex(tdd, 0);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, cfmDlg->addWidget(tdd) == NDBCfmDlg::Ok, "could not add widget");
+    TouchSlider *ts = NDBTouchSlider::create(nullptr);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, ts, "could not create touch slider");
+    ts->setOrientation(Qt::Horizontal);
+    ts->setMinimum(50);
+    ts->setMaximum(100);
+    ts->setValue(90);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, cfmDlg->addWidget(ts) == NDBCfmDlg::Ok, "could not add widget");
+    cfmDlg->showDialog();
 }
 
 /*!

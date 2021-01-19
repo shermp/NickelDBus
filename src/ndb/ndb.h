@@ -81,6 +81,7 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmClose();
         void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);
         void dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
+        void dlgConfirmWidgetTest();
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();

@@ -27,6 +27,7 @@ compile_commands.json
 /src/ndb/ndb.o
 /src/ndb/util.o
 /src/ndb/NDBCfmDlg.o
+/src/ndb/NDBTouchWidgets.o
 /NickelMenu/src/action_cc.o
 /src/interface/ndb_adapter.o
 /src/ndb/ndb.moc

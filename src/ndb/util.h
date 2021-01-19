@@ -30,3 +30,6 @@
 #endif
 
 void ndbResolveSymbol(void* libnickel, const char *name, void **fn);
+void ndbResolveSymbolRTLD(const char *name, void **fn);
+
+#define ARRAY_LEN(arr) (sizeof((arr)) / sizeof ((arr)[0]))
