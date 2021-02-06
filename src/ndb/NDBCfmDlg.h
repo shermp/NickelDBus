@@ -21,7 +21,7 @@ class NDBCfmDlg : public QObject {
         enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError};
         enum dialogType {TypeStd, TypeLineEdit};
         enum result initResult;
-        NDBCfmDlg(QObject* parent, void* libnickel);
+        NDBCfmDlg(QObject* parent);
         ~NDBCfmDlg();
         QString errString;
         QPointer<ConfirmationDialog> dlg;

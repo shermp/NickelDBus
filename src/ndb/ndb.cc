@@ -74,7 +74,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
         return;
     }
     // Setup the Confirmation Dialog object
-    cfmDlg = new NDBCfmDlg(this, libnickel);
+    cfmDlg = new NDBCfmDlg(this);
     if (!cfmDlg || cfmDlg->initResult == NDBCfmDlg::InitError) {
         nh_log("failed to create confirmation dialog object");
         initSucceeded = false;
