@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QChar>
 #include "../interface/ndb_proxy.h"
 
 struct MethodParamList {
@@ -25,6 +26,7 @@ class NDBCli : public QObject {
         void setMethodName(QString name);
         void setMethodArgs(QStringList args);
         void setSignalNames(QStringList names);
+        void setListDelim(QString const& delim = ",");
         void setTimeout(int timeout);
         void setPrintAPI(bool api);
         void handleSignalParam0();
@@ -41,6 +43,7 @@ class NDBCli : public QObject {
         QString methodName;
         QStringList methodArgs;
         QStringList signalNames;
+        QChar listDelim;
         bool signalComplete, methodComplete, printApi;
         int timeout;
         com::github::shermp::nickeldbus* ndb;
