@@ -2,19 +2,6 @@
 #include "util.h"
 #include "NDBTouchWidgets.h"
 
-template<typename T, typename... A>
-T* createTouchWidget(const char* name, size_t sz, A...args) {
-    T *(*func)(T* _this, A...);
-    ndbResolveSymbolRTLD(name, nh_symoutptr(func));
-    if (func) {
-        T *tw = reinterpret_cast<T*>(calloc(1,sz));
-        if (tw) {
-            return func(tw, args...);
-        }
-    }
-    return nullptr;
-}
-
 // template<typename T, typename... A>
 // T callTouchMethod(const char* name, A...args) {
 //     T (*method)(A...);
@@ -23,23 +10,23 @@ T* createTouchWidget(const char* name, size_t sz, A...args) {
 // }
 
 TouchLabel* NDBTouchLabel::create(QString const& text, QWidget* parent, QFlags<Qt::WindowType> flags) {
-    return createTouchWidget<TouchLabel>("_ZN10TouchLabelC1ERK7QStringP7QWidget6QFlagsIN2Qt10WindowTypeEE", 128, text, parent, flags);
+    return ndbCreateNickelObject<TouchLabel>("_ZN10TouchLabelC1ERK7QStringP7QWidget6QFlagsIN2Qt10WindowTypeEE", 128, text, parent, flags);
 }
 
 TouchLabel* NDBTouchLabel::create(QWidget* parent, QFlags<Qt::WindowType> flags) {
-    return createTouchWidget<TouchLabel>("_ZN10TouchLabelC2EP7QWidget6QFlagsIN2Qt10WindowTypeEE", 128, parent, flags);
+    return ndbCreateNickelObject<TouchLabel>("_ZN10TouchLabelC2EP7QWidget6QFlagsIN2Qt10WindowTypeEE", 128, parent, flags);
 }
 
 TouchCheckBox* NDBTouchCheckBox::create(QWidget* parent) {
-    return createTouchWidget<TouchCheckBox>("_ZN13TouchCheckBoxC1EP7QWidget", 128, parent);
+    return ndbCreateNickelObject<TouchCheckBox>("_ZN13TouchCheckBoxC1EP7QWidget", 128, parent);
 }
 
 TouchRadioButton* NDBTouchRadioButton::create(QWidget* parent) {
-    return createTouchWidget<TouchRadioButton>("_ZN16TouchRadioButtonC1EP7QWidget", 128, parent);
+    return ndbCreateNickelObject<TouchRadioButton>("_ZN16TouchRadioButtonC1EP7QWidget", 128, parent);
 }
 
 TouchSlider* NDBTouchSlider::create(QWidget* parent) {
-    return createTouchWidget<TouchSlider>("_ZN11TouchSliderC1EP7QWidget", 128, parent);
+    return ndbCreateNickelObject<TouchSlider>("_ZN11TouchSliderC1EP7QWidget", 128, parent);
 }
 
 namespace NDBTouchDropDown {
@@ -66,9 +53,9 @@ namespace NDBTouchDropDown {
         if (createBlock) {
             // A BlockTouchDown essentially appears to be a standard TouchDropDown with a border around it.
             // Don't know why Kobo decided it needed to be it's own class.
-            return createTouchWidget<TouchDropDown>("_ZN18BlockTouchDropDownC1EP7QWidget", 256, parent);
+            return ndbCreateNickelObject<TouchDropDown>("_ZN18BlockTouchDropDownC1EP7QWidget", 256, parent);
         } else {
-            return createTouchWidget<TouchDropDown>("_ZN13TouchDropDownC1EP7QWidget", 256, parent);
+            return ndbCreateNickelObject<TouchDropDown>("_ZN13TouchDropDownC1EP7QWidget", 256, parent);
         }
 }
 
