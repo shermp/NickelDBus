@@ -7,7 +7,7 @@ override IFACE_DIR := src/interface
 
 override LIBRARY  := libndb.so
 # NDB sources
-override SOURCES  += src/ndb/nickeldbus.cc src/ndb/ndb.cc src/ndb/util.cc src/ndb/NDBCfmDlg.cc src/ndb/NDBTouchWidgets.cc $(IFACE_DIR)/ndb_adapter.cpp  
+override SOURCES  += src/ndb/nickeldbus.cc src/ndb/ndb.cc src/ndb/NDBCfmDlg.cc src/ndb/NDBTouchWidgets.cc src/ndb/util.cc $(IFACE_DIR)/ndb_adapter.cpp  
 # NM sources
 override SOURCES  += NickelMenu/src/util.c NickelMenu/src/action.c NickelMenu/src/action_c.c NickelMenu/src/action_cc.cc NickelMenu/src/kfmon.c
 override CFLAGS   += -Wall -Wextra -Werror
@@ -55,6 +55,7 @@ gitignore: gitignore-cli
 
 doc:
 	cd qdoc/config && qdoc NickelDBus.qdocconf
+	sed -i 's/This function was introduced in +Qt/This function was introduced in NickelDBus/g' qdoc/html/ndb.html
 
 uninstall-file:
 	echo "$(VERSION)" > $(UNINSTALL_FILE)
