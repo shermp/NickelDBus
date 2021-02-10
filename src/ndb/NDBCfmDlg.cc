@@ -3,6 +3,7 @@
 #include <NickelHook.h>
 #include "util.h"
 #include "NDBCfmDlg.h"
+#include "NDBTouchWidgets.h"
 
 #define DLG_ASSERT(ret, cond, str) if (!(cond)) {         \
     errString = QString("%1: %2").arg(__func__).arg(str); \
@@ -27,6 +28,7 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
     ndbResolveSymbolRTLD("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(symbols.ConfirmationDialog__showCloseButton));
     ndbResolveSymbolRTLD("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb", nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
     ndbResolveSymbolRTLD("_ZN18ConfirmationDialog9addWidgetEP7QWidget", nh_symoutptr(symbols.ConfirmationDialog__addWidget));
+    ndbResolveSymbolRTLD("_ZN18ConfirmationDialog10setContentEP7QWidget", nh_symoutptr(symbols.ConfirmationDialog__setContent));
     // Keyboard stuff
     ndbResolveSymbolRTLD("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS));
     if (!symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
@@ -71,7 +73,14 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         symbols.ConfirmationDialog__setRejectOnOutsideTap,
         "could not find one or more standard dialog symbols"
     );
-    if (dlgType == TypeLineEdit) {
+    switch (dlgType) {
+    case TypeStd:
+        dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
+        DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
+        currActiveType = TypeStd;
+        break;
+
+    case TypeLineEdit:
         dlg = symbols.ConfirmationDialogFactory_showTextEditDialog(title);
         DLG_ASSERT(NullError, dlg, "could not get line edit dialog");
         DLG_ASSERT(
@@ -81,31 +90,36 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
             symbols.N3ConfirmationTextEditField__textEdit,
             "could not find symbols"
         );
-        size_t tefSize = 128;
-        // We can't directly allocate this memory to the 'tef' QPointer variable, because
-        // it is not yet a valid QObject
-        N3ConfirmationTextEditField* tf = reinterpret_cast<N3ConfirmationTextEditField*>(calloc(1, tefSize));
-        DLG_ASSERT(NullError, tf, "error getting text edit field");
         if (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
-            // Still don't know what 'KeyboardScript' is, but I've seen code in libnickel that uses 1 so...
-            symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS(tf, dlg, 1);
+            tef = ndbCreateNickelObject<N3ConfirmationTextEditField>("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", 128, dlg, 1);
         } else {
-            symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(tf, dlg);
+            tef = ndbCreateNickelObject<N3ConfirmationTextEditField>("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog", 128, dlg);
         }
-        tle = symbols.N3ConfirmationTextEditField__textEdit(tf);
+        DLG_ASSERT(NullError, tef, "error getting text edit field");
+        tle = symbols.N3ConfirmationTextEditField__textEdit(tef);
         DLG_ASSERT(NullError, tle, "error getting TouchLineEdit");
         // Make the 'Go' key accept the dialog.
-        if (!QObject::connect(tf, SIGNAL(commitRequested()), dlg, SIGNAL(accepted()))) {
+        if (!QObject::connect(tef, SIGNAL(commitRequested()), dlg, SIGNAL(accepted()))) {
             nh_log("unable to connect N3ConfirmationTextEditField::commitRequested() to ConfirmationDialog::accepted()");
         }
-        // Keep a reference of the text edit field for later use.
-        tef = tf;
         currActiveType = TypeLineEdit;
-    } else {
+        break;
+    
+    case TypeAdvanced:
+        DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__setContent, "could not find setContent() symbol");
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
         DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
-        currActiveType = TypeStd;
+        dlgContent = new QFrame;
+        dlgContentLayout = new QVBoxLayout;
+        dlgContent->setLayout(dlgContentLayout);
+        currActiveType = TypeAdvanced;
+        break;
+
+    default:
+        DLG_ASSERT(ParamError, false, "Incorrect dialog type passed");
+        break;
     }
+
     symbols.ConfirmationDialog__setTitle(dlg, title);
     symbols.ConfirmationDialog__setText(dlg, body);
     symbols.ConfirmationDialog__setRejectOnOutsideTap(dlg, tapOutsideClose);
@@ -119,6 +133,13 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
 
 enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    switch (currActiveType) {
+    case TypeAdvanced:
+        symbols.ConfirmationDialog__setContent(dlg, dlgContent);
+        break;
+    default:
+        break;
+    }
     connectStdSignals();
     dlg->open();
     return Ok;
@@ -130,13 +151,13 @@ enum NDBCfmDlg::result NDBCfmDlg::closeDialog() {
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::addWidget(QWidget* w) {
-    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
-    DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
-    DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__addWidget, "could not find addWidget symbol");
-    symbols.ConfirmationDialog__addWidget(dlg, w);
-    return Ok;
-}
+// enum NDBCfmDlg::result NDBCfmDlg::addWidget(QWidget* w) {
+//     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+//     DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
+//     DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__addWidget, "could not find addWidget symbol");
+//     symbols.ConfirmationDialog__addWidget(dlg, w);
+//     return Ok;
+// }
 
 enum NDBCfmDlg::result NDBCfmDlg::updateBody(QString const& body) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
@@ -175,4 +196,72 @@ void NDBCfmDlg::setText(QString const& text) {
     if (dlg && currActiveType == TypeLineEdit && tle) {
         tle->setPlaceholderText(text);
     }
+}
+
+void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget, bool dualCol) {
+    QFrame *f = new QFrame;
+    QGridLayout *gl = new QGridLayout(f);
+    TouchLabel *lbl = NDBTouchLabel::create(label, nullptr, 0);
+    int wRow = (dualCol) ? 0 : 1;
+    int wCol = (dualCol) ? 1 : 0;
+    enum Qt::AlignmentFlag wAlign = (dualCol) ? Qt::AlignRight : Qt::AlignLeft; 
+    gl->addWidget(lbl, 0, 0, 0);
+    gl->addWidget(widget, wRow, wCol, wAlign);
+    gl->setColumnStretch(0, 2);
+    gl->setColumnStretch(1, 0);
+    dlgContentLayout->addWidget(f);
+}
+
+#define DLG_SET_OBJ_NAME(obj, name) (obj)->setObjectName(QString("ndb_%1").arg(name))
+
+enum NDBCfmDlg::result NDBCfmDlg::advAddCheckbox(QString const& name, QString const& label, bool checked, bool dualCol) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    TouchCheckBox *cb = NDBTouchCheckBox::create(nullptr);
+    DLG_ASSERT(NullError, cb, "unable to create checkbox");
+    DLG_SET_OBJ_NAME(cb, name);
+    Qt::CheckState cs = (checked) ? Qt::Checked : Qt::Unchecked;
+    cb->setCheckState(cs);
+    if (dualCol) {
+        addWidgetToFrame(label, cb, dualCol);
+    } else {
+        cb->setText(label);
+        dlgContentLayout->addWidget(cb);
+    }
+    return Ok;
+}
+
+enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    TouchSlider *sl = NDBTouchSlider::create(nullptr);
+    DLG_ASSERT(NullError, sl, "unable to create slider");
+    DLG_SET_OBJ_NAME(sl, name);
+    TouchLabel *minLabel = NDBTouchLabel::create(QString::number(min), nullptr, 0);
+    DLG_ASSERT(NullError, minLabel, "unable to create min label");
+    TouchLabel *maxLabel = NDBTouchLabel::create(QString::number(max), nullptr, 0);
+    DLG_ASSERT(NullError, maxLabel, "unable to create max label");
+    sl->setMaximum(max);
+    sl->setMinimum(min);
+    sl->setValue(val);
+    sl->setOrientation(Qt::Horizontal);
+    QFrame *f = new QFrame;
+    QGridLayout *slLayout = new QGridLayout(f);
+    slLayout->addWidget(minLabel, 0, 0);
+    slLayout->addWidget(sl, 0, 1, Qt::AlignCenter);
+    slLayout->addWidget(maxLabel, 0, 2, Qt::AlignRight);
+    slLayout->setColumnStretch(1, 2);
+    addWidgetToFrame(label, f, dualCol);
+    return Ok;
+}
+
+enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval __attribute__((unused)), bool dualCol) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    TouchDropDown *td = NDBTouchDropDown::create(nullptr, true);
+    DLG_ASSERT(NullError, td, "unable to create TouchDropDown");
+    DLG_SET_OBJ_NAME(td, name);
+    for (int i = 0; i < items.size(); ++i) {
+        NDBTouchDropDown::addItem(td, items[i], QVariant(items[i]), false);
+    }
+    NDBTouchDropDown::setCurrentIndex(td, 0);
+    addWidgetToFrame(label, td, dualCol);
+    return Ok;
 }

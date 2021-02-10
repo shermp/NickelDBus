@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QPointer>
 #include <QCheckBox>
+#include <QVBoxLayout>
 
 typedef QDialog ConfirmationDialog;
 typedef int KeyboardScript;
@@ -18,13 +19,15 @@ typedef QCheckBox TouchCheckBox;
 class NDBCfmDlg : public QObject {
     Q_OBJECT
     public:
-        enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError};
-        enum dialogType {TypeStd, TypeLineEdit};
+        enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError, ParamError};
+        enum dialogType {TypeStd, TypeLineEdit, TypeAdvanced};
         enum result initResult;
         NDBCfmDlg(QObject* parent);
         ~NDBCfmDlg();
         QString errString;
         QPointer<ConfirmationDialog> dlg;
+        QPointer<QFrame> dlgContent;
+        QPointer<QVBoxLayout> dlgContentLayout;
         enum result createDialog(
             enum dialogType dlgType,
             QString const& title, 
@@ -39,7 +42,9 @@ class NDBCfmDlg : public QObject {
         void setPassword(bool isPassword);
         QString getText();
         void setText(QString const& text);
-        enum result addWidget(QWidget* w);
+        enum result advAddCheckbox(QString const& name, QString const& label, bool checked, bool dualCol);
+        enum result advAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol);
+        enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol);
     private:
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
@@ -51,6 +56,7 @@ class NDBCfmDlg : public QObject {
             void (*ConfirmationDialog__showCloseButton)(ConfirmationDialog* _this, bool show);
             void (*ConfirmationDialog__setRejectOnOutsideTap)(ConfirmationDialog* _this, bool setReject);
             void (*ConfirmationDialog__addWidget)(ConfirmationDialog* _this, QWidget* w);
+            void (*ConfirmationDialog__setContent)(ConfirmationDialog* _this, QWidget* content);
             N3ConfirmationTextEditField *(*N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS)(
                 N3ConfirmationTextEditField* _this, 
                 ConfirmationDialog* dlg, 
@@ -65,6 +71,7 @@ class NDBCfmDlg : public QObject {
         QPointer<TouchLineEdit> tle;
         QPointer<N3ConfirmationTextEditField> tef;
         void connectStdSignals();
+        void addWidgetToFrame(QString const& label, QWidget* widget, bool dualCol);
 };
 
 #endif // NDB_CONFIRM_DLG_H
