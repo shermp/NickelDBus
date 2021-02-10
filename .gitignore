@@ -3,6 +3,7 @@ src/interface/ndb_proxy.moc
 src/interface/ndb_proxy.o
 src/interface/ndb_proxy.moc.o
 qdoc/html/
+qdoc/ditaxml
 .kdev4/
 *.kdev4
 .kateconfig
@@ -25,9 +26,9 @@ compile_commands.json
 /NickelMenu/src/kfmon.o
 /src/ndb/nickeldbus.o
 /src/ndb/ndb.o
-/src/ndb/util.o
 /src/ndb/NDBCfmDlg.o
 /src/ndb/NDBTouchWidgets.o
+/src/ndb/util.o
 /NickelMenu/src/action_cc.o
 /src/interface/ndb_adapter.o
 /src/ndb/ndb.moc
