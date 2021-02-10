@@ -81,7 +81,12 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmClose();
         void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);
         void dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
-        void dlgConfirmWidgetTest();
+        // Advanced Confirmation Dialog
+        void dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText);
+        void dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked, bool dualCol);
+        void dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol);
+        void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol);
+        void dlgConfirmAdvancedShow();
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -112,6 +117,7 @@ class NDB : public QObject, protected QDBusContext {
         QStackedWidget *stackedWidget = nullptr;
         QString fwVersion;
         NDBCfmDlg *cfmDlg;
+        //NDBN3Dlg *n3Dlg;
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);
             PlugManager *(*PlugManager__sharedInstance)();

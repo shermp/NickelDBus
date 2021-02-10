@@ -4,12 +4,12 @@
 #include <QWidget>
 #include <QFrame>
 #include <QRegExp>
+#include <QStringList>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
 #include "../../NickelMenu/src/action.h"
 #include "../../NickelMenu/src/util.h"
-#include "NDBTouchWidgets.h"
 #include "util.h"
 #include "ndb.h"
 #include "../interface/ndb_adapter.h"
@@ -80,6 +80,13 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
         initSucceeded = false;
         return;
     }
+    // // Setup the N3 Dialog object
+    // n3Dlg = new NDBN3Dlg(this);
+    // if (!n3Dlg || n3Dlg->initResult == NDBN3Dlg::InitError) {
+    //     nh_log("failed to create N3 Dialog object");
+    //     initSucceeded = false;
+    //     return;
+    // }
     viewTimer->setSingleShot(true);
     QObject::connect(viewTimer, &QTimer::timeout, this, &NDB::handleQSWTimer);
 
@@ -557,23 +564,67 @@ void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acc
     dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, setText);
 }
 
-void NDB::dlgConfirmWidgetTest() {
+/*!
+ * \brief Create advanced dialog which can have widgets added
+ * 
+ * This creates an empty confirmation dialog with a \a title which you can add widgets to using the
+ * \c dlgConfirmAdvancedAdd* methods. This will not be shown to the user until
+ * the \l dlgConfirmAdvancedShow() method is called. The \c Accept and \c Reject buttons are set
+ * with \a acceptText and \a rejectText parameters respectively. 
+ */
+void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, "addWidget", "", "", "", true) == NDBCfmDlg::Ok));
-    TouchDropDown *tdd = NDBTouchDropDown::create(nullptr, true);
-    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, tdd, "could not create touch drop down");
-    NDBTouchDropDown::addItem(tdd, "test1", QVariant(1), false);
-    NDBTouchDropDown::addItem(tdd, "test2", QVariant(2), false);
-    NDBTouchDropDown::setCurrentIndex(tdd, 0);
-    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, cfmDlg->addWidget(tdd) == NDBCfmDlg::Ok, "could not add widget");
-    TouchSlider *ts = NDBTouchSlider::create(nullptr);
-    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, ts, "could not create touch slider");
-    ts->setOrientation(Qt::Horizontal);
-    ts->setMinimum(50);
-    ts->setMaximum(100);
-    ts->setValue(90);
-    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, cfmDlg->addWidget(ts) == NDBCfmDlg::Ok, "could not add widget");
-    cfmDlg->showDialog();
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
+}
+
+/*!
+ * \brief Add a checkbox to an advanced dialog
+ * 
+ * This adds a checkbox to an advanced dialog. The \a name of the checkbox is used to retrieve the value
+ * later. The user visible text is set by \a label and you can set the checkbox to be \a checked or not.
+ * \a dualCol decides whether to separate the label from the checkbox in a 'two column' mode.
+ */
+void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked, bool dualCol) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddCheckbox(name, label, checked, dualCol) == NDBCfmDlg::Ok));
+}
+
+/*!
+ * \brief Add a slider to an advanced dialog
+ * 
+ * This adds a slider to an advanced dialog. The \a name of the the slider is used to retrieve the value later.
+ * The user visible text is set by \a label. The slider range is set by \a min and \a max and the starting position
+ * is set by \a val.
+ * 
+ * If \a dualCol is true, the label will be to the left of the slider, otherwise the label will be above
+ * the slider.
+ */
+void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddSlider(name, label, min, max, val, dualCol) == NDBCfmDlg::Ok));
+}
+
+/*!
+ * \brief Add a slider to an advanced dialog
+ * 
+ * This adds a dropdown to an advanced dialog. The \a name of the the slider is used to dropdown the value later.
+ * The user visible text is set by \a label. The dropdown list is populated by \a items. You can enable addition
+ * and removal of items using \a allowAdditionAndRemoval.
+ * 
+ * If \a dualCol is true, the label will be to the left of the dropdown, otherwise the label will be above
+ * the dropdown.
+ */
+void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items, allowAdditionAndRemoval, dualCol) == NDBCfmDlg::Ok));
+}
+
+/*!
+ * \brief Show an advanced dialog
+ */
+void NDB::dlgConfirmAdvancedShow() {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->showDialog() == NDBCfmDlg::Ok));
 }
 
 /*!
