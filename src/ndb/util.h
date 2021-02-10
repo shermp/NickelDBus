@@ -1,4 +1,8 @@
+#ifndef NDB_UTIL_H
+#define NDB_UTIL_H
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <syslog.h>
 
 #ifndef NH_VERSION
@@ -34,4 +38,31 @@
 void ndbResolveSymbol(void* libnickel, const char *name, void **fn);
 void ndbResolveSymbolRTLD(const char *name, void **fn);
 
-#define ARRAY_LEN(arr) (sizeof((arr)) / sizeof ((arr)[0]))
+// Note, template definition can not (easily) be included in a separate cpp file
+template<typename T, typename... A>
+T* ndbCreateNickelObject(const char* name, size_t sz, A...args) {
+    T *(*func)(T* _this, A...);
+    ndbResolveSymbolRTLD(name, nh_symoutptr(func));
+    if (func) {
+        T *tw = reinterpret_cast<T*>(calloc(1,sz));
+        if (tw) {
+            return func(tw, args...);
+        }
+    }
+    return nullptr;
+}
+
+template<typename T>
+T* ndbCreateNickelObject(const char* name, size_t sz) {
+    T *(*func)(T* _this);
+    ndbResolveSymbolRTLD(name, nh_symoutptr(func));
+    if (func) {
+        T *tw = reinterpret_cast<T*>(calloc(1,sz));
+        if (tw) {
+            return func(tw);
+        }
+    }
+    return nullptr;
+}
+
+#endif // NDB_UTIL_H
