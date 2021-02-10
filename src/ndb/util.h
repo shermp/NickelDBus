@@ -29,6 +29,8 @@
 #define NDB_DEBUG(fmt, ...) do {} while (0)
 #endif
 
+#define ARRAY_LEN(arr) (sizeof((arr)) / sizeof ((arr)[0]))
+
 void ndbResolveSymbol(void* libnickel, const char *name, void **fn);
 void ndbResolveSymbolRTLD(const char *name, void **fn);
 
