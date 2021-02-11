@@ -571,6 +571,14 @@ void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acc
  * \c dlgConfirmAdvancedAdd* methods. This will not be shown to the user until
  * the \l dlgConfirmAdvancedShow() method is called. The \c Accept and \c Reject buttons are set
  * with \a acceptText and \a rejectText parameters respectively. 
+ * 
+ * If the user presses the accept button, \l dlgConfirmAdvancedJSON() will emit a JSON object. The widget
+ * names will be used as keys, and the value will be the value of the widget when the accept button
+ * is pressed.
+ * 
+ * \l dlgConfirmResult() will emit the result of \c 0 if the reject button is pressed.
+ * 
+ * \since v0.2.0
  */
 void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -583,6 +591,8 @@ void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptTe
  * This adds a checkbox to an advanced dialog. The \a name of the checkbox is used to retrieve the value
  * later. The user visible text is set by \a label and you can set the checkbox to be \a checked or not.
  * \a dualCol decides whether to separate the label from the checkbox in a 'two column' mode.
+ * 
+ * \since v0.2.0
  */
 void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked, bool dualCol) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -598,6 +608,8 @@ void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& labe
  * 
  * If \a dualCol is true, the label will be to the left of the slider, otherwise the label will be above
  * the slider.
+ * 
+ * \since v0.2.0
  */
 void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -613,6 +625,8 @@ void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label,
  * 
  * If \a dualCol is true, the label will be to the left of the dropdown, otherwise the label will be above
  * the dropdown.
+ * 
+ * \since v0.2.0
  */
 void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -621,6 +635,10 @@ void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& labe
 
 /*!
  * \brief Show an advanced dialog
+ * 
+ * An advanced dialog MUST be created with \l dlgConfirmAdvancedCreate() first.
+ * 
+ * \since v0.2.0
  */
 void NDB::dlgConfirmAdvancedShow() {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -892,6 +910,16 @@ void NDB::rvConnectSignals(QWidget* rv) {
  * When emitted \a input will be the text the user inputted. This signal is
  * only emitted when the user taps the \c accept button is tapped. \a input 
  * may be an empty string.
+ * 
+ * \since v0.2.0
+ */
+
+/*!
+ * \fn void NDB::dlgConfirmAdvancedJSON(QString json)
+ * \brief The signal that is emitted when the user accepts an advanced confirmation dialog
+ * 
+ * When emitted, \a json will be a JSON object with the keys set to the widget names, and
+ * the value will be set to the value of each widget at the time the accept button was pressed.
  * 
  * \since v0.2.0
  */
