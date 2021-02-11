@@ -624,7 +624,22 @@ void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& labe
  */
 void NDB::dlgConfirmAdvancedShow() {
     NDB_DBUS_USB_ASSERT((void) 0);
+    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDB::onAdvancedDlgAccepted);
+    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::emitConfirmDialogResultReject);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->showDialog() == NDBCfmDlg::Ok));
+}
+
+/*!
+ * \internal
+ * \brief Slot for handling when the accept button for the Advanced confirmation dialog is pressed
+ */
+void NDB::onAdvancedDlgAccepted() {
+    QString json;
+    if (cfmDlg->advGetJSON(json) == NDBCfmDlg::Ok) {
+        emit dlgConfirmAdvancedJSON(json);
+    } else {
+        emit dlgConfirmAdvancedJSON("{}");
+    }
 }
 
 /*!

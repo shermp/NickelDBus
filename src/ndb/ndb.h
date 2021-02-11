@@ -43,6 +43,7 @@ class NDB : public QObject, protected QDBusContext {
     Q_SIGNALS:
         void dlgConfirmResult(int result);
         void dlgConfirmTextInput(QString input);
+        void dlgConfirmAdvancedJSON(QString json);
         // PlugworkFlowManager signals
         void pfmDoneProcessing();
         void pfmAboutToConnect();
@@ -111,6 +112,7 @@ class NDB : public QObject, protected QDBusContext {
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
+        void onAdvancedDlgAccepted();
     private:
         void *libnickel;
         QSet<QString> connectedSignals;

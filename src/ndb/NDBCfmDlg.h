@@ -45,6 +45,7 @@ class NDBCfmDlg : public QObject {
         enum result advAddCheckbox(QString const& name, QString const& label, bool checked, bool dualCol);
         enum result advAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol);
         enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol);
+        enum result advGetJSON(QString& json);
     private:
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);

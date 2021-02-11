@@ -1,5 +1,10 @@
 #include <Qt>
 #include <QLocale>
+#include <QRegularExpression>
+#include <QList>
+#include <QVariant>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include <NickelHook.h>
 #include "util.h"
 #include "NDBCfmDlg.h"
@@ -263,5 +268,37 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString co
     }
     NDBTouchDropDown::setCurrentIndex(td, 0);
     addWidgetToFrame(label, td, dualCol);
+    return Ok;
+}
+
+enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    // Get all widgets in the frame whose name begins with 'ndb_'
+    QRegularExpression re("ndb_.+");
+    QList<QWidget*> widgets = dlgContent->findChildren<QWidget*>(re);
+    //nh_log("advGetJSON: Found %d widgets", widgets.size());
+    QVariantMap qvm;
+    for (int i = 0; i < widgets.size(); ++i) {
+        QString className = widgets[i]->metaObject()->className();
+        QString name = widgets[i]->objectName().remove(QRegularExpression("ndb_"));
+        //nh_log("advGetJSON: Widget %d has className '%s' and name '%s'", i, className.toUtf8().constData(), name.toUtf8().constData());
+        if (className == "TouchCheckBox") {
+            TouchCheckBox *cb = qobject_cast<TouchCheckBox*>(widgets[i]);
+            qvm[name] = QVariant(cb->isChecked());
+        } else if (className == "TouchSlider") {
+            TouchSlider *sl = qobject_cast<TouchSlider*>(widgets[i]);
+            qvm[name] = QVariant(sl->value());
+        } else if (className == "TouchDropDown" || className == "BlockTouchDropDown") {
+            TouchDropDown *dd = qobject_cast<TouchDropDown*>(widgets[i]);
+            qvm[name] = NDBTouchDropDown::currentData(dd);
+        }
+    }
+    QJsonObject obj = QJsonObject::fromVariantMap(qvm);
+    //nh_log("QJsonObject is %s", (obj.isEmpty() ? "empty" : "not empty"));
+    QJsonDocument doc(obj);
+    //nh_log("QJsonDocument is %s", (doc.isNull() ? "invalid" : "valid"));
+    QByteArray docBA = doc.toJson(QJsonDocument::Compact);
+    //nh_log("JSON contents is: %s", docBA.constData());
+    json.append(QLatin1String(docBA));
     return Ok;
 }
