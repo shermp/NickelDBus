@@ -41,6 +41,29 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
         ndbResolveSymbolRTLD("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField));
     }
     ndbResolveSymbolRTLD("_ZNK27N3ConfirmationTextEditField8textEditEv", nh_symoutptr(symbols.N3ConfirmationTextEditField__textEdit));
+    styleSheet = QString(R"(
+        * {
+            font-family: Avenir, sans-serif;
+            font-style: normal;
+            font-size: 17px;
+        }
+        *[localeName="ja"] {
+            font-family: Sans-SerifJP, sans-serif;
+            font-style: normal;
+        }
+        *[localeName="zh"] {
+            font-family: Sans-SerifZH-Simplified, sans-serif;
+            font-style: normal;
+        }
+        *[localeName="zh-HK"] {
+            font-family: Sans-SerifZH-Traditional, sans-serif;
+            font-style: normal;
+        }
+        *[localeName="zh-TW"] {
+            font-family: Sans-SerifZH-Traditional, sans-serif;
+            font-style: normal;
+        }
+    )");
 }
 
 NDBCfmDlg::~NDBCfmDlg() {
@@ -140,6 +163,7 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     switch (currActiveType) {
     case TypeAdvanced:
+        dlgContent->setStyleSheet(styleSheet);
         symbols.ConfirmationDialog__setContent(dlg, dlgContent);
         break;
     default:
@@ -207,6 +231,7 @@ void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget, bool dua
     QFrame *f = new QFrame;
     QGridLayout *gl = new QGridLayout(f);
     TouchLabel *lbl = NDBTouchLabel::create(label, nullptr, 0);
+    lbl->setObjectName("text");
     int wRow = (dualCol) ? 0 : 1;
     int wCol = (dualCol) ? 1 : 0;
     enum Qt::AlignmentFlag wAlign = (dualCol) ? Qt::AlignRight : Qt::AlignLeft; 

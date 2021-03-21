@@ -43,10 +43,13 @@ class NDBCfmDlg : public QObject {
         QString getText();
         void setText(QString const& text);
         enum result advAddCheckbox(QString const& name, QString const& label, bool checked, bool dualCol);
+        //enum result advUpdateCheckbox(QString const& name, bool checked);
         enum result advAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol);
+        //enum result advUpdateSlider(QString const& name, int val);
         enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol);
         enum result advGetJSON(QString& json);
     private:
+        QString styleSheet;
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
             ConfirmationDialog *(*ConfirmationDialogFactory_showTextEditDialog)(QString const& title);
