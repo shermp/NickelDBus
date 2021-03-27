@@ -45,7 +45,8 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
         * {
             font-family: Avenir, sans-serif;
             font-style: normal;
-            font-size: 17px;
+            padding: 0px;
+            margin: 0px;
         }
         *[localeName="ja"] {
             font-family: Sans-SerifJP, sans-serif;
@@ -62,6 +63,29 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
         *[localeName="zh-TW"] {
             font-family: Sans-SerifZH-Traditional, sans-serif;
             font-style: normal;
+        }
+
+        *[qApp_deviceIsTrilogy=true] {
+            font-size: 23px;
+
+        }
+        *[qApp_deviceIsPhoenix=true] {
+            font-size: 26px;
+        }
+        *[qApp_deviceIsDragon=true] {
+            font-size: 32px;
+        }
+        *[qApp_deviceIsAlyssum=true] {
+            font-size: 35px;
+        }
+        *[qApp_deviceIsNova=true] {
+            font-size: 35px;
+        }
+        *[qApp_deviceIsStorm=true] {
+            font-size: 44px;
+        }
+        *[qApp_deviceIsDaylight=true] {
+            font-size: 42px;
         }
     )");
 }
@@ -324,6 +348,6 @@ enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
     //nh_log("QJsonDocument is %s", (doc.isNull() ? "invalid" : "valid"));
     QByteArray docBA = doc.toJson(QJsonDocument::Compact);
     //nh_log("JSON contents is: %s", docBA.constData());
-    json.append(QLatin1String(docBA));
+    json.append(QString().fromUtf8(docBA));
     return Ok;
 }
