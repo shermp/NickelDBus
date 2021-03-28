@@ -111,7 +111,8 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
     QString const& body, 
     QString const& acceptText, 
     QString const& rejectText, 
-    bool tapOutsideClose
+    bool tapOutsideClose,
+    enum layoutType layout
 ) {
     DLG_ASSERT(ForbiddenError, !dlg, "dialog already open");
     DLG_ASSERT(
@@ -162,8 +163,13 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
         DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
         dlgContent = new QFrame;
-        dlgContentLayout = new QVBoxLayout;
-        dlgContent->setLayout(dlgContentLayout);
+        if (layout == FormLayout) {
+            dlgFormLayout = new QFormLayout;
+            dlgContent->setLayout(dlgFormLayout);
+        } else {
+            dlgContentVLayout = new QVBoxLayout;
+            dlgContent->setLayout(dlgContentVLayout);
+        }
         currActiveType = TypeAdvanced;
         break;
 
@@ -251,40 +257,39 @@ void NDBCfmDlg::setText(QString const& text) {
     }
 }
 
-void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget, bool dualCol) {
-    QFrame *f = new QFrame;
-    QGridLayout *gl = new QGridLayout(f);
+void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget) {
+    auto cb = qobject_cast<TouchCheckBox*>(widget);
+    if (dlgContentVLayout && cb) {
+        cb->setText(label);
+        dlgContentVLayout->addWidget(cb);
+        return;
+    }
     TouchLabel *lbl = NDBTouchLabel::create(label, nullptr, 0);
-    lbl->setObjectName("text");
-    int wRow = (dualCol) ? 0 : 1;
-    int wCol = (dualCol) ? 1 : 0;
-    enum Qt::AlignmentFlag wAlign = (dualCol) ? Qt::AlignRight : Qt::AlignLeft; 
-    gl->addWidget(lbl, 0, 0, 0);
-    gl->addWidget(widget, wRow, wCol, wAlign);
-    gl->setColumnStretch(0, 2);
-    gl->setColumnStretch(1, 0);
-    dlgContentLayout->addWidget(f);
+    if (dlgContentVLayout) {
+        dlgContentVLayout->addWidget(lbl);
+        dlgContentVLayout->addWidget(widget);
+    } else if (dlgFormLayout) {
+        dlgFormLayout->addRow(lbl, widget);
+    } else {
+        nh_log("both form and vertical layouts were null");
+    }
+    return;
 }
 
 #define DLG_SET_OBJ_NAME(obj, name) (obj)->setObjectName(QString("ndb_%1").arg(name))
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddCheckbox(QString const& name, QString const& label, bool checked, bool dualCol) {
+enum NDBCfmDlg::result NDBCfmDlg::advAddCheckbox(QString const& name, QString const& label, bool checked) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchCheckBox *cb = NDBTouchCheckBox::create(nullptr);
     DLG_ASSERT(NullError, cb, "unable to create checkbox");
     DLG_SET_OBJ_NAME(cb, name);
     Qt::CheckState cs = (checked) ? Qt::Checked : Qt::Unchecked;
     cb->setCheckState(cs);
-    if (dualCol) {
-        addWidgetToFrame(label, cb, dualCol);
-    } else {
-        cb->setText(label);
-        dlgContentLayout->addWidget(cb);
-    }
+    addWidgetToFrame(label, cb);
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol) {
+enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, int min, int max, int val) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchSlider *sl = NDBTouchSlider::create(nullptr);
     DLG_ASSERT(NullError, sl, "unable to create slider");
@@ -303,11 +308,11 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString cons
     slLayout->addWidget(sl, 0, 1, Qt::AlignCenter);
     slLayout->addWidget(maxLabel, 0, 2, Qt::AlignRight);
     slLayout->setColumnStretch(1, 2);
-    addWidgetToFrame(label, f, dualCol);
+    addWidgetToFrame(label, f);
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval __attribute__((unused)), bool dualCol) {
+enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval __attribute__((unused))) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchDropDown *td = NDBTouchDropDown::create(nullptr, true);
     DLG_ASSERT(NullError, td, "unable to create TouchDropDown");
@@ -316,7 +321,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString co
         NDBTouchDropDown::addItem(td, items[i], QVariant(items[i]), false);
     }
     NDBTouchDropDown::setCurrentIndex(td, 0);
-    addWidgetToFrame(label, td, dualCol);
+    addWidgetToFrame(label, td);
     return Ok;
 }
 

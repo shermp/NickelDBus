@@ -580,9 +580,10 @@ void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acc
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText) {
+void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText, bool formLayout) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
+    auto lt = (formLayout) ? NDBCfmDlg::FormLayout : NDBCfmDlg::StdLayout;
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true, lt) == NDBCfmDlg::Ok));
 }
 
 /*!
@@ -594,9 +595,9 @@ void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptTe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked, bool dualCol) {
+void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddCheckbox(name, label, checked, dualCol) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddCheckbox(name, label, checked) == NDBCfmDlg::Ok));
 }
 
 /*!
@@ -611,9 +612,9 @@ void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& labe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol) {
+void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddSlider(name, label, min, max, val, dualCol) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddSlider(name, label, min, max, val) == NDBCfmDlg::Ok));
 }
 
 /*!
@@ -628,9 +629,9 @@ void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label,
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol) {
+void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items, allowAdditionAndRemoval, dualCol) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items, allowAdditionAndRemoval) == NDBCfmDlg::Ok));
 }
 
 /*!

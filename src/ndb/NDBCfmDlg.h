@@ -9,6 +9,7 @@
 #include <QPointer>
 #include <QCheckBox>
 #include <QVBoxLayout>
+#include <QFormLayout>
 
 typedef QDialog ConfirmationDialog;
 typedef int KeyboardScript;
@@ -21,20 +22,23 @@ class NDBCfmDlg : public QObject {
     public:
         enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError, ParamError};
         enum dialogType {TypeStd, TypeLineEdit, TypeAdvanced};
+        enum layoutType {StdLayout, FormLayout};
         enum result initResult;
         NDBCfmDlg(QObject* parent);
         ~NDBCfmDlg();
         QString errString;
         QPointer<ConfirmationDialog> dlg;
         QPointer<QFrame> dlgContent;
-        QPointer<QVBoxLayout> dlgContentLayout;
+        QPointer<QVBoxLayout> dlgContentVLayout;
+        QPointer<QFormLayout> dlgFormLayout;
         enum result createDialog(
             enum dialogType dlgType,
             QString const& title, 
             QString const& body, 
             QString const& acceptText, 
             QString const& rejectText, 
-            bool tapOutsideClose
+            bool tapOutsideClose,
+            enum layoutType layout = StdLayout
         );
         enum result showDialog();
         enum result closeDialog();
@@ -42,11 +46,11 @@ class NDBCfmDlg : public QObject {
         void setPassword(bool isPassword);
         QString getText();
         void setText(QString const& text);
-        enum result advAddCheckbox(QString const& name, QString const& label, bool checked, bool dualCol);
+        enum result advAddCheckbox(QString const& name, QString const& label, bool checked);
         //enum result advUpdateCheckbox(QString const& name, bool checked);
-        enum result advAddSlider(QString const& name, QString const& label, int min, int max, int val, bool dualCol);
+        enum result advAddSlider(QString const& name, QString const& label, int min, int max, int val);
         //enum result advUpdateSlider(QString const& name, int val);
-        enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval, bool dualCol);
+        enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
         enum result advGetJSON(QString& json);
     private:
         QString styleSheet;
@@ -75,7 +79,7 @@ class NDBCfmDlg : public QObject {
         QPointer<TouchLineEdit> tle;
         QPointer<N3ConfirmationTextEditField> tef;
         void connectStdSignals();
-        void addWidgetToFrame(QString const& label, QWidget* widget, bool dualCol);
+        void addWidgetToFrame(QString const& label, QWidget* widget);
 };
 
 #endif // NDB_CONFIRM_DLG_H
