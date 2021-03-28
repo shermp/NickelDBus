@@ -105,6 +105,17 @@ void NDBCfmDlg::connectStdSignals() {
     }
 }
 
+N3ConfirmationTextEditField* NDBCfmDlg::createTextEditField() {
+    N3ConfirmationTextEditField *t = reinterpret_cast<N3ConfirmationTextEditField*>(calloc(1,128));
+    if (!t || !dlg) {return nullptr;}
+    if (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
+        symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS(t, dlg, 1);
+    } else {
+        symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField(t, dlg);
+    }
+    return t;
+}
+
 enum NDBCfmDlg::result NDBCfmDlg::createDialog(
     enum dialogType dlgType,
     QString const& title, 
@@ -126,6 +137,15 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         symbols.ConfirmationDialog__setRejectOnOutsideTap,
         "could not find one or more standard dialog symbols"
     );
+    if (dlgType == TypeLineEdit || dlgType == TypeAdvanced) {
+        DLG_ASSERT(
+            SymbolError,
+            (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS ||
+             symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField) &&
+            symbols.N3ConfirmationTextEditField__textEdit,
+            "could not find text edit symbols"
+        );
+    }
     switch (dlgType) {
     case TypeStd:
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
@@ -136,18 +156,7 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
     case TypeLineEdit:
         dlg = symbols.ConfirmationDialogFactory_showTextEditDialog(title);
         DLG_ASSERT(NullError, dlg, "could not get line edit dialog");
-        DLG_ASSERT(
-            SymbolError,
-            (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS ||
-             symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField) &&
-            symbols.N3ConfirmationTextEditField__textEdit,
-            "could not find symbols"
-        );
-        if (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
-            tef = ndbCreateNickelObject<N3ConfirmationTextEditField>("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", 128, dlg, 1);
-        } else {
-            tef = ndbCreateNickelObject<N3ConfirmationTextEditField>("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog", 128, dlg);
-        }
+        tef = createTextEditField();
         DLG_ASSERT(NullError, tef, "error getting text edit field");
         tle = symbols.N3ConfirmationTextEditField__textEdit(tef);
         DLG_ASSERT(NullError, tle, "error getting TouchLineEdit");

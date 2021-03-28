@@ -78,6 +78,7 @@ class NDBCfmDlg : public QObject {
         enum dialogType currActiveType;
         QPointer<TouchLineEdit> tle;
         QPointer<N3ConfirmationTextEditField> tef;
+        N3ConfirmationTextEditField* createTextEditField();
         void connectStdSignals();
         void addWidgetToFrame(QString const& label, QWidget* widget);
 };
