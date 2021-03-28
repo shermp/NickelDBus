@@ -77,9 +77,11 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
         void dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText);
         void dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
+        // Modal basic dialog
         void dlgConfirmModalMessage(QString const& title, QString const& body);
         void dlgConfirmChangeBody(QString const& body);
         void dlgConfirmClose();
+        // Line edit dialog
         void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);
         void dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
         // Advanced Confirmation Dialog
@@ -107,12 +109,13 @@ class NDB : public QObject, protected QDBusContext {
         void pwrShutdown();
         void pwrReboot();
     protected Q_SLOTS:
-        void emitDialogLineEditInput();
-        void emitConfirmDialogResultReject();
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
         void onAdvancedDlgAccepted();
+        void onAdvancedDlgRejected();
+        void onDlgLineEditAccepted();
+        void onDlgLineEditRejected();
     private:
         void *libnickel;
         QSet<QString> connectedSignals;

@@ -399,21 +399,6 @@ QString NDB::ndbFirmwareVersion() {
 #define NDB_DLG_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, (cfmDlg->errString.toUtf8().constData()))
 
 /*!
- * \internal
- * \brief Emits user inputted text
- */
-void NDB::emitDialogLineEditInput() {
-    emit dlgConfirmTextInput(cfmDlg->getText());
-}
-
-/*!
- * \internal
- * \brief Emits \l dlgConfirmResult() when line edit dialog is canceled/closed
- */
-void NDB::emitConfirmDialogResultReject() {
-    emit dlgConfirmResult(QDialog::Rejected);
-}
-/*!
  * \brief Show a confirmation dialog with no buttons (except close)
  * 
  * Create a dialog box with \a title and \a body. This dialog only has a close
@@ -522,13 +507,31 @@ void NDB::dlgConfirmClose() {
     NDB_DLG_ASSERT((void) 0, (cfmDlg->closeDialog() == NDBCfmDlg::Ok));
 }
 
+/*!
+ * \internal
+ * \brief slot for handling a line edit dialog that is accepted.
+*/
+void NDB::onDlgLineEditAccepted() {
+    emit dlgConfirmTextInput(cfmDlg->getText());
+    emit dlgConfirmResult(QDialog::Accepted);
+}
+
+/*!
+ * \internal
+ * \brief slot for handling a line edit dialog that is rejected.
+*/
+void NDB::onDlgLineEditRejected() {
+    emit dlgConfirmTextInput("");
+    emit dlgConfirmResult(QDialog::Rejected);
+}
+
 void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeLineEdit, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
     cfmDlg->setText(setText);
     cfmDlg->setPassword(isPassword);
-    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDB::emitDialogLineEditInput);
-    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::emitConfirmDialogResultReject);
+    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDB::onDlgLineEditAccepted);
+    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::onDlgLineEditRejected);
     cfmDlg->showDialog();
 }
 
@@ -541,7 +544,9 @@ void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText
  * 
  * If the dialog is closed by tapping the 'accept' button, the 
  * \l dlgConfirmTextInput() signal will emit the contents of the text edit field 
- * (which may be an empty string). Otherwise, \l dlgConfirmResult() will emit the result of \c 0
+ * (which may be an empty string), and \l dlgConfirmResult() will emit \c 1. 
+ * Otherwise, \l dlgConfirmResult() will emit the result of \c 0 and \l dlgConfirmTextInput()
+ * will emit an empty string.
  * 
  * \since v0.2.0
  */
@@ -570,13 +575,16 @@ void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acc
  * This creates an empty confirmation dialog with a \a title which you can add widgets to using the
  * \c dlgConfirmAdvancedAdd* methods. This will not be shown to the user until
  * the \l dlgConfirmAdvancedShow() method is called. The \c Accept and \c Reject buttons are set
- * with \a acceptText and \a rejectText parameters respectively. 
+ * with \a acceptText and \a rejectText parameters respectively. If \a formLayout is set to
+ * \c true, the dialog widgets will be layed out in two columns. Otherwise the widgets will be
+ * stacked vertically.
  * 
  * If the user presses the accept button, \l dlgConfirmAdvancedJSON() will emit a JSON object. The widget
  * names will be used as keys, and the value will be the value of the widget when the accept button
- * is pressed.
+ * is pressed. \l dlgConfirmResult() will emit the result of \c 1.
  * 
- * \l dlgConfirmResult() will emit the result of \c 0 if the reject button is pressed.
+ * \l dlgConfirmResult() will emit the result of \c 0 if the reject button is pressed, and 
+ * \l dlgConfirmAdvancedJSON() will emit an empty JSON object.
  * 
  * \since v0.2.0
  */
@@ -591,7 +599,6 @@ void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptTe
  * 
  * This adds a checkbox to an advanced dialog. The \a name of the checkbox is used to retrieve the value
  * later. The user visible text is set by \a label and you can set the checkbox to be \a checked or not.
- * \a dualCol decides whether to separate the label from the checkbox in a 'two column' mode.
  * 
  * \since v0.2.0
  */
@@ -607,9 +614,6 @@ void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& labe
  * The user visible text is set by \a label. The slider range is set by \a min and \a max and the starting position
  * is set by \a val.
  * 
- * If \a dualCol is true, the label will be to the left of the slider, otherwise the label will be above
- * the slider.
- * 
  * \since v0.2.0
  */
 void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val) {
@@ -623,9 +627,6 @@ void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label,
  * This adds a dropdown to an advanced dialog. The \a name of the the slider is used to dropdown the value later.
  * The user visible text is set by \a label. The dropdown list is populated by \a items. You can enable addition
  * and removal of items using \a allowAdditionAndRemoval.
- * 
- * If \a dualCol is true, the label will be to the left of the dropdown, otherwise the label will be above
- * the dropdown.
  * 
  * \since v0.2.0
  */
@@ -644,7 +645,7 @@ void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& labe
 void NDB::dlgConfirmAdvancedShow() {
     NDB_DBUS_USB_ASSERT((void) 0);
     QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDB::onAdvancedDlgAccepted);
-    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::emitConfirmDialogResultReject);
+    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::onAdvancedDlgRejected);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->showDialog() == NDBCfmDlg::Ok));
 }
 
@@ -659,6 +660,16 @@ void NDB::onAdvancedDlgAccepted() {
     } else {
         emit dlgConfirmAdvancedJSON("{}");
     }
+    emit dlgConfirmResult(QDialog::Accepted);
+}
+
+/*!
+ * \internal
+ * \brief Slot for handling when the reject or close button for the Advanced confirmation dialog is pressed
+ */
+void NDB::onAdvancedDlgRejected() {
+    emit dlgConfirmAdvancedJSON("{}");
+    emit dlgConfirmResult(QDialog::Rejected);
 }
 
 /*!
