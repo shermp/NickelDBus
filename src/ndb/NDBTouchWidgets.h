@@ -14,32 +14,45 @@
 
 typedef QLabel TouchLabel;
 typedef QWidget TouchDropDown;
+typedef TouchDropDown BlockTouchDropDown;
 typedef QCheckBox TouchCheckBox;
 typedef QRadioButton TouchRadioButton;
 typedef QSlider TouchSlider;
 
-namespace NDBTouchLabel {
-    TouchLabel* create(QString const& text, QWidget* parent, QFlags<Qt::WindowType> flags);
-    TouchLabel* create(QWidget* parent, QFlags<Qt::WindowType> flags);
-}
+namespace NDBTouchWidgets {
+    namespace NDBTouchLabel {
+        bool initSymbols();
 
-namespace NDBTouchDropDown {
-    TouchDropDown* create(QWidget* parent, bool createBlock);
-    void addItem(TouchDropDown* _this, QString const& name, QVariant const& value, bool prepend);
-    void clear(TouchDropDown* _this);
-    void setCurrentIndex(TouchDropDown* _this, int index);
-    QVariant currentData(TouchDropDown* _this);
-}
+        TouchLabel* create(QString const& text, QWidget* parent, QFlags<Qt::WindowType> flags);
+        TouchLabel* create(QWidget* parent, QFlags<Qt::WindowType> flags);
+    }
 
-namespace NDBTouchCheckBox {
-    TouchCheckBox* create(QWidget* parent);
-}
+    namespace NDBTouchDropDown {
+        bool initSymbols();
+        
+        TouchDropDown* create(QWidget* parent, bool createBlock);
+        void addItem(TouchDropDown* _this, QString const& name, QVariant const& value, bool prepend);
+        void clear(TouchDropDown* _this);
+        void setCurrentIndex(TouchDropDown* _this, int index);
+        QVariant currentData(TouchDropDown* _this);
+    }
 
-namespace NDBTouchRadioButton {
-    TouchRadioButton* create(QWidget* parent);
-}
+    namespace NDBTouchCheckBox {
+        bool initSymbols();
 
-namespace NDBTouchSlider {
-    TouchSlider* create(QWidget* parent);
+        TouchCheckBox* create(QWidget* parent);
+    }
+
+    namespace NDBTouchRadioButton {
+        bool initSymbols();
+
+        TouchRadioButton* create(QWidget* parent);
+    }
+
+    namespace NDBTouchSlider {
+        bool initSymbols();
+
+        TouchSlider* create(QWidget* parent);
+    }
 }
 #endif // NDB_TOUCH_WIDGETS_H

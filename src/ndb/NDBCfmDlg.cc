@@ -267,6 +267,7 @@ void NDBCfmDlg::setText(QString const& text) {
 }
 
 void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget) {
+    using namespace NDBTouchWidgets;
     auto cb = qobject_cast<TouchCheckBox*>(widget);
     if (dlgContentVLayout && cb) {
         cb->setText(label);
@@ -288,6 +289,7 @@ void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget) {
 #define DLG_SET_OBJ_NAME(obj, name) (obj)->setObjectName(QString("ndb_%1").arg(name))
 
 enum NDBCfmDlg::result NDBCfmDlg::advAddCheckbox(QString const& name, QString const& label, bool checked) {
+    using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchCheckBox *cb = NDBTouchCheckBox::create(nullptr);
     DLG_ASSERT(NullError, cb, "unable to create checkbox");
@@ -299,6 +301,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddCheckbox(QString const& name, QString co
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, int min, int max, int val) {
+    using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchSlider *sl = NDBTouchSlider::create(nullptr);
     DLG_ASSERT(NullError, sl, "unable to create slider");
@@ -322,6 +325,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString cons
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval __attribute__((unused))) {
+    using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchDropDown *td = NDBTouchDropDown::create(nullptr, true);
     DLG_ASSERT(NullError, td, "unable to create TouchDropDown");
@@ -335,6 +339,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString co
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
+    using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     // Get all widgets in the frame whose name begins with 'ndb_'
     QRegularExpression re("ndb_.+");
