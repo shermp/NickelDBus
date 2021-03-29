@@ -1,4 +1,6 @@
 #include <NickelHook.h>
+#include <QTextEdit>
+#include <QLineEdit>
 #include "util.h"
 #include "NDBTouchWidgets.h"
 
@@ -76,7 +78,7 @@ namespace NDBTouchWidgets {
 
     namespace NDBTouchSlider {
         TouchSlider *(*TouchSlider__TouchSlider)(TouchSlider* _this, QWidget* parent);
-        
+
         bool initSymbols() {
             if (!TouchSlider__TouchSlider)
                 ndbResolveSymbolRTLD("_ZN11TouchSliderC1EP7QWidget", nh_symoutptr(TouchSlider__TouchSlider));
@@ -91,7 +93,6 @@ namespace NDBTouchWidgets {
             return TouchSlider__TouchSlider(ts, parent);
         }
     }
-
 
     namespace NDBTouchDropDown {
         TouchDropDown *(*TouchDropDown__TouchDropDown)(TouchDropDown* _this, QWidget* parent);
@@ -165,6 +166,103 @@ namespace NDBTouchWidgets {
 
         QVariant currentData(TouchDropDown* _this) {
             return TouchDropDown__currentData(_this);
+        }
+    }
+
+    namespace NDBKeyboard {
+        KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);
+        KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_textEdit)(KeyboardReceiver* _this, QTextEdit* text, bool dunno);
+        SearchKeyboardController *(*KeyboardFrame_createKeyboard)(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
+        void (*SearchKeyboardController__setReceiver)(SearchKeyboardController* _this, KeyboardReceiver* receiver);
+        void (*SearchKeyboardController__setMultiLineEntry)(SearchKeyboardController* _this, bool enabled);
+        TouchLineEdit *(*TouchLineEdit__TouchLineEdit)(TouchLineEdit* _this, QWidget* parent);
+        TouchTextEdit *(*TouchTextEdit__TouchTextEdit)(TouchTextEdit* _this, QWidget* parent);
+        QTextEdit *(*TouchTextEdit__textEdit)(TouchTextEdit* _this);
+
+        bool initSymbols() {
+            if (!KeyboardReceiver__KeyboardReceiver_lineEdit)
+                ndbResolveSymbolRTLD("_ZN16KeyboardReceiverC1EP9QLineEditb", 
+                                    nh_symoutptr(KeyboardReceiver__KeyboardReceiver_lineEdit));
+            
+            if (!KeyboardReceiver__KeyboardReceiver_textEdit)
+                ndbResolveSymbolRTLD("_ZN16KeyboardReceiverC1EP9QTextEditb", 
+                                    nh_symoutptr(KeyboardReceiver__KeyboardReceiver_textEdit));
+            
+            if (!KeyboardFrame_createKeyboard)
+                ndbResolveSymbolRTLD("_ZN13KeyboardFrame14createKeyboardE14KeyboardScriptRK7QLocale", 
+                                    nh_symoutptr(KeyboardFrame_createKeyboard));
+            
+            if (!SearchKeyboardController__setReceiver)
+                ndbResolveSymbolRTLD("_ZN24SearchKeyboardController11setReceiverEP16KeyboardReceiverb", 
+                                    nh_symoutptr(SearchKeyboardController__setReceiver));
+
+            if (!SearchKeyboardController__setMultiLineEntry)
+                ndbResolveSymbolRTLD("_ZN24SearchKeyboardController17setMultiLineEntryEb", 
+                                    nh_symoutptr(SearchKeyboardController__setMultiLineEntry));
+            
+            if (!TouchLineEdit__TouchLineEdit)
+                ndbResolveSymbolRTLD("_ZN13TouchLineEditC1EP7QWidget", 
+                                    nh_symoutptr(TouchLineEdit__TouchLineEdit));
+            
+            if (!TouchTextEdit__TouchTextEdit)
+                ndbResolveSymbolRTLD("_ZN13TouchTextEditC1EP7QWidget", 
+                                    nh_symoutptr(TouchTextEdit__TouchTextEdit));
+            
+            if (!TouchTextEdit__textEdit)
+                ndbResolveSymbolRTLD("_ZN13TouchTextEdit8textEditEv", 
+                                    nh_symoutptr(TouchTextEdit__textEdit));
+            
+            return (KeyboardReceiver__KeyboardReceiver_lineEdit &&
+                    KeyboardReceiver__KeyboardReceiver_textEdit &&
+                    KeyboardFrame_createKeyboard &&
+                    SearchKeyboardController__setReceiver &&
+                    SearchKeyboardController__setMultiLineEntry &&
+                    TouchLineEdit__TouchLineEdit &&
+                    TouchTextEdit__TouchTextEdit &&
+                    TouchTextEdit__textEdit);
+        }
+
+        TouchLineEdit* createLineEdit(QWidget* parent) {
+            NDB_TW_ASSERT(initSymbols());
+            auto tle = reinterpret_cast<TouchLineEdit*>(calloc(1,sizeof(QLineEdit) * 4));
+            NDB_TW_ASSERT(tle);
+            TouchLineEdit__TouchLineEdit(tle, parent);
+            auto tlr = reinterpret_cast<KeyboardReceiver*>(calloc(1,sizeof(QFrame) * 4));
+            NDB_TW_ASSERT(tlr);
+            KeyboardReceiver__KeyboardReceiver_lineEdit(tlr, tle, true);
+            return tle;
+        }
+
+        TouchTextEdit* createTextEdit(QWidget* parent) {
+            NDB_TW_ASSERT(initSymbols());
+            auto tte = reinterpret_cast<TouchTextEdit*>(calloc(1,sizeof(QTextEdit) * 4));
+            NDB_TW_ASSERT(tte);
+            TouchTextEdit__TouchTextEdit(tte, parent);
+            auto ttr = reinterpret_cast<KeyboardReceiver*>(calloc(1,sizeof(QFrame) * 4));
+            NDB_TW_ASSERT(ttr);
+            KeyboardReceiver__KeyboardReceiver_textEdit(ttr, TouchTextEdit__textEdit(tte), true);
+            return tte;
+        }
+
+        KeyboardReceiver* getKeyboardReciever(QWidget* lte) {
+            auto tle = qobject_cast<TouchLineEdit*>(lte);
+            auto tte = qobject_cast<TouchTextEdit*>(lte);
+            NDB_TW_ASSERT(tle || tte);
+            auto c = lte->children();
+            for (int i = 0; i < c.size(); ++i) {
+                auto o = c.at(i);
+                if (o->metaObject()->className() == QString("KeyboardReceiver"))
+                    return qobject_cast<KeyboardReceiver*>(o);
+            }
+            return nullptr;
+        }
+
+        SearchKeyboardController* createKeyboard(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc) {
+            return KeyboardFrame_createKeyboard(_this, script, loc);
+        }
+
+        void setReceiver(SearchKeyboardController* _this, KeyboardReceiver* receiver) {
+            return SearchKeyboardController__setReceiver(_this, receiver);
         }
     }
 }

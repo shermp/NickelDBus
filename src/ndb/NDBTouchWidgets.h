@@ -19,6 +19,14 @@ typedef QCheckBox TouchCheckBox;
 typedef QRadioButton TouchRadioButton;
 typedef QSlider TouchSlider;
 
+// Keyboard stuff
+typedef QObject SearchKeyboardController;
+typedef int KeyboardScript;
+typedef QFrame KeyboardFrame;
+typedef QObject KeyboardReceiver;
+typedef QLineEdit TouchLineEdit;
+typedef QFrame TouchTextEdit;
+
 namespace NDBTouchWidgets {
     namespace NDBTouchLabel {
         bool initSymbols();
@@ -53,6 +61,17 @@ namespace NDBTouchWidgets {
         bool initSymbols();
 
         TouchSlider* create(QWidget* parent);
+    }
+
+    namespace NDBKeyboard {
+        bool initSymbols();
+
+        TouchLineEdit* createLineEdit(QWidget* parent);
+        TouchTextEdit* createTextEdit(QWidget* parent);
+        KeyboardReceiver* getKeyboardReciever(QWidget* lte);
+
+        SearchKeyboardController* createKeyboard(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
+        void setReceiver(SearchKeyboardController* _this, KeyboardReceiver* receiver);
     }
 }
 #endif // NDB_TOUCH_WIDGETS_H

@@ -8,7 +8,6 @@
 #include <NickelHook.h>
 #include "util.h"
 #include "NDBCfmDlg.h"
-#include "NDBTouchWidgets.h"
 
 #define DLG_ASSERT(ret, cond, str) if (!(cond)) {         \
     errString = QString("%1: %2").arg(__func__).arg(str); \
@@ -41,6 +40,8 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
         ndbResolveSymbolRTLD("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField));
     }
     ndbResolveSymbolRTLD("_ZNK27N3ConfirmationTextEditField8textEditEv", nh_symoutptr(symbols.N3ConfirmationTextEditField__textEdit));
+    ndbResolveSymbolRTLD("_ZNK18ConfirmationDialog13keyboardFrameEv", nh_symoutptr(symbols.ConfirmationDialog__keyboardFrame));
+
     styleSheet = QString(R"(
         * {
             font-family: Avenir, sans-serif;
@@ -366,6 +367,40 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString co
     return Ok;
 }
 
+enum NDBCfmDlg::result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label) {
+    using namespace NDBTouchWidgets::NDBKeyboard;
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    auto tle = createLineEdit(dlg);
+    DLG_ASSERT(NullError, tle, "unable to create TextLineEdit");
+    DLG_ASSERT(ConnError, 
+                QObject::connect(tle, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
+                "unable to connect TouchLineEdit::tapped() to onLineTextEditTapped()");
+    DLG_SET_OBJ_NAME(tle, name);
+    addWidgetToFrame(label, tle);
+    return Ok;
+}
+
+void NDBCfmDlg::onLineTextEditTapped() {
+    using namespace NDBTouchWidgets::NDBKeyboard;
+    auto sender = QObject::sender();
+    auto tle = qobject_cast<TouchLineEdit*>(sender);
+    auto tte = qobject_cast<TouchTextEdit*>(sender);
+    if (!tle && !tte) 
+        return;
+    
+    auto kr = getKeyboardReciever(qobject_cast<QWidget*>(sender));
+    if (!kr)
+        return;
+    
+    auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
+    if (!kf)
+        return;
+    
+    auto skbc = createKeyboard(kf, 1, QLocale());
+    setReceiver(skbc, kr);
+    kf->show();
+}
+
 enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
     using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
@@ -387,6 +422,10 @@ enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
         } else if (className == "TouchDropDown" || className == "BlockTouchDropDown") {
             TouchDropDown *dd = qobject_cast<TouchDropDown*>(widgets[i]);
             qvm[name] = NDBTouchDropDown::currentData(dd);
+        } else if (className == "TouchLineEdit") {
+            TouchLineEdit *t = qobject_cast<TouchLineEdit*>(widgets[i]);
+            DLG_ASSERT(NullError, t, "unable to get TouchLineEdit");
+            qvm[name] = QVariant(t->text());
         }
     }
     QJsonObject obj = QJsonObject::fromVariantMap(qvm);

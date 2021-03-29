@@ -659,6 +659,19 @@ void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& labe
 }
 
 /*!
+ * \brief Add a text line edit to an advanced dialog
+ * 
+ * This adds a text line edit to an advanced dialog. The \a name of the line edit is used to retrieve the value later.
+ * The user visible text is set by \a label. An optional \a placeholder may be set.
+ * 
+ * \since v0.2.0
+ */
+void NDB::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label) == NDBCfmDlg::Ok));
+}
+
+/*!
  * \brief Show an advanced dialog
  * 
  * An advanced dialog MUST be created with \l dlgConfirmAdvancedCreate() first.

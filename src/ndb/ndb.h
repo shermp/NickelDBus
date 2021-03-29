@@ -90,6 +90,7 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked);
         void dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val);
         void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
+        void dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label);
         void dlgConfirmAdvancedShow();
         // PlugWorkFlowManager
         void pfmRescanBooks();
