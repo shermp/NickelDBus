@@ -244,6 +244,11 @@ namespace NDBTouchWidgets {
             return tte;
         }
 
+        QTextEdit* textEdit(TouchTextEdit* tte) {
+            NDB_TW_ASSERT(initSymbols());
+            return TouchTextEdit__textEdit(tte);
+        }
+
         KeyboardReceiver* getKeyboardReciever(QWidget* lte) {
             auto tle = qobject_cast<TouchLineEdit*>(lte);
             auto tte = qobject_cast<TouchTextEdit*>(lte);
@@ -263,6 +268,10 @@ namespace NDBTouchWidgets {
 
         void setReceiver(SearchKeyboardController* _this, KeyboardReceiver* receiver) {
             return SearchKeyboardController__setReceiver(_this, receiver);
+        }
+
+        void setMultilineEntry(SearchKeyboardController* _this, bool enabled) {
+            return SearchKeyboardController__setMultiLineEntry(_this, enabled);
         }
     }
 }

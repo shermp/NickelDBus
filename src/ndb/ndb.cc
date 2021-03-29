@@ -671,6 +671,11 @@ void NDB::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& labe
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label) == NDBCfmDlg::Ok));
 }
 
+void NDB::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label) == NDBCfmDlg::Ok));
+}
+
 /*!
  * \brief Show an advanced dialog
  * 

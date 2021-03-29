@@ -52,6 +52,7 @@ class NDBCfmDlg : public QObject {
         enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
         //enum result advAddLineEdit(QString const& name, QString const& label, QString const& placeholder);
         enum result advAddLineEdit(QString const& name, QString const& label);
+        enum result advAddTextEdit(QString const& name, QString const& label);
         enum result advGetJSON(QString& json);
     protected Q_SLOTS:
         void onLineTextEditTapped();

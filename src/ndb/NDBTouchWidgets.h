@@ -68,10 +68,12 @@ namespace NDBTouchWidgets {
 
         TouchLineEdit* createLineEdit(QWidget* parent);
         TouchTextEdit* createTextEdit(QWidget* parent);
+        QTextEdit* textEdit(TouchTextEdit* tte);
         KeyboardReceiver* getKeyboardReciever(QWidget* lte);
 
         SearchKeyboardController* createKeyboard(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
         void setReceiver(SearchKeyboardController* _this, KeyboardReceiver* receiver);
+        void setMultilineEntry(SearchKeyboardController* _this, bool enabled);
     }
 }
 #endif // NDB_TOUCH_WIDGETS_H

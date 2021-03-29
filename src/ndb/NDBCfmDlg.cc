@@ -380,24 +380,43 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddLineEdit(QString const& name, QString co
     return Ok;
 }
 
+enum NDBCfmDlg::result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label) {
+    using namespace NDBTouchWidgets::NDBKeyboard;
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    auto tte = createTextEdit(dlg);
+    DLG_ASSERT(NullError, tte, "unable to create TouchTextEdit");
+    DLG_ASSERT(ConnError, 
+                QObject::connect(tte, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
+                "unable to connect TouchTextEdit::tapped() to onLineTextEditTapped()");
+    DLG_SET_OBJ_NAME(tte, name);
+    addWidgetToFrame(label, tte);
+    return Ok;
+}
+
 void NDBCfmDlg::onLineTextEditTapped() {
     using namespace NDBTouchWidgets::NDBKeyboard;
     auto sender = QObject::sender();
     auto tle = qobject_cast<TouchLineEdit*>(sender);
     auto tte = qobject_cast<TouchTextEdit*>(sender);
-    if (!tle && !tte) 
+    if (!tle && !tte)
+        nh_log("onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
         return;
     
     auto kr = getKeyboardReciever(qobject_cast<QWidget*>(sender));
     if (!kr)
+        nh_log("onLineTextEditTapped: can't get keyboard receiver");
         return;
     
     auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
     if (!kf)
+        nh_log("onLineTextEditTapped: can't get keyboard frame");
         return;
     
     auto skbc = createKeyboard(kf, 1, QLocale());
     setReceiver(skbc, kr);
+    if (tte)
+        setMultilineEntry(skbc, true);
+
     QObject::connect(skbc, SIGNAL(commitRequested()), this, SLOT(onCommitRequested()));
     kf->show();
 }
@@ -434,6 +453,10 @@ enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
             TouchLineEdit *t = qobject_cast<TouchLineEdit*>(widgets[i]);
             DLG_ASSERT(NullError, t, "unable to get TouchLineEdit");
             qvm[name] = QVariant(t->text());
+        } else if (className == "TouchTextEdit") {
+            TouchTextEdit *t = qobject_cast<TouchTextEdit*>(widgets[i]);
+            DLG_ASSERT(NullError, t, "unable to get TouchTextEdit");
+            qvm[name] = QVariant(NDBKeyboard::textEdit(t)->toPlainText());
         }
     }
     QJsonObject obj = QJsonObject::fromVariantMap(qvm);
