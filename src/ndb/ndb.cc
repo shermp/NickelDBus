@@ -575,9 +575,8 @@ void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acc
  * This creates an empty confirmation dialog with a \a title which you can add widgets to using the
  * \c dlgConfirmAdvancedAdd* methods. This will not be shown to the user until
  * the \l dlgConfirmAdvancedShow() method is called. The \c Accept and \c Reject buttons are set
- * with \a acceptText and \a rejectText parameters respectively. If \a formLayout is set to
- * \c true, the dialog widgets will be layed out in two columns. Otherwise the widgets will be
- * stacked vertically.
+ * with \a acceptText and \a rejectText parameters respectively. By default, widgets are stacked 
+ * vertically. \l dlgConfirmAdvancedAddLayout() provides more advanced layout options.
  * 
  * If the user presses the accept button, \l dlgConfirmAdvancedJSON() will emit a JSON object. The widget
  * names will be used as keys, and the value will be the value of the widget when the accept button
@@ -588,10 +587,34 @@ void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acc
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText, bool formLayout) {
+void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    auto lt = (formLayout) ? NDBCfmDlg::FormLayout : NDBCfmDlg::StdLayout;
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true, lt) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
+}
+
+/*!
+ * \brief Add and begin using a new layout type in an advanced dialog
+ * 
+ * You can use this function for more advanced widget layout options compared to the default 
+ * vertical box layout. \a layout can be one of three options: \c "horizontal", \c "vertical" 
+ * and \c "form". You can add multiple layouts to a dialog as needed. Simply call this function,
+ * add the widgets for the current layout, then call this function again to start a new
+ * layout.
+ * 
+ * \since v0.2.0
+ */
+void NDB::dlgConfirmAdvancedAddLayout(QString const& layout) {
+    auto l = layout.toLower();
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, (l == "vertical" || l == "horizontal" || l == "form"), 
+                    "Parameter must be one of 'vertical', 'horizontal' or 'form'");
+    enum NDBCfmDlg::layoutType lt;
+    if (l == "vertical")
+        lt = NDBCfmDlg::VertLayout;
+    else if (l == "horizontal")
+        lt = NDBCfmDlg::HorLayout;
+    else 
+        lt = NDBCfmDlg::FormLayout;
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLayout(lt) == NDBCfmDlg::Ok));
 }
 
 /*!

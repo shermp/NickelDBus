@@ -85,7 +85,8 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);
         void dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
         // Advanced Confirmation Dialog
-        void dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText, bool formLayout = false);
+        void dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText);
+        void dlgConfirmAdvancedAddLayout(QString const& layout);
         void dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked);
         void dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val);
         void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);

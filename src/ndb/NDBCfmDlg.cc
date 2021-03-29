@@ -122,8 +122,7 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
     QString const& body, 
     QString const& acceptText, 
     QString const& rejectText, 
-    bool tapOutsideClose,
-    enum layoutType layout
+    bool tapOutsideClose
 ) {
     DLG_ASSERT(ForbiddenError, !dlg, "dialog already open");
     DLG_ASSERT(
@@ -171,14 +170,11 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
         DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__setContent, "could not find setContent() symbol");
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
         DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
-        dlgContent = new QFrame;
-        if (layout == FormLayout) {
-            dlgFormLayout = new QFormLayout;
-            dlgContent->setLayout(dlgFormLayout);
-        } else {
-            dlgContentVLayout = new QVBoxLayout;
-            dlgContent->setLayout(dlgContentVLayout);
-        }
+        advContent = new QFrame;
+        advMainLayout = new QVBoxLayout;
+        advActiveLayout = nullptr;
+        advContent->setLayout(advMainLayout);
+
         currActiveType = TypeAdvanced;
         break;
 
@@ -202,8 +198,12 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     switch (currActiveType) {
     case TypeAdvanced:
-        dlgContent->setStyleSheet(styleSheet);
-        symbols.ConfirmationDialog__setContent(dlg, dlgContent);
+        // Set the final layout
+        if (advActiveLayout)
+            advMainLayout->addLayout(advActiveLayout);
+
+        advContent->setStyleSheet(styleSheet);
+        symbols.ConfirmationDialog__setContent(dlg, advContent);
         break;
     default:
         break;
@@ -268,22 +268,50 @@ void NDBCfmDlg::setText(QString const& text) {
 
 void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget) {
     using namespace NDBTouchWidgets;
+    // If the user hasn't set a layout, default to vertical box
+    if (!advActiveLayout) {
+        advActiveLayout = new QVBoxLayout;
+    }
     auto cb = qobject_cast<TouchCheckBox*>(widget);
-    if (dlgContentVLayout && cb) {
+    auto vbl = qobject_cast<QVBoxLayout*>(advActiveLayout);
+    auto fl = qobject_cast<QFormLayout*>(advActiveLayout);
+    auto hbl = qobject_cast<QHBoxLayout*>(advActiveLayout);
+    if (vbl && cb) {
         cb->setText(label);
-        dlgContentVLayout->addWidget(cb);
+        vbl->addWidget(cb);
         return;
     }
     TouchLabel *lbl = NDBTouchLabel::create(label, nullptr, 0);
-    if (dlgContentVLayout) {
-        dlgContentVLayout->addWidget(lbl);
-        dlgContentVLayout->addWidget(widget);
-    } else if (dlgFormLayout) {
-        dlgFormLayout->addRow(lbl, widget);
+    if (vbl || hbl) {
+        advActiveLayout->addWidget(lbl);
+        advActiveLayout->addWidget(widget);
+    } else if (fl) {
+        fl->addRow(lbl, widget);
     } else {
         nh_log("both form and vertical layouts were null");
     }
     return;
+}
+
+enum NDBCfmDlg::result NDBCfmDlg::advAddLayout(enum NDBCfmDlg::layoutType lt) {
+    if (advActiveLayout) {
+        advMainLayout->addLayout(advActiveLayout);
+    }
+    switch (lt) {
+    case HorLayout:
+        advActiveLayout = new QHBoxLayout;
+        break;
+    case VertLayout:
+        advActiveLayout = new QVBoxLayout;
+        break;
+    case FormLayout:
+        advActiveLayout = new QFormLayout;
+        break;
+    default:
+        advActiveLayout = nullptr;
+    }
+    DLG_ASSERT(NullError, advActiveLayout, "unabled to get new layout");
+    return Ok;
 }
 
 #define DLG_SET_OBJ_NAME(obj, name) (obj)->setObjectName(QString("ndb_%1").arg(name))
@@ -343,7 +371,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     // Get all widgets in the frame whose name begins with 'ndb_'
     QRegularExpression re("ndb_.+");
-    QList<QWidget*> widgets = dlgContent->findChildren<QWidget*>(re);
+    QList<QWidget*> widgets = advContent->findChildren<QWidget*>(re);
     //nh_log("advGetJSON: Found %d widgets", widgets.size());
     QVariantMap qvm;
     for (int i = 0; i < widgets.size(); ++i) {
