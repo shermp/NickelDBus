@@ -398,7 +398,15 @@ void NDBCfmDlg::onLineTextEditTapped() {
     
     auto skbc = createKeyboard(kf, 1, QLocale());
     setReceiver(skbc, kr);
+    QObject::connect(skbc, SIGNAL(commitRequested()), this, SLOT(onCommitRequested()));
     kf->show();
+}
+
+void NDBCfmDlg::onCommitRequested() {
+    auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
+    if (!kf)
+        return;
+    kf->hide();
 }
 
 enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {

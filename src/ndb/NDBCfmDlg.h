@@ -55,6 +55,7 @@ class NDBCfmDlg : public QObject {
         enum result advGetJSON(QString& json);
     protected Q_SLOTS:
         void onLineTextEditTapped();
+        void onCommitRequested();
     private:
         QString styleSheet;
         struct {
