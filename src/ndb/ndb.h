@@ -92,6 +92,10 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
         void dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label);
         void dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label);
+        void dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label);
+        void dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label, QString const& init);
+        void dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label);
+        void dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label, QString const& init);
         void dlgConfirmAdvancedShow();
         // PlugWorkFlowManager
         void pfmRescanBooks();

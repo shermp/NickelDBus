@@ -169,6 +169,53 @@ namespace NDBTouchWidgets {
         }
     }
 
+    namespace NDBDateTime {
+        N3DatePicker *(*N3DatePicker__N3DatePicker)(N3DatePicker* _this, QWidget* parent, QDate init);
+        N3TimePicker *(*N3TimePicker__N3TimePicker)(N3TimePicker* _this, QWidget* parent, QTime init);
+
+        QDate (*N3DatePicker__getDate)(N3DatePicker* _this);
+        QTime (*N3TimePicker__getTime)(N3TimePicker* _this);
+
+        bool initSymbols() {
+            if (!N3DatePicker__N3DatePicker)
+                ndbResolveSymbolRTLD("_ZN12N3DatePickerC1EP7QWidget5QDate", nh_symoutptr(N3DatePicker__N3DatePicker));
+            
+            if (!N3TimePicker__N3TimePicker)
+                ndbResolveSymbolRTLD("_ZN12N3TimePickerC1EP7QWidget5QTime", nh_symoutptr(N3TimePicker__N3TimePicker));
+
+            if (!N3DatePicker__getDate)
+                ndbResolveSymbolRTLD("_ZNK12N3DatePicker7getDateEv", nh_symoutptr(N3DatePicker__getDate));
+            
+            if (!N3TimePicker__getTime)
+                ndbResolveSymbolRTLD("_ZNK12N3TimePicker7getTimeEv", nh_symoutptr(N3TimePicker__getTime));
+            
+            return (N3DatePicker__N3DatePicker && N3TimePicker__N3TimePicker && 
+                    N3DatePicker__getDate && N3TimePicker__getTime);
+        }
+
+        N3DatePicker* create(QWidget* parent, QDate init) {
+            NDB_TW_ASSERT(initSymbols());
+            auto d = reinterpret_cast<N3DatePicker*>(calloc(1,128));
+            NDB_TW_ASSERT(d);
+            return N3DatePicker__N3DatePicker(d, parent, init);
+        }
+
+        N3TimePicker* create(QWidget* parent, QTime init) {
+            NDB_TW_ASSERT(initSymbols());
+            auto t = reinterpret_cast<N3TimePicker*>(calloc(1,128));
+            NDB_TW_ASSERT(t);
+            return N3TimePicker__N3TimePicker(t, parent, init);
+        }
+
+        QDate getDate(N3DatePicker* _this) {
+            return N3DatePicker__getDate(_this);
+        }
+
+        QTime getTime(N3TimePicker* _this) {
+            return N3TimePicker__getTime(_this);
+        }
+    }
+
     namespace NDBKeyboard {
         KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);
         KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_textEdit)(KeyboardReceiver* _this, QTextEdit* text, bool dunno);

@@ -11,6 +11,8 @@
 #include <QLabel>
 #include <QSet>
 #include <QSlider>
+#include <QDate>
+#include <QTime>
 
 typedef QLabel TouchLabel;
 typedef QWidget TouchDropDown;
@@ -18,6 +20,9 @@ typedef TouchDropDown BlockTouchDropDown;
 typedef QCheckBox TouchCheckBox;
 typedef QRadioButton TouchRadioButton;
 typedef QSlider TouchSlider;
+
+typedef QWidget N3DatePicker;
+typedef QWidget N3TimePicker;
 
 // Keyboard stuff
 typedef QObject SearchKeyboardController;
@@ -61,6 +66,16 @@ namespace NDBTouchWidgets {
         bool initSymbols();
 
         TouchSlider* create(QWidget* parent);
+    }
+
+    namespace NDBDateTime {
+        bool initSymbols();
+
+        N3DatePicker* create(QWidget* parent, QDate init);
+        N3TimePicker* create(QWidget* parent, QTime init);
+
+        QDate getDate(N3DatePicker* _this);
+        QTime getTime(N3TimePicker* _this);
     }
 
     namespace NDBKeyboard {

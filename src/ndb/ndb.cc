@@ -676,6 +676,30 @@ void NDB::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& labe
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label) == NDBCfmDlg::Ok));
 }
 
+void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, QDate::currentDate()) == NDBCfmDlg::Ok));
+}
+
+void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label, QString const& init) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    auto d = QDate::fromString(init, Qt::ISODate);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, d.isValid(), "invalid init date");
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, d) == NDBCfmDlg::Ok));
+}
+
+void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, QTime::currentTime()) == NDBCfmDlg::Ok));
+}
+
+void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label, QString const& init) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    auto t = QTime::fromString(init, "HH:mm");
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, t.isValid(), "invalid init time");
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, t) == NDBCfmDlg::Ok));
+}
+
 /*!
  * \brief Show an advanced dialog
  * 

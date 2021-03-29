@@ -53,6 +53,8 @@ class NDBCfmDlg : public QObject {
         //enum result advAddLineEdit(QString const& name, QString const& label, QString const& placeholder);
         enum result advAddLineEdit(QString const& name, QString const& label);
         enum result advAddTextEdit(QString const& name, QString const& label);
+        enum result advAddDatePicker(QString const& name, QString const& label, QDate init);
+        enum result advAddTimePicker(QString const& name, QString const& label, QTime init);
         enum result advGetJSON(QString& json);
     protected Q_SLOTS:
         void onLineTextEditTapped();

@@ -428,6 +428,26 @@ void NDBCfmDlg::onCommitRequested() {
     kf->hide();
 }
 
+enum NDBCfmDlg::result NDBCfmDlg::advAddDatePicker(QString const& name, QString const& label, QDate init) {
+    using namespace NDBTouchWidgets::NDBDateTime;
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    auto d = create(dlg, init);
+    DLG_ASSERT(NullError, d, "unable to create N3DatePicker");
+    DLG_SET_OBJ_NAME(d, name);
+    addWidgetToFrame(label, d);
+    return Ok;
+}
+
+enum NDBCfmDlg::result NDBCfmDlg::advAddTimePicker(QString const& name, QString const& label, QTime init) {
+    using namespace NDBTouchWidgets::NDBDateTime;
+    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
+    auto t = create(dlg, init);
+    DLG_ASSERT(NullError, t, "unable to create N3TimePicker");
+    DLG_SET_OBJ_NAME(t, name);
+    addWidgetToFrame(label, t);
+    return Ok;
+}
+
 enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
     using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
@@ -457,6 +477,12 @@ enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
             TouchTextEdit *t = qobject_cast<TouchTextEdit*>(widgets[i]);
             DLG_ASSERT(NullError, t, "unable to get TouchTextEdit");
             qvm[name] = QVariant(NDBKeyboard::textEdit(t)->toPlainText());
+        } else if (className == "N3DatePicker") {
+            N3DatePicker *d = qobject_cast<N3DatePicker*>(widgets[i]);
+            qvm[name] = QVariant(NDBDateTime::getDate(d));
+        } else if (className == "N3TimePicker") {
+            N3TimePicker *t = qobject_cast<N3TimePicker*>(widgets[i]);
+            qvm[name] = QVariant(NDBDateTime::getTime(t));
         }
     }
     QJsonObject obj = QJsonObject::fromVariantMap(qvm);
