@@ -494,3 +494,33 @@ enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
     json.append(QString().fromUtf8(docBA));
     return Ok;
 }
+
+/*
+ * A note on my current understanding of how the keyboard stuff works:
+ * 
+ * Start with a TouchLineEdit (TLE) or TouchTextEdit (TTE). TouchLineEdit is a subclass
+ * of QLineEdit, TouchLineEdit is a subclass of a QFrame, which contains a
+ * QTextEdit.
+ * 
+ * To attach the keyboard to the above widgets, a KeyboardReceiver (KR) is used, the 
+ * constructor for this adds a KR as a child object of the TLE or 
+ * TTE. 
+ * 
+ * Both the edit widgets and KR need to be manually heap allocated before use. Care
+ * needs to be taken that enough memory is allocated.
+ * 
+ * The keyboard itself is contained in a KeyboardFrame (KF). The ConfirmationDialog 
+ * already contains a KF, and has a method to get a pointer to it (ConfirmationDialog::keyboardFrame()).
+ * The KF has a method to create the actual keyboard (KeyboardFrame::createKeyboard()), 
+ * which is locale dependent. One of the parameters required for createKeyboard() is a 
+ * KeyboardScript, which is unknown at this time, but is likely an enum.
+ * 
+ * createKeyboard() returns (a pointer to) a SearchKeyboardController (SKC), whic is a 
+ * descendant of the KeyboardController (KC) class. To finally connect the edit widget 
+ * to the keyboard, SearchKeyboardController::setReceiver() is used to set the previously 
+ * created KR to the SKC.
+ * 
+ * To actually show and hide the keyboard, we can use QWidget::show() and QWidget::hide() on the 
+ * KF. The edit widgets have a tapped() signal used to show the keyboard, and the KC has a 
+ * commitRequested() signal to hide the keyboard when the 'go' key is pressed.
+*/
