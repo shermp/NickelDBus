@@ -666,14 +666,14 @@ void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& labe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label) {
+void NDB::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
 }
 
-void NDB::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label) {
+void NDB::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
 }
 
 void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label) {

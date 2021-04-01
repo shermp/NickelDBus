@@ -81,8 +81,8 @@ namespace NDBTouchWidgets {
     namespace NDBKeyboard {
         bool initSymbols();
 
-        TouchLineEdit* createLineEdit(QWidget* parent);
-        TouchTextEdit* createTextEdit(QWidget* parent);
+        TouchLineEdit* createLineEdit(QWidget* parent, bool autoFormatCaps);
+        TouchTextEdit* createTextEdit(QWidget* parent, bool autoFormatCaps);
         QTextEdit* textEdit(TouchTextEdit* tte);
         KeyboardReceiver* getKeyboardReciever(QWidget* lte);
 

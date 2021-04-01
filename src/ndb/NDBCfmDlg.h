@@ -51,8 +51,8 @@ class NDBCfmDlg : public QObject {
         //enum result advUpdateSlider(QString const& name, int val);
         enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
         //enum result advAddLineEdit(QString const& name, QString const& label, QString const& placeholder);
-        enum result advAddLineEdit(QString const& name, QString const& label);
-        enum result advAddTextEdit(QString const& name, QString const& label);
+        enum result advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps);
+        enum result advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps);
         enum result advAddDatePicker(QString const& name, QString const& label, QDate init);
         enum result advAddTimePicker(QString const& name, QString const& label, QTime init);
         enum result advGetJSON(QString& json);

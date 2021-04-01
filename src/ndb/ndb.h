@@ -90,8 +90,8 @@ class NDB : public QObject, protected QDBusContext {
         void dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked);
         void dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val);
         void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
-        void dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label);
-        void dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label);
+        void dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps = true);
+        void dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps = true);
         void dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label);
         void dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label, QString const& init);
         void dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label);

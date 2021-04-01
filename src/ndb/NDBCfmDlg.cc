@@ -200,8 +200,9 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
     switch (currActiveType) {
     case TypeAdvanced:
         // Set the final layout
-        if (advActiveLayout)
+        if (advActiveLayout) {
             advMainLayout->addLayout(advActiveLayout);
+        }
 
         advContent->setStyleSheet(styleSheet);
         symbols.ConfirmationDialog__setContent(dlg, advContent);
@@ -367,10 +368,10 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString co
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label) {
+enum NDBCfmDlg::result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     using namespace NDBTouchWidgets::NDBKeyboard;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    auto tle = createLineEdit(dlg);
+    auto tle = createLineEdit(dlg, autoFormatCaps);
     DLG_ASSERT(NullError, tle, "unable to create TextLineEdit");
     DLG_ASSERT(ConnError, 
                 QObject::connect(tle, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
@@ -380,10 +381,10 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddLineEdit(QString const& name, QString co
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label) {
+enum NDBCfmDlg::result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     using namespace NDBTouchWidgets::NDBKeyboard;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    auto tte = createTextEdit(dlg);
+    auto tte = createTextEdit(dlg, autoFormatCaps);
     DLG_ASSERT(NullError, tte, "unable to create TouchTextEdit");
     DLG_ASSERT(ConnError, 
                 QObject::connect(tte, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
@@ -395,36 +396,53 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddTextEdit(QString const& name, QString co
 
 void NDBCfmDlg::onLineTextEditTapped() {
     using namespace NDBTouchWidgets::NDBKeyboard;
+    NDB_DEBUG("slot invoked");
     auto sender = QObject::sender();
     auto tle = qobject_cast<TouchLineEdit*>(sender);
     auto tte = qobject_cast<TouchTextEdit*>(sender);
-    if (!tle && !tte)
+    NDB_DEBUG("sender is TouchLineEdit: %s", (tle) ? "yes" : "no");
+    NDB_DEBUG("sender is TouchTextEdit: %s", (tte) ? "yes" : "no");
+    if (!tle && !tte) {
         nh_log("onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
         return;
+    }
     
-    auto kr = getKeyboardReciever(qobject_cast<QWidget*>(sender));
-    if (!kr)
+    NDB_DEBUG("getting KeyboardReceiver");
+    auto kr = getKeyboardReciever((qobject_cast<QWidget*>(sender)));
+    if (!kr) {
         nh_log("onLineTextEditTapped: can't get keyboard receiver");
         return;
+    }
     
+    NDB_DEBUG("getting KeyboardFrame");
     auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
-    if (!kf)
+    if (!kf) {
         nh_log("onLineTextEditTapped: can't get keyboard frame");
         return;
+    }
     
-    auto skbc = createKeyboard(kf, 1, QLocale());
+    NDB_DEBUG("getting SearchKeyboardController");
+    auto skbc = createKeyboard(kf, 1, QLocale(QLocale::English));
+    if (!skbc) {
+        nh_log("onLineTextEditTapped: can't get SearchKeyboardController");
+        return;
+    }
+    NDB_DEBUG("setting receiver");
     setReceiver(skbc, kr);
-    if (tte)
+    if (tte) {
+        NDB_DEBUG("setting multiline entry");
         setMultilineEntry(skbc, true);
+    }
 
+    NDB_DEBUG("connecting signal");
     QObject::connect(skbc, SIGNAL(commitRequested()), this, SLOT(onCommitRequested()));
+    NDB_DEBUG("showing frame");
     kf->show();
 }
 
 void NDBCfmDlg::onCommitRequested() {
     auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
-    if (!kf)
-        return;
+    if (!kf) { return; }
     kf->hide();
 }
 

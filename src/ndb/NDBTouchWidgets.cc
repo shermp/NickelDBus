@@ -116,7 +116,7 @@ namespace NDBTouchWidgets {
             NDB_TW_ASSERT_SYM("_ZNK13TouchDropDown11currentDataEv", TouchDropDown__currentData);
             NDB_TW_ASSERT_SYM("_ZN13TouchDropDown15setCurrentIndexEi", TouchDropDown__setCurrentIndex);
             return true;
-            }
+        }
 
         TouchDropDown* create(QWidget* parent, bool createBlock) {
             NDB_TW_ASSERT(initSymbols());
@@ -129,7 +129,7 @@ namespace NDBTouchWidgets {
             } else {
                 return TouchDropDown__TouchDropDown(reinterpret_cast<TouchDropDown*>(td), parent);
             }
-    }
+        }
 
         void addItem(TouchDropDown* _this, QString const& name, QVariant const& value, bool prepend) {
             if (TouchDropDown__addItem_loc) {
@@ -192,10 +192,10 @@ namespace NDBTouchWidgets {
     }
 
     namespace NDBKeyboard {
-        KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool dunno);
-        KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_textEdit)(KeyboardReceiver* _this, QTextEdit* text, bool dunno);
+        KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_lineEdit)(KeyboardReceiver* _this, QLineEdit* line, bool autoFormatCaps);
+        KeyboardReceiver *(*KeyboardReceiver__KeyboardReceiver_textEdit)(KeyboardReceiver* _this, QTextEdit* text, bool autoFormatCaps);
         SearchKeyboardController *(*KeyboardFrame_createKeyboard)(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
-        void (*SearchKeyboardController__setReceiver)(SearchKeyboardController* _this, KeyboardReceiver* receiver);
+        void (*SearchKeyboardController__setReceiver)(SearchKeyboardController* _this, KeyboardReceiver* receiver, bool umm);
         void (*SearchKeyboardController__setMultiLineEntry)(SearchKeyboardController* _this, bool enabled);
         TouchLineEdit *(*TouchLineEdit__TouchLineEdit)(TouchLineEdit* _this, QWidget* parent);
         TouchTextEdit *(*TouchTextEdit__TouchTextEdit)(TouchTextEdit* _this, QWidget* parent);
@@ -213,25 +213,26 @@ namespace NDBTouchWidgets {
             return true;
         }
 
-        TouchLineEdit* createLineEdit(QWidget* parent) {
+        TouchLineEdit* createLineEdit(QWidget* parent, bool autoFormatCaps) {
             NDB_TW_ASSERT(initSymbols());
             auto tle = reinterpret_cast<TouchLineEdit*>(calloc(1,sizeof(QLineEdit) * 4));
             NDB_TW_ASSERT(tle);
             TouchLineEdit__TouchLineEdit(tle, parent);
             auto tlr = reinterpret_cast<KeyboardReceiver*>(calloc(1,sizeof(QFrame) * 4));
             NDB_TW_ASSERT(tlr);
-            KeyboardReceiver__KeyboardReceiver_lineEdit(tlr, tle, true);
+            NDB_TW_ASSERT(KeyboardReceiver__KeyboardReceiver_lineEdit(tlr, tle, autoFormatCaps));
             return tle;
         }
 
-        TouchTextEdit* createTextEdit(QWidget* parent) {
+        TouchTextEdit* createTextEdit(QWidget* parent, bool autoFormatCaps) {
             NDB_TW_ASSERT(initSymbols());
             auto tte = reinterpret_cast<TouchTextEdit*>(calloc(1,sizeof(QTextEdit) * 4));
             NDB_TW_ASSERT(tte);
             TouchTextEdit__TouchTextEdit(tte, parent);
+            textEdit(tte)->clear();
             auto ttr = reinterpret_cast<KeyboardReceiver*>(calloc(1,sizeof(QFrame) * 4));
             NDB_TW_ASSERT(ttr);
-            KeyboardReceiver__KeyboardReceiver_textEdit(ttr, TouchTextEdit__textEdit(tte), true);
+            NDB_TW_ASSERT(KeyboardReceiver__KeyboardReceiver_textEdit(ttr, textEdit(tte), autoFormatCaps));
             return tte;
         }
 
@@ -241,15 +242,29 @@ namespace NDBTouchWidgets {
         }
 
         KeyboardReceiver* getKeyboardReciever(QWidget* lte) {
+            NDB_DEBUG("getting receiver");
             auto tle = qobject_cast<TouchLineEdit*>(lte);
             auto tte = qobject_cast<TouchTextEdit*>(lte);
-            NDB_TW_ASSERT(tle || tte);
-            auto c = lte->children();
+            QObjectList c;
+            if (tte) {
+                auto qte = TouchTextEdit__textEdit(tte);
+                c = qte->children();
+            } else if (tle) {
+                c = tle->children();
+            } else {
+                nh_log("getKeyboardReciever: parameter is not TouchLineEdit or TouchTextEdit");
+                return nullptr;
+            }
+            NDB_DEBUG("there are %d children", c.size());
             for (int i = 0; i < c.size(); ++i) {
                 auto o = c.at(i);
-                if (o->metaObject()->className() == QString("KeyboardReceiver"))
+                NDB_DEBUG("className at %d is '%s'", i, o->metaObject()->className());
+                if (o->metaObject()->className() == QString("KeyboardReceiver")) {
+                    NDB_DEBUG("KeyboardReceiver found at position %d", i);
                     return qobject_cast<KeyboardReceiver*>(o);
+                }
             }
+            NDB_DEBUG("KeyboardReceiver not found");
             return nullptr;
         }
 
@@ -258,7 +273,7 @@ namespace NDBTouchWidgets {
         }
 
         void setReceiver(SearchKeyboardController* _this, KeyboardReceiver* receiver) {
-            return SearchKeyboardController__setReceiver(_this, receiver);
+            return SearchKeyboardController__setReceiver(_this, receiver, true);
         }
 
         void setMultilineEntry(SearchKeyboardController* _this, bool enabled) {
