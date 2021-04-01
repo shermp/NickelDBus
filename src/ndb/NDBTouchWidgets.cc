@@ -7,6 +7,19 @@
 #define NDB_TW_ASSERT(obj) if (!(obj)) { return nullptr; }
 #define NDB_TW_INIT_SYM(name, symbol) if(!(symbol) )
 
+#define NDB_TW_ASSERT_SYM(name, symbol) if (!(symbol)) { \
+    ndbResolveSymbolRTLD((name), nh_symoutptr((symbol))); \
+    if (!(symbol)) { return false; } \
+}
+
+#define NDB_TW_ASSERT_MULTI_SYM(name, symbol, name2, symbol2) if (!(symbol) || !(symbol2)) { \
+    ndbResolveSymbolRTLD((name), nh_symoutptr((symbol))); \
+    if (!(symbol)) { \
+        ndbResolveSymbolRTLD((name2), nh_symoutptr((symbol2))); \
+            if (!(symbol2)) { return false; } \
+    } \
+}
+
 namespace NDBTouchWidgets {
 
     namespace NDBTouchLabel {
@@ -14,15 +27,9 @@ namespace NDBTouchWidgets {
         TouchLabel *(*TouchLabel__TouchLabel)(TouchLabel *_this, QWidget* parent, QFlags<Qt::WindowType> flags);
 
         bool initSymbols() {
-            if (!TouchLabel__TouchLabel_text)
-                ndbResolveSymbolRTLD("_ZN10TouchLabelC1ERK7QStringP7QWidget6QFlagsIN2Qt10WindowTypeEE", 
-                                    nh_symoutptr(TouchLabel__TouchLabel_text));
-
-            if (!TouchLabel__TouchLabel)
-                ndbResolveSymbolRTLD("_ZN10TouchLabelC1EP7QWidget6QFlagsIN2Qt10WindowTypeEE", 
-                                    nh_symoutptr(TouchLabel__TouchLabel));
-            
-            return (TouchLabel__TouchLabel_text && TouchLabel__TouchLabel);
+            NDB_TW_ASSERT_SYM("_ZN10TouchLabelC1ERK7QStringP7QWidget6QFlagsIN2Qt10WindowTypeEE", TouchLabel__TouchLabel_text);
+            NDB_TW_ASSERT_SYM("_ZN10TouchLabelC1EP7QWidget6QFlagsIN2Qt10WindowTypeEE", TouchLabel__TouchLabel);
+            return true;
         }
 
         TouchLabel* create(QString const& text, QWidget* parent, QFlags<Qt::WindowType> flags) {
@@ -44,10 +51,8 @@ namespace NDBTouchWidgets {
         TouchCheckBox *(*TouchCheckBox__TouchCheckBox)(TouchCheckBox* _this, QWidget* parent);
 
         bool initSymbols() {
-            if (!TouchCheckBox__TouchCheckBox)
-                ndbResolveSymbolRTLD("_ZN13TouchCheckBoxC1EP7QWidget", nh_symoutptr(TouchCheckBox__TouchCheckBox));
-            
-            return (TouchCheckBox__TouchCheckBox != nullptr);
+            NDB_TW_ASSERT_SYM("_ZN13TouchCheckBoxC1EP7QWidget", TouchCheckBox__TouchCheckBox);
+            return true;
         }
 
         TouchCheckBox* create(QWidget* parent) {
@@ -62,10 +67,8 @@ namespace NDBTouchWidgets {
         TouchRadioButton *(*TouchRadioButton__TouchRadioButton)(TouchRadioButton* _this, QWidget* parent);
 
         bool initSymbols() {
-            if (!TouchRadioButton__TouchRadioButton)
-                ndbResolveSymbolRTLD("_ZN16TouchRadioButtonC1EP7QWidget", nh_symoutptr(TouchRadioButton__TouchRadioButton));
-            
-            return (TouchRadioButton__TouchRadioButton != nullptr);
+            NDB_TW_ASSERT_SYM("_ZN16TouchRadioButtonC1EP7QWidget", TouchRadioButton__TouchRadioButton);
+            return true;
         }
 
         TouchRadioButton* create(QWidget* parent) {
@@ -80,10 +83,8 @@ namespace NDBTouchWidgets {
         TouchSlider *(*TouchSlider__TouchSlider)(TouchSlider* _this, QWidget* parent);
 
         bool initSymbols() {
-            if (!TouchSlider__TouchSlider)
-                ndbResolveSymbolRTLD("_ZN11TouchSliderC1EP7QWidget", nh_symoutptr(TouchSlider__TouchSlider));
-            
-            return (TouchSlider__TouchSlider != nullptr);
+            NDB_TW_ASSERT_SYM("_ZN11TouchSliderC1EP7QWidget", TouchSlider__TouchSlider);
+            return true;
         }
 
         TouchSlider* create(QWidget* parent) {
@@ -104,35 +105,18 @@ namespace NDBTouchWidgets {
         QVariant (*TouchDropDown__currentData)(TouchDropDown* _this);
 
         bool initSymbols() {
-            if (!BlockTouchDropDown__BlockTouchDropDown)
-                ndbResolveSymbolRTLD("_ZN18BlockTouchDropDownC1EP7QWidget", nh_symoutptr(BlockTouchDropDown__BlockTouchDropDown));
-        
-            if (!TouchDropDown__TouchDropDown) 
-                ndbResolveSymbolRTLD("_ZN13TouchDropDownC1EP7QWidget", nh_symoutptr(TouchDropDown__TouchDropDown));
-            
-            if (!TouchDropDown__addItem_loc || !TouchDropDown__addItem) {
-                ndbResolveSymbolRTLD("_ZN13TouchDropDown7addItemERK7QStringRK8QVariantRK7QLocaleb", nh_symoutptr(TouchDropDown__addItem_loc));
-                if (!TouchDropDown__addItem_loc)
-                    ndbResolveSymbolRTLD("_ZN13TouchDropDown7addItemERK7QStringRK8QVariantb", nh_symoutptr(TouchDropDown__addItem));
+            NDB_TW_ASSERT_SYM("_ZN18BlockTouchDropDownC1EP7QWidget", BlockTouchDropDown__BlockTouchDropDown);
+            NDB_TW_ASSERT_SYM("_ZN13TouchDropDownC1EP7QWidget", TouchDropDown__TouchDropDown);
+            NDB_TW_ASSERT_MULTI_SYM("_ZN13TouchDropDown7addItemERK7QStringRK8QVariantRK7QLocaleb", 
+                TouchDropDown__addItem_loc,
+                "_ZN13TouchDropDown7addItemERK7QStringRK8QVariantb",
+                TouchDropDown__addItem
+            );
+            NDB_TW_ASSERT_SYM("_ZN13TouchDropDown5clearEv", TouchDropDown__clear);
+            NDB_TW_ASSERT_SYM("_ZNK13TouchDropDown11currentDataEv", TouchDropDown__currentData);
+            NDB_TW_ASSERT_SYM("_ZN13TouchDropDown15setCurrentIndexEi", TouchDropDown__setCurrentIndex);
+            return true;
             }
-
-            if (!TouchDropDown__clear) 
-                ndbResolveSymbolRTLD("_ZN13TouchDropDown5clearEv", nh_symoutptr(TouchDropDown__clear));
-            
-            if (!TouchDropDown__currentData)
-                ndbResolveSymbolRTLD("_ZNK13TouchDropDown11currentDataEv", nh_symoutptr(TouchDropDown__currentData));
-            
-            if (!TouchDropDown__setCurrentIndex) {
-                ndbResolveSymbolRTLD("_ZN13TouchDropDown15setCurrentIndexEi", nh_symoutptr(TouchDropDown__setCurrentIndex));
-            }
-
-            return (BlockTouchDropDown__BlockTouchDropDown && 
-                    TouchDropDown__TouchDropDown && 
-                    (TouchDropDown__addItem_loc || TouchDropDown__addItem) &&
-                    TouchDropDown__clear &&
-                    TouchDropDown__currentData &&
-                    TouchDropDown__setCurrentIndex);
-        }
 
         TouchDropDown* create(QWidget* parent, bool createBlock) {
             NDB_TW_ASSERT(initSymbols());
@@ -177,20 +161,11 @@ namespace NDBTouchWidgets {
         QTime (*N3TimePicker__getTime)(N3TimePicker* _this);
 
         bool initSymbols() {
-            if (!N3DatePicker__N3DatePicker)
-                ndbResolveSymbolRTLD("_ZN12N3DatePickerC1EP7QWidget5QDate", nh_symoutptr(N3DatePicker__N3DatePicker));
-            
-            if (!N3TimePicker__N3TimePicker)
-                ndbResolveSymbolRTLD("_ZN12N3TimePickerC1EP7QWidget5QTime", nh_symoutptr(N3TimePicker__N3TimePicker));
-
-            if (!N3DatePicker__getDate)
-                ndbResolveSymbolRTLD("_ZNK12N3DatePicker7getDateEv", nh_symoutptr(N3DatePicker__getDate));
-            
-            if (!N3TimePicker__getTime)
-                ndbResolveSymbolRTLD("_ZNK12N3TimePicker7getTimeEv", nh_symoutptr(N3TimePicker__getTime));
-            
-            return (N3DatePicker__N3DatePicker && N3TimePicker__N3TimePicker && 
-                    N3DatePicker__getDate && N3TimePicker__getTime);
+            NDB_TW_ASSERT_SYM("_ZN12N3DatePickerC1EP7QWidget5QDate", N3DatePicker__N3DatePicker);
+            NDB_TW_ASSERT_SYM("_ZN12N3TimePickerC1EP7QWidget5QTime", N3TimePicker__N3TimePicker);
+            NDB_TW_ASSERT_SYM("_ZNK12N3DatePicker7getDateEv", N3DatePicker__getDate);
+            NDB_TW_ASSERT_SYM("_ZNK12N3TimePicker7getTimeEv", N3TimePicker__getTime);
+            return true;
         }
 
         N3DatePicker* create(QWidget* parent, QDate init) {
@@ -227,46 +202,15 @@ namespace NDBTouchWidgets {
         QTextEdit *(*TouchTextEdit__textEdit)(TouchTextEdit* _this);
 
         bool initSymbols() {
-            if (!KeyboardReceiver__KeyboardReceiver_lineEdit)
-                ndbResolveSymbolRTLD("_ZN16KeyboardReceiverC1EP9QLineEditb", 
-                                    nh_symoutptr(KeyboardReceiver__KeyboardReceiver_lineEdit));
-            
-            if (!KeyboardReceiver__KeyboardReceiver_textEdit)
-                ndbResolveSymbolRTLD("_ZN16KeyboardReceiverC1EP9QTextEditb", 
-                                    nh_symoutptr(KeyboardReceiver__KeyboardReceiver_textEdit));
-            
-            if (!KeyboardFrame_createKeyboard)
-                ndbResolveSymbolRTLD("_ZN13KeyboardFrame14createKeyboardE14KeyboardScriptRK7QLocale", 
-                                    nh_symoutptr(KeyboardFrame_createKeyboard));
-            
-            if (!SearchKeyboardController__setReceiver)
-                ndbResolveSymbolRTLD("_ZN24SearchKeyboardController11setReceiverEP16KeyboardReceiverb", 
-                                    nh_symoutptr(SearchKeyboardController__setReceiver));
-
-            if (!SearchKeyboardController__setMultiLineEntry)
-                ndbResolveSymbolRTLD("_ZN24SearchKeyboardController17setMultiLineEntryEb", 
-                                    nh_symoutptr(SearchKeyboardController__setMultiLineEntry));
-            
-            if (!TouchLineEdit__TouchLineEdit)
-                ndbResolveSymbolRTLD("_ZN13TouchLineEditC1EP7QWidget", 
-                                    nh_symoutptr(TouchLineEdit__TouchLineEdit));
-            
-            if (!TouchTextEdit__TouchTextEdit)
-                ndbResolveSymbolRTLD("_ZN13TouchTextEditC1EP7QWidget", 
-                                    nh_symoutptr(TouchTextEdit__TouchTextEdit));
-            
-            if (!TouchTextEdit__textEdit)
-                ndbResolveSymbolRTLD("_ZN13TouchTextEdit8textEditEv", 
-                                    nh_symoutptr(TouchTextEdit__textEdit));
-            
-            return (KeyboardReceiver__KeyboardReceiver_lineEdit &&
-                    KeyboardReceiver__KeyboardReceiver_textEdit &&
-                    KeyboardFrame_createKeyboard &&
-                    SearchKeyboardController__setReceiver &&
-                    SearchKeyboardController__setMultiLineEntry &&
-                    TouchLineEdit__TouchLineEdit &&
-                    TouchTextEdit__TouchTextEdit &&
-                    TouchTextEdit__textEdit);
+            NDB_TW_ASSERT_SYM("_ZN16KeyboardReceiverC1EP9QLineEditb", KeyboardReceiver__KeyboardReceiver_lineEdit);
+            NDB_TW_ASSERT_SYM("_ZN16KeyboardReceiverC1EP9QTextEditb", KeyboardReceiver__KeyboardReceiver_textEdit);
+            NDB_TW_ASSERT_SYM("_ZN13KeyboardFrame14createKeyboardE14KeyboardScriptRK7QLocale", KeyboardFrame_createKeyboard);
+            NDB_TW_ASSERT_SYM("_ZN24SearchKeyboardController11setReceiverEP16KeyboardReceiverb", SearchKeyboardController__setReceiver);
+            NDB_TW_ASSERT_SYM("_ZN24SearchKeyboardController17setMultiLineEntryEb", SearchKeyboardController__setMultiLineEntry);
+            NDB_TW_ASSERT_SYM("_ZN13TouchLineEditC1EP7QWidget", TouchLineEdit__TouchLineEdit);
+            NDB_TW_ASSERT_SYM("_ZN13TouchTextEditC1EP7QWidget", TouchTextEdit__TouchTextEdit);
+            NDB_TW_ASSERT_SYM("_ZN13TouchTextEdit8textEditEv", TouchTextEdit__textEdit);
+            return true;
         }
 
         TouchLineEdit* createLineEdit(QWidget* parent) {
