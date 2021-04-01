@@ -14,8 +14,8 @@
 #include "NDBDbus.h"
 #include "../interface/ndb_adapter.h"
 
+namespace NDB {
 typedef enum NDBCfmDlg::result CfmDlgResult;
-
 /*!
  * \class NDBDbus
  * \inmodule NickelDBus
@@ -1143,3 +1143,5 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
  * 
  * \sa NDBDbus::ndbCurrentView()
  */
+
+} // namespace NDB

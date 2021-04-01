@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 
+namespace NDB {
+
 #ifndef NH_VERSION
     #define NH_VERSION "dev"
 #endif
@@ -37,5 +39,7 @@
 
 void ndbResolveSymbol(void* libnickel, const char *name, void **fn);
 void ndbResolveSymbolRTLD(const char *name, void **fn);
+
+} // namespace NDB
 
 #endif // NDB_UTIL_H

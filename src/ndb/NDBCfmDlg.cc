@@ -18,6 +18,8 @@
     return (ret);                                         \
 }
 
+namespace NDB {
+
 NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
     initResult = Ok;
     currActiveType = TypeStd;
@@ -512,6 +514,8 @@ enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
     json.append(QString().fromUtf8(docBA));
     return Ok;
 }
+
+} // namespace NDB
 
 /*
  * A note on my current understanding of how the keyboard stuff works:

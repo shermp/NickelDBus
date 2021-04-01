@@ -2,6 +2,8 @@
 #include "NDBDevice.h"
 #include "util.h"
 
+namespace NDB {
+
 NDBDevice::NDBDevice() {
     initResult = Ok;
     Device *(*Device__getCurrentDevice)();
@@ -103,3 +105,5 @@ bool NDBDevice::isStorm() {
 bool NDBDevice::isTrilogy(bool p1) {
     return callDeviceMethodArgs<bool>("_ZNK6Device9isTrilogyEb", p1);
 }
+
+} // namespace NDB

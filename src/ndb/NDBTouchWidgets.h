@@ -32,6 +32,8 @@ typedef QObject KeyboardReceiver;
 typedef QLineEdit TouchLineEdit;
 typedef QFrame TouchTextEdit;
 
+namespace NDB {
+
 namespace NDBTouchWidgets {
     namespace NDBTouchLabel {
         bool initSymbols();
@@ -91,4 +93,6 @@ namespace NDBTouchWidgets {
         void setMultilineEntry(SearchKeyboardController* _this, bool enabled);
     }
 }
+
+} // namespace NDB
 #endif // NDB_TOUCH_WIDGETS_H

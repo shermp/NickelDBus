@@ -20,6 +20,8 @@
     } \
 }
 
+namespace NDB {
+
 namespace NDBTouchWidgets {
 
     namespace NDBTouchLabel {
@@ -286,3 +288,5 @@ namespace NDBTouchWidgets {
         }
     }
 }
+
+} // namespace NDB

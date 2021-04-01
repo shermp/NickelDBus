@@ -19,6 +19,8 @@ typedef QLineEdit TouchLineEdit;
 typedef QWidget N3ConfirmationTextEditField;
 typedef QCheckBox TouchCheckBox;
 
+namespace NDB {
+
 class NDBCfmDlg : public QObject {
     Q_OBJECT
     public:
@@ -93,5 +95,7 @@ class NDBCfmDlg : public QObject {
         void connectStdSignals();
         void addWidgetToFrame(QString const& label, QWidget* widget);
 };
+
+} // namespace NDB
 
 #endif // NDB_CONFIRM_DLG_H

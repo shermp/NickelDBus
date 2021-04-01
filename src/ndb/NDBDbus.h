@@ -26,6 +26,7 @@ typedef void Device;
     #define NDB_DBUS_OBJECT_PATH "/nickeldbus"
 #endif
 
+namespace NDB {
 
 class NDBDbus : public QObject, protected QDBusContext {
     Q_OBJECT
@@ -155,5 +156,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         void rvConnectSignals(QWidget* rv);
         void dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
 };
+
+} // namespace NDB
 
 #endif // NDB_DBUS_H
