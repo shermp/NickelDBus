@@ -15,7 +15,6 @@
 #include "../interface/ndb_adapter.h"
 
 namespace NDB {
-typedef enum NDBCfmDlg::result CfmDlgResult;
 /*!
  * \class NDBDbus
  * \inmodule NickelDBus
@@ -75,7 +74,7 @@ NDBDbus::NDBDbus(QObject* parent) : QObject(parent), QDBusContext() {
     }
     // Setup the Confirmation Dialog object
     cfmDlg = new NDBCfmDlg(this);
-    if (!cfmDlg || cfmDlg->initResult == NDBCfmDlg::InitError) {
+    if (!cfmDlg || cfmDlg->initResult == InitError) {
         nh_log("failed to create confirmation dialog object");
         initSucceeded = false;
         return;
@@ -408,7 +407,7 @@ QString NDBDbus::ndbFirmwareVersion() {
  */
 void NDBDbus::dlgConfirmNoBtn(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", true) == Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -424,7 +423,7 @@ void NDBDbus::dlgConfirmNoBtn(QString const& title, QString const& body) {
  */
 void NDBDbus::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, "", true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, "", true) == Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -440,7 +439,7 @@ void NDBDbus::dlgConfirmAccept(QString const& title, QString const& body, QStrin
  */
 void NDBDbus::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", rejectText, true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", rejectText, true) == Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -457,7 +456,7 @@ void NDBDbus::dlgConfirmReject(QString const& title, QString const& body, QStrin
  */
 void NDBDbus::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, rejectText, true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, rejectText, true) == Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -474,7 +473,7 @@ void NDBDbus::dlgConfirmAcceptReject(QString const& title, QString const& body, 
  */
 void NDBDbus::dlgConfirmModalMessage(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", false) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", false) == Ok));
     QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
@@ -491,7 +490,7 @@ void NDBDbus::dlgConfirmModalMessage(QString const& title, QString const& body) 
  */ 
 void NDBDbus::dlgConfirmChangeBody(QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->updateBody(body) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->updateBody(body) == Ok));
 }
 
 /*!
@@ -504,7 +503,7 @@ void NDBDbus::dlgConfirmChangeBody(QString const& body) {
  */
 void NDBDbus::dlgConfirmClose() {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->closeDialog() == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->closeDialog() == Ok));
 }
 
 /*!
@@ -527,7 +526,7 @@ void NDBDbus::onDlgLineEditRejected() {
 
 void NDBDbus::dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeLineEdit, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeLineEdit, title, "", acceptText, rejectText, true) == Ok));
     cfmDlg->setText(setText);
     cfmDlg->setPassword(isPassword);
     QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDBDbus::onDlgLineEditAccepted);
@@ -589,7 +588,7 @@ void NDBDbus::dlgConfirmLineEditPlaceholder(QString const& title, QString const&
  */
 void NDBDbus::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true) == Ok));
 }
 
 /*!
@@ -614,7 +613,7 @@ void NDBDbus::dlgConfirmAdvancedAddLayout(QString const& layout) {
         lt = NDBCfmDlg::HorLayout;
     else 
         lt = NDBCfmDlg::FormLayout;
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLayout(lt) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLayout(lt) == Ok));
 }
 
 /*!
@@ -627,7 +626,7 @@ void NDBDbus::dlgConfirmAdvancedAddLayout(QString const& layout) {
  */
 void NDBDbus::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddCheckbox(name, label, checked) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddCheckbox(name, label, checked) == Ok));
 }
 
 /*!
@@ -641,7 +640,7 @@ void NDBDbus::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& 
  */
 void NDBDbus::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddSlider(name, label, min, max, val) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddSlider(name, label, min, max, val) == Ok));
 }
 
 /*!
@@ -655,7 +654,7 @@ void NDBDbus::dlgConfirmAdvancedAddSlider(QString const& name, QString const& la
  */
 void NDBDbus::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items, allowAdditionAndRemoval) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items, allowAdditionAndRemoval) == Ok));
 }
 
 /*!
@@ -669,7 +668,7 @@ void NDBDbus::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& 
  */
 void NDBDbus::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label, autoFormatCaps) == Ok));
 }
 
 /*!
@@ -683,7 +682,7 @@ void NDBDbus::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& 
  */
 void NDBDbus::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label, autoFormatCaps) == Ok));
 }
 
 /*!
@@ -696,7 +695,7 @@ void NDBDbus::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& 
  */
 void NDBDbus::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, QDate::currentDate()) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, QDate::currentDate()) == Ok));
 }
 
 /*!
@@ -712,7 +711,7 @@ void NDBDbus::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const
     NDB_DBUS_USB_ASSERT((void) 0);
     auto d = QDate::fromString(init, Qt::ISODate);
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, d.isValid(), "invalid init date");
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, d) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, d) == Ok));
 }
 
 /*!
@@ -725,7 +724,7 @@ void NDBDbus::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const
  */
 void NDBDbus::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, QTime::currentTime()) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, QTime::currentTime()) == Ok));
 }
 
 /*!
@@ -741,7 +740,7 @@ void NDBDbus::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const
     NDB_DBUS_USB_ASSERT((void) 0);
     auto t = QTime::fromString(init, "HH:mm");
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, t.isValid(), "invalid init time");
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, t) == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, t) == Ok));
 }
 
 /*!
@@ -755,7 +754,7 @@ void NDBDbus::dlgConfirmAdvancedShow() {
     NDB_DBUS_USB_ASSERT((void) 0);
     QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDBDbus::onAdvancedDlgAccepted);
     QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDBDbus::onAdvancedDlgRejected);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->showDialog() == NDBCfmDlg::Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->showDialog() == Ok));
 }
 
 /*!
@@ -764,7 +763,7 @@ void NDBDbus::dlgConfirmAdvancedShow() {
  */
 void NDBDbus::onAdvancedDlgAccepted() {
     QString json;
-    if (cfmDlg->advGetJSON(json) == NDBCfmDlg::Ok) {
+    if (cfmDlg->advGetJSON(json) == Ok) {
         emit dlgConfirmAdvancedJSON(json);
     } else {
         emit dlgConfirmAdvancedJSON("{}");

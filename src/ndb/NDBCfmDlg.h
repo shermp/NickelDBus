@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include "NDBTouchWidgets.h"
+#include "ndb.h"
 
 typedef QDialog ConfirmationDialog;
 typedef int KeyboardScript;
@@ -24,15 +25,14 @@ namespace NDB {
 class NDBCfmDlg : public QObject {
     Q_OBJECT
     public:
-        enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError, ParamError, ConnError};
         enum dialogType {TypeStd, TypeLineEdit, TypeAdvanced};
         enum layoutType {VertLayout, HorLayout, FormLayout};
-        enum result initResult;
+        enum Result initResult;
         NDBCfmDlg(QObject* parent);
         ~NDBCfmDlg();
         QString errString;
         QPointer<ConfirmationDialog> dlg;
-        enum result createDialog(
+        enum Result createDialog(
             enum dialogType dlgType,
             QString const& title, 
             QString const& body, 
@@ -40,24 +40,24 @@ class NDBCfmDlg : public QObject {
             QString const& rejectText, 
             bool tapOutsideClose
         );
-        enum result showDialog();
-        enum result closeDialog();
-        enum result updateBody(QString const& body);
+        enum Result showDialog();
+        enum Result closeDialog();
+        enum Result updateBody(QString const& body);
         void setPassword(bool isPassword);
         QString getText();
         void setText(QString const& text);
-        enum result advAddLayout(enum layoutType lt);
-        enum result advAddCheckbox(QString const& name, QString const& label, bool checked);
+        enum Result advAddLayout(enum layoutType lt);
+        enum Result advAddCheckbox(QString const& name, QString const& label, bool checked);
         //enum result advUpdateCheckbox(QString const& name, bool checked);
-        enum result advAddSlider(QString const& name, QString const& label, int min, int max, int val);
+        enum Result advAddSlider(QString const& name, QString const& label, int min, int max, int val);
         //enum result advUpdateSlider(QString const& name, int val);
-        enum result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
+        enum Result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
         //enum result advAddLineEdit(QString const& name, QString const& label, QString const& placeholder);
-        enum result advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps);
-        enum result advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps);
-        enum result advAddDatePicker(QString const& name, QString const& label, QDate init);
-        enum result advAddTimePicker(QString const& name, QString const& label, QTime init);
-        enum result advGetJSON(QString& json);
+        enum Result advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps);
+        enum Result advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps);
+        enum Result advAddDatePicker(QString const& name, QString const& label, QDate init);
+        enum Result advAddTimePicker(QString const& name, QString const& label, QTime init);
+        enum Result advGetJSON(QString& json);
     protected Q_SLOTS:
         void onLineTextEditTapped();
         void onCommitRequested();

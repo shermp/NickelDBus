@@ -119,7 +119,7 @@ N3ConfirmationTextEditField* NDBCfmDlg::createTextEditField() {
     return t;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::createDialog(
+enum Result NDBCfmDlg::createDialog(
     enum dialogType dlgType,
     QString const& title, 
     QString const& body, 
@@ -197,7 +197,7 @@ enum NDBCfmDlg::result NDBCfmDlg::createDialog(
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
+enum Result NDBCfmDlg::showDialog() {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     switch (currActiveType) {
     case TypeAdvanced:
@@ -217,7 +217,7 @@ enum NDBCfmDlg::result NDBCfmDlg::showDialog() {
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::closeDialog() {
+enum Result NDBCfmDlg::closeDialog() {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     dlg->accept();
     return Ok;
@@ -231,7 +231,7 @@ enum NDBCfmDlg::result NDBCfmDlg::closeDialog() {
 //     return Ok;
 // }
 
-enum NDBCfmDlg::result NDBCfmDlg::updateBody(QString const& body) {
+enum Result NDBCfmDlg::updateBody(QString const& body) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
     DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__setText, "could not find setText symbol");
@@ -297,7 +297,7 @@ void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget) {
     return;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddLayout(enum NDBCfmDlg::layoutType lt) {
+enum Result NDBCfmDlg::advAddLayout(enum NDBCfmDlg::layoutType lt) {
     if (advActiveLayout) {
         advMainLayout->addLayout(advActiveLayout);
     }
@@ -320,7 +320,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddLayout(enum NDBCfmDlg::layoutType lt) {
 
 #define DLG_SET_OBJ_NAME(obj, name) (obj)->setObjectName(QString("ndb_%1").arg(name))
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddCheckbox(QString const& name, QString const& label, bool checked) {
+enum Result NDBCfmDlg::advAddCheckbox(QString const& name, QString const& label, bool checked) {
     using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchCheckBox *cb = NDBTouchCheckBox::create(nullptr);
@@ -332,7 +332,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddCheckbox(QString const& name, QString co
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, int min, int max, int val) {
+enum Result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, int min, int max, int val) {
     using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchSlider *sl = NDBTouchSlider::create(nullptr);
@@ -356,7 +356,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddSlider(QString const& name, QString cons
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval __attribute__((unused))) {
+enum Result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval __attribute__((unused))) {
     using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchDropDown *td = NDBTouchDropDown::create(nullptr, true);
@@ -370,7 +370,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddDropDown(QString const& name, QString co
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
+enum Result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     using namespace NDBTouchWidgets::NDBKeyboard;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     auto tle = createLineEdit(dlg, autoFormatCaps);
@@ -383,7 +383,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddLineEdit(QString const& name, QString co
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
+enum Result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     using namespace NDBTouchWidgets::NDBKeyboard;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     auto tte = createTextEdit(dlg, autoFormatCaps);
@@ -448,7 +448,7 @@ void NDBCfmDlg::onCommitRequested() {
     kf->hide();
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddDatePicker(QString const& name, QString const& label, QDate init) {
+enum Result NDBCfmDlg::advAddDatePicker(QString const& name, QString const& label, QDate init) {
     using namespace NDBTouchWidgets::NDBDateTime;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     auto d = create(dlg, init);
@@ -458,7 +458,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddDatePicker(QString const& name, QString 
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advAddTimePicker(QString const& name, QString const& label, QTime init) {
+enum Result NDBCfmDlg::advAddTimePicker(QString const& name, QString const& label, QTime init) {
     using namespace NDBTouchWidgets::NDBDateTime;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     auto t = create(dlg, init);
@@ -468,7 +468,7 @@ enum NDBCfmDlg::result NDBCfmDlg::advAddTimePicker(QString const& name, QString 
     return Ok;
 }
 
-enum NDBCfmDlg::result NDBCfmDlg::advGetJSON(QString& json) {
+enum Result NDBCfmDlg::advGetJSON(QString& json) {
     using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     // Get all widgets in the frame whose name begins with 'ndb_'

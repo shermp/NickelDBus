@@ -1,14 +1,15 @@
 #ifndef NDB_DEVICE_H
 #define NDB_DEVICE_H
 
+#include "ndb.h"
+
 typedef void Device;
 
 namespace NDB {
 
 class NDBDevice {
     public:
-        enum result {Ok, NotImplemented, InitError, SymbolError, NullError, ForbiddenError, ParamError};
-        enum result initResult;
+        enum Result initResult;
         NDBDevice();
         ~NDBDevice();
         bool isAlyssum();
