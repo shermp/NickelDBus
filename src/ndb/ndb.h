@@ -27,7 +27,7 @@ typedef void Device;
 #endif
 
 
-class NDB : public QObject, protected QDBusContext {
+class NDBDbus : public QObject, protected QDBusContext {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", NDB_DBUS_IFACE_NAME)
 
@@ -35,8 +35,8 @@ class NDB : public QObject, protected QDBusContext {
     
     public:
         bool initSucceeded;
-        NDB(QObject* parent);
-        ~NDB();
+        NDBDbus(QObject* parent);
+        ~NDBDbus();
         // bool registerDBus();
         void connectSignals();
 

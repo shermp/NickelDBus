@@ -8,7 +8,7 @@
 static const char ndb_ininstall_file[] = "/mnt/onboard/.adds/nickeldbus";
 static const char ndb_version_str[] = NH_VERSION;
 
-NDB *ndb;
+NDBDbus *ndb;
 
 static int ndb_init() {
     // Ensure that the user visible version file has the correct
@@ -22,7 +22,7 @@ static int ndb_init() {
         nh_log("(init) Failed to open %s with error %m", ndb_ininstall_file);
     }
 
-    ndb = new NDB(nullptr);
+    ndb = new NDBDbus(nullptr);
     if (!ndb->initSucceeded) {
         delete ndb;
         return -1;

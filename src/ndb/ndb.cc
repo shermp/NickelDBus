@@ -17,11 +17,11 @@
 typedef enum NDBCfmDlg::result CfmDlgResult;
 
 /*!
- * \class NDB
+ * \class NDBDbus
  * \inmodule NickelDBus
- * \brief The NDB class registers a service on d-bus of Kobo e-readers.
+ * \brief The NDBDbus class registers a service on d-bus of Kobo e-readers.
  * 
- * NDB provides a bridge between Kobo's proprietary software, libnickel, 
+ * NDBDbus provides a bridge between Kobo's proprietary software, libnickel, 
  * and other software running on Kobo e-readers. It registers itself as a 
  * service on d-bus, and provides methods and signals to monitor and interact 
  * with nickel.
@@ -34,7 +34,7 @@ typedef enum NDBCfmDlg::result CfmDlgResult;
  * 
  * \a parent QObject
  */
-NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
+NDBDbus::NDBDbus(QObject* parent) : QObject(parent), QDBusContext() {
     new NDBAdapter(this);
     initSucceeded = true;
     nh_log("NickelDBus: registering object %s", NDB_DBUS_OBJECT_PATH);
@@ -88,7 +88,7 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
     //     return;
     // }
     viewTimer->setSingleShot(true);
-    QObject::connect(viewTimer, &QTimer::timeout, this, &NDB::handleQSWTimer);
+    QObject::connect(viewTimer, &QTimer::timeout, this, &NDBDbus::handleQSWTimer);
 
     // Resolve the rest of the Nickel symbols up-front
     // PlugWorkFlowManager
@@ -113,16 +113,16 @@ NDB::NDB(QObject* parent) : QObject(parent), QDBusContext() {
 
 /*!
  * \internal
- * \brief Destroy the NDB::NDB object
+ * \brief Destroy the NDBDbus::NDBDbus object
  */
-NDB::~NDB() {
+NDBDbus::~NDBDbus() {
     delete viewTimer;
     conn.unregisterService(NDB_DBUS_IFACE_NAME);
     conn.unregisterObject(NDB_DBUS_OBJECT_PATH);
 }
 
 template <typename T>
-void NDB::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest) {
+void NDBDbus::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest) {
     const char *dest_start = dest + 1;
     const char *dest_end = strchr(dest_start, '(');
     nh_log("connecting %s to %s", srcSignal, dest);
@@ -140,7 +140,7 @@ void NDB::ndbConnectSignal(T *srcObj, const char *srcSignal, const char *dest) {
  * Failures to connect a signal will stop execution, the failure will be logged
  * to syslog. 
  */
-void NDB::connectSignals() {
+void NDBDbus::connectSignals() {
     if (nSym.PlugWorkflowManager_sharedInstance) {
         PlugWorkflowManager *wf = nSym.PlugWorkflowManager_sharedInstance();
         if (wf) {
@@ -173,7 +173,7 @@ void NDB::connectSignals() {
 /*!
  * \brief Get the version of NickelDBus
  */
-QString NDB::ndbVersion() {
+QString NDBDbus::ndbVersion() {
     return QStringLiteral(NH_VERSION);
 }
 
@@ -181,7 +181,7 @@ QString NDB::ndbVersion() {
  * \internal
  * \brief Set stackedWidget pointer to null if widget ever destroyed by Nickel
  */
-void NDB::handleStackedWidgetDestroyed() {
+void NDBDbus::handleStackedWidgetDestroyed() {
     stackedWidget = nullptr;
 }
 
@@ -191,7 +191,7 @@ void NDB::handleStackedWidgetDestroyed() {
  * 
  * \a index is the index of the new widget.
  */
-void NDB::handleQSWCurrentChanged(int index) {
+void NDBDbus::handleQSWCurrentChanged(int index) {
     if (index >= 0) {
         // I'd rather emit the ndbViewChanged signal here, but it's
         // not reliable, so it seems it needs to wait until the signal
@@ -208,7 +208,7 @@ void NDB::handleQSWCurrentChanged(int index) {
  * \internal
  * \brief Emits ndbViewChanged() after a small timeout
  */
-void NDB::handleQSWTimer() {
+void NDBDbus::handleQSWTimer() {
     emit ndbViewChanged(ndbCurrentView());
 }
 
@@ -218,7 +218,7 @@ void NDB::handleQSWTimer() {
  * Some class name examples are \c HomePageView \c ReadingView
  * among others.
  */
-QString NDB::ndbCurrentView() {
+QString NDBDbus::ndbCurrentView() {
     QString name = QString();
     NDB_DBUS_SYM_ASSERT(name, nSym.MainWindowController_sharedInstance);
     NDB_DBUS_SYM_ASSERT(name, nSym.MainWindowController_currentView);
@@ -229,8 +229,8 @@ QString NDB::ndbCurrentView() {
     if (!stackedWidget) {
         if (QString(cv->parentWidget()->metaObject()->className()) == "QStackedWidget") {
             stackedWidget = static_cast<QStackedWidget*>(cv->parentWidget());
-            QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDB::handleQSWCurrentChanged);
-            QObject::connect(stackedWidget, &QObject::destroyed, this, &NDB::handleStackedWidgetDestroyed);
+            QObject::connect(stackedWidget, &QStackedWidget::currentChanged, this, &NDBDbus::handleQSWCurrentChanged);
+            QObject::connect(stackedWidget, &QObject::destroyed, this, &NDBDbus::handleStackedWidgetDestroyed);
         } else {
             nh_log("expected QStackedWidget, got %s", cv->parentWidget()->metaObject()->className());
         }
@@ -247,11 +247,11 @@ QString NDB::ndbCurrentView() {
     return name;
 }
 
-bool NDB::ndbInUSBMS() {
+bool NDBDbus::ndbInUSBMS() {
     return nSym.PlugManager__gadgetMode(nSym.PlugManager__sharedInstance());
 }
 
-QString NDB::getNickelMetaObjectDetails(const QMetaObject* nmo) {
+QString NDBDbus::getNickelMetaObjectDetails(const QMetaObject* nmo) {
     QString str = QStringLiteral("");
     str.append(QString("Showing meta information for Nickel class %1 : \n").arg(nmo->className()));
     str.append("Properties : \n");
@@ -292,7 +292,7 @@ QString NDB::getNickelMetaObjectDetails(const QMetaObject* nmo) {
  * 
  * A formatted string of available signals and slots is returned.
  */
-QString NDB::ndbNickelClassDetails(QString const& staticMetaobjectSymbol) {
+QString NDBDbus::ndbNickelClassDetails(QString const& staticMetaobjectSymbol) {
     NDB_DBUS_USB_ASSERT("");
     typedef QMetaObject NickelMetaObject;
     NDB_DBUS_ASSERT("",QDBusError::InvalidArgs, staticMetaobjectSymbol.endsWith(QStringLiteral("staticMetaObjectE")), "not a valid staticMetaObject symbol");
@@ -311,7 +311,7 @@ QString NDB::ndbNickelClassDetails(QString const& staticMetaobjectSymbol) {
  * 
  * Returns \c 1 if exists, or \c 0 otherwise
  */
-bool NDB::ndbSignalConnected(QString const &signalName) {
+bool NDBDbus::ndbSignalConnected(QString const &signalName) {
     return connectedSignals.contains(signalName);
 }
 
@@ -319,7 +319,7 @@ bool NDB::ndbSignalConnected(QString const &signalName) {
  * \internal
  * \brief Print details gleaned from the QApplication instance
  */
-QString NDB::ndbNickelWidgets() {
+QString NDBDbus::ndbNickelWidgets() {
     QString str = QString("Active Modal: \n");
     QWidget *modal = QApplication::activeModalWidget();
     if (modal) {
@@ -381,7 +381,7 @@ QString NDB::ndbNickelWidgets() {
  * 
  * Get the current firmware version as found in the user agent string
  */
-QString NDB::ndbFirmwareVersion() {
+QString NDBDbus::ndbFirmwareVersion() {
     NDB_DBUS_USB_ASSERT(fwVersion);
     if (fwVersion.isEmpty()) {
         NDB_DBUS_SYM_ASSERT(fwVersion, nSym.Device__getCurrentDevice);
@@ -406,10 +406,10 @@ QString NDB::ndbFirmwareVersion() {
  * 
  * When the dialog is closed, a \l dlgConfirmResult() signal is emitted.
  */
-void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
+void NDBDbus::dlgConfirmNoBtn(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", true) == NDBCfmDlg::Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
+    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
 
@@ -422,10 +422,10 @@ void NDB::dlgConfirmNoBtn(QString const& title, QString const& body) {
  * When the dialog is closed, or the accept button is pressed, a 
  * \l dlgConfirmResult() signal is emitted.
  */
-void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
+void NDBDbus::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, "", true) == NDBCfmDlg::Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
+    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
 
@@ -438,10 +438,10 @@ void NDB::dlgConfirmAccept(QString const& title, QString const& body, QString co
  * When the dialog is closed, or the reject button is pressed, a 
  * \l dlgConfirmResult() signal is emitted.
  */
-void NDB::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
+void NDBDbus::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", rejectText, true) == NDBCfmDlg::Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
+    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
 
@@ -455,10 +455,10 @@ void NDB::dlgConfirmReject(QString const& title, QString const& body, QString co
  * When the dialog is closed, either button is pressed, a 
  * \l dlgConfirmResult() signal is emitted.
  */
-void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
+void NDBDbus::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, rejectText, true) == NDBCfmDlg::Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
+    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
 
@@ -472,10 +472,10 @@ void NDB::dlgConfirmAcceptReject(QString const& title, QString const& body, QStr
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmModalMessage(QString const& title, QString const& body) {
+void NDBDbus::dlgConfirmModalMessage(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", false) == NDBCfmDlg::Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDB::dlgConfirmResult);
+    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
     cfmDlg->showDialog();
 }
 
@@ -489,7 +489,7 @@ void NDB::dlgConfirmModalMessage(QString const& title, QString const& body) {
  * 
  * \since v0.2.0
  */ 
-void NDB::dlgConfirmChangeBody(QString const& body) {
+void NDBDbus::dlgConfirmChangeBody(QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->updateBody(body) == NDBCfmDlg::Ok));
 }
@@ -502,7 +502,7 @@ void NDB::dlgConfirmChangeBody(QString const& body) {
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmClose() {
+void NDBDbus::dlgConfirmClose() {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->closeDialog() == NDBCfmDlg::Ok));
 }
@@ -511,7 +511,7 @@ void NDB::dlgConfirmClose() {
  * \internal
  * \brief slot for handling a line edit dialog that is accepted.
 */
-void NDB::onDlgLineEditAccepted() {
+void NDBDbus::onDlgLineEditAccepted() {
     emit dlgConfirmTextInput(cfmDlg->getText());
     emit dlgConfirmResult(QDialog::Accepted);
 }
@@ -520,18 +520,18 @@ void NDB::onDlgLineEditAccepted() {
  * \internal
  * \brief slot for handling a line edit dialog that is rejected.
 */
-void NDB::onDlgLineEditRejected() {
+void NDBDbus::onDlgLineEditRejected() {
     emit dlgConfirmTextInput("");
     emit dlgConfirmResult(QDialog::Rejected);
 }
 
-void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
+void NDBDbus::dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeLineEdit, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
     cfmDlg->setText(setText);
     cfmDlg->setPassword(isPassword);
-    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDB::onDlgLineEditAccepted);
-    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::onDlgLineEditRejected);
+    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDBDbus::onDlgLineEditAccepted);
+    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDBDbus::onDlgLineEditRejected);
     cfmDlg->showDialog();
 }
 
@@ -550,7 +550,7 @@ void NDB::dlgConfirmLineEditFull(QString const& title, QString const& acceptText
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword) {
+void NDBDbus::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword) {
     dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, "");
 }
 
@@ -565,7 +565,7 @@ void NDB::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QS
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
+void NDBDbus::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
     dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, setText);
 }
 
@@ -587,7 +587,7 @@ void NDB::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acc
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText) {
+void NDBDbus::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeAdvanced, title, "", acceptText, rejectText, true) == NDBCfmDlg::Ok));
 }
@@ -603,7 +603,7 @@ void NDB::dlgConfirmAdvancedCreate(QString const& title, QString const& acceptTe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddLayout(QString const& layout) {
+void NDBDbus::dlgConfirmAdvancedAddLayout(QString const& layout) {
     auto l = layout.toLower();
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, (l == "vertical" || l == "horizontal" || l == "form"), 
                     "Parameter must be one of 'vertical', 'horizontal' or 'form'");
@@ -625,7 +625,7 @@ void NDB::dlgConfirmAdvancedAddLayout(QString const& layout) {
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked) {
+void NDBDbus::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddCheckbox(name, label, checked) == NDBCfmDlg::Ok));
 }
@@ -639,7 +639,7 @@ void NDB::dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& labe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val) {
+void NDBDbus::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddSlider(name, label, min, max, val) == NDBCfmDlg::Ok));
 }
@@ -653,7 +653,7 @@ void NDB::dlgConfirmAdvancedAddSlider(QString const& name, QString const& label,
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval) {
+void NDBDbus::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items, allowAdditionAndRemoval) == NDBCfmDlg::Ok));
 }
@@ -667,7 +667,7 @@ void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& labe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
+void NDBDbus::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
 }
@@ -681,7 +681,7 @@ void NDB::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& labe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
+void NDBDbus::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
 }
@@ -694,7 +694,7 @@ void NDB::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& labe
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label) {
+void NDBDbus::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, QDate::currentDate()) == NDBCfmDlg::Ok));
 }
@@ -708,7 +708,7 @@ void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& la
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label, QString const& init) {
+void NDBDbus::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label, QString const& init) {
     NDB_DBUS_USB_ASSERT((void) 0);
     auto d = QDate::fromString(init, Qt::ISODate);
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, d.isValid(), "invalid init date");
@@ -723,7 +723,7 @@ void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& la
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label) {
+void NDBDbus::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, QTime::currentTime()) == NDBCfmDlg::Ok));
 }
@@ -737,7 +737,7 @@ void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& la
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label, QString const& init) {
+void NDBDbus::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label, QString const& init) {
     NDB_DBUS_USB_ASSERT((void) 0);
     auto t = QTime::fromString(init, "HH:mm");
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, t.isValid(), "invalid init time");
@@ -751,10 +751,10 @@ void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& la
  * 
  * \since v0.2.0
  */
-void NDB::dlgConfirmAdvancedShow() {
+void NDBDbus::dlgConfirmAdvancedShow() {
     NDB_DBUS_USB_ASSERT((void) 0);
-    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDB::onAdvancedDlgAccepted);
-    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDB::onAdvancedDlgRejected);
+    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDBDbus::onAdvancedDlgAccepted);
+    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDBDbus::onAdvancedDlgRejected);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->showDialog() == NDBCfmDlg::Ok));
 }
 
@@ -762,7 +762,7 @@ void NDB::dlgConfirmAdvancedShow() {
  * \internal
  * \brief Slot for handling when the accept button for the Advanced confirmation dialog is pressed
  */
-void NDB::onAdvancedDlgAccepted() {
+void NDBDbus::onAdvancedDlgAccepted() {
     QString json;
     if (cfmDlg->advGetJSON(json) == NDBCfmDlg::Ok) {
         emit dlgConfirmAdvancedJSON(json);
@@ -776,7 +776,7 @@ void NDB::onAdvancedDlgAccepted() {
  * \internal
  * \brief Slot for handling when the reject or close button for the Advanced confirmation dialog is pressed
  */
-void NDB::onAdvancedDlgRejected() {
+void NDBDbus::onAdvancedDlgRejected() {
     emit dlgConfirmAdvancedJSON("{}");
     emit dlgConfirmResult(QDialog::Rejected);
 }
@@ -787,7 +787,7 @@ void NDB::onAdvancedDlgRejected() {
  * Show a text box on screen for \a toastDuration duration (in milliseconds)
  * with \a msgMain as the body text, and an optional \a msgSub
  */
-void NDB::mwcToast(int toastDuration, QString const &msgMain, QString const &msgSub) {
+void NDBDbus::mwcToast(int toastDuration, QString const &msgMain, QString const &msgSub) {
     NDB_DBUS_USB_ASSERT((void) 0);
     // The following code has been adapted from NickelMenu
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, toastDuration > 0 && toastDuration <= 5000, "toast duration must be between 0 and 5000 miliseconds");
@@ -800,7 +800,7 @@ void NDB::mwcToast(int toastDuration, QString const &msgMain, QString const &msg
 /*!
  * \brief Navigate to the home screen
  */
-void NDB::mwcHome() {
+void NDBDbus::mwcHome() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("home");
 }
@@ -808,7 +808,7 @@ void NDB::mwcHome() {
 /*!
  * \brief Begin an abbreviated book rescan. Same as 'rescan_books' from NickelMenu
  */
-void NDB::pfmRescanBooks() {
+void NDBDbus::pfmRescanBooks() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("rescan_books");
 }
@@ -816,12 +816,12 @@ void NDB::pfmRescanBooks() {
 /*!
  * \brief Begins a full book rescan. Same as 'rescan_books_full' from NickelMenu
  */
-void NDB::pfmRescanBooksFull() {
+void NDBDbus::pfmRescanBooksFull() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("rescan_books_full");
 }
 
-void NDB::ndbNickelMisc(const char *action) {
+void NDBDbus::ndbNickelMisc(const char *action) {
     nm_action_result_t *res = nm_action_nickel_misc(action);
     if (!res) {
         nh_log("nm_action_nickel_misc failed with error: %s", nm_err_peek());
@@ -831,7 +831,7 @@ void NDB::ndbNickelMisc(const char *action) {
     nm_action_result_free(res);
 }
 
-bool NDB::ndbActionStrValid(QString const& actStr) {
+bool NDBDbus::ndbActionStrValid(QString const& actStr) {
     return (!actStr.compare("enable") || !actStr.compare("disable") || !actStr.compare("toggle"));
 }
 
@@ -840,7 +840,7 @@ bool NDB::ndbActionStrValid(QString const& actStr) {
  * 
  * Note, this is the same as 'autoconnect' option from NickelMenu
  */
-void NDB::wfmConnectWireless() {
+void NDBDbus::wfmConnectWireless() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbWireless("autoconnect");
 }
@@ -850,7 +850,7 @@ void NDB::wfmConnectWireless() {
  * 
  * Note, this is the same as 'autoconnect_silent' from NickelMenu
  */
-void NDB::wfmConnectWirelessSilently() {
+void NDBDbus::wfmConnectWirelessSilently() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbWireless("autoconnect_silent");
 }
@@ -862,14 +862,14 @@ void NDB::wfmConnectWirelessSilently() {
  * 
  * \a action should be one of \c {enable}, \c {disable}, \c {toggle}
  */
-void NDB::wfmSetAirplaneMode(QString const& action) {
+void NDBDbus::wfmSetAirplaneMode(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray actBytes = action.toUtf8();
     return ndbWireless(actBytes.constData());
 }
 
-void NDB::ndbWireless(const char *act) {
+void NDBDbus::ndbWireless(const char *act) {
     nm_action_result_t *res = nm_action_nickel_wifi(act);
     if (!res) {
         nh_log("ndbWireless failed with error: %s", nm_err_peek());
@@ -889,7 +889,7 @@ void NDB::ndbWireless(const char *act) {
  * a close button. If \a url is set, the browser will open it on
  * open. If \a css is set, additional CSS is supplied to the browser
  */
-void NDB::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
+void NDBDbus::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
     NDB_DBUS_USB_ASSERT((void) 0);
     QString qarg = QStringLiteral("");
     if (modal || !url.isEmpty() || !css.isEmpty()) {
@@ -926,7 +926,7 @@ void NDB::bwmOpenBrowser(bool modal, QString const& url, QString const& css) {
  * 
  * Set \a action to \c {enable}, \c {disable} or \c {toggle} inversion.
  */
-void NDB::nsInvert(QString const& action) {
+void NDBDbus::nsInvert(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "invert");
 }
@@ -936,7 +936,7 @@ void NDB::nsInvert(QString const& action) {
  * 
  * Set \a action to \c {enable}, \c {disable} or \c {toggle} UnlockEnabled.
  */
-void NDB::nsLockscreen(QString const& action) {
+void NDBDbus::nsLockscreen(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "lockscreen");
 }
@@ -946,7 +946,7 @@ void NDB::nsLockscreen(QString const& action) {
  * 
  * Set \a action to \c {enable}, \c {disable} or \c {toggle} screenshots.
  */
-void NDB::nsScreenshots(QString const& action) {
+void NDBDbus::nsScreenshots(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "screenshots");
 }
@@ -956,7 +956,7 @@ void NDB::nsScreenshots(QString const& action) {
  * 
  * Set \a action to \c {enable}, \c {disable} or \c {toggle} ForceWifiOn.
  */
-void NDB::nsForceWifi(QString const& action) {
+void NDBDbus::nsForceWifi(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "force_wifi");
 }
@@ -966,12 +966,12 @@ void NDB::nsForceWifi(QString const& action) {
  * 
  * Set \a action to \c {enable}, \c {disable} or \c {toggle} auto USB connect.
  */
-void NDB::nsAutoUSBGadget(QString const& action) {
+void NDBDbus::nsAutoUSBGadget(QString const& action) {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbSettings(action, "auto_usb_gadget");
 }
 
-void NDB::ndbSettings(QString const& action, const char* setting) {
+void NDBDbus::ndbSettings(QString const& action, const char* setting) {
     NDB_DBUS_ASSERT((void) 0, QDBusError::InvalidArgs, ndbActionStrValid(action), "invalid action name");
     QByteArray qarg = QString("%1:%2").arg(action).arg(setting).toUtf8();
     nm_action_result_t *res = nm_action_nickel_setting(qarg.constData());
@@ -986,7 +986,7 @@ void NDB::ndbSettings(QString const& action, const char* setting) {
 /*!
  * \brief Shutdown Kobo
  */
-void NDB::pwrShutdown() {
+void NDBDbus::pwrShutdown() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return pwrAction("shutdown");
 }
@@ -994,12 +994,12 @@ void NDB::pwrShutdown() {
 /*!
  * \brief Reboot Kobo
  */
-void NDB::pwrReboot() {
+void NDBDbus::pwrReboot() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return pwrAction("reboot");
 }
 
-void NDB::pwrAction(const char *action) {
+void NDBDbus::pwrAction(const char *action) {
     nm_action_result_t *res = nm_action_power(action);
     if (!res) {
         nh_log("pwrAction failed with error: %s", nm_err_peek());
@@ -1009,7 +1009,7 @@ void NDB::pwrAction(const char *action) {
     nm_action_result_free(res);
 }
 
-void NDB::rvConnectSignals(QWidget* rv) {
+void NDBDbus::rvConnectSignals(QWidget* rv) {
     // Just connecting pageChanged(int) for now. Others may or may not 
     // come in the future.
     QObject::connect(rv, SIGNAL(pageChanged(int)), this, SIGNAL(rvPageChanged(int)), Qt::UniqueConnection);
@@ -1018,14 +1018,14 @@ void NDB::rvConnectSignals(QWidget* rv) {
 /* Signal Documentation */
 
 /*!
- * \fn void NDB::dlgConfirmResult(int result)
+ * \fn void NDBDbus::dlgConfirmResult(int result)
  * \brief The signal that is emitted when a confirmation dialog is dismissed
  * 
  * When emitted, \a result will be \c 1 for ACCEPT or \c 0 for REJECT
  */
 
 /*!
- * \fn void NDB::dlgConfirmTextInput(QString input)
+ * \fn void NDBDbus::dlgConfirmTextInput(QString input)
  * \brief The signal that is emitted when text is entered by user
  * 
  * When emitted \a input will be the text the user inputted. This signal is
@@ -1036,7 +1036,7 @@ void NDB::rvConnectSignals(QWidget* rv) {
  */
 
 /*!
- * \fn void NDB::dlgConfirmAdvancedJSON(QString json)
+ * \fn void NDBDbus::dlgConfirmAdvancedJSON(QString json)
  * \brief The signal that is emitted when the user accepts an advanced confirmation dialog
  * 
  * When emitted, \a json will be a JSON object with the keys set to the widget names, and
@@ -1046,100 +1046,100 @@ void NDB::rvConnectSignals(QWidget* rv) {
  */
 
 /*!
- * \fn void NDB::pfmDoneProcessing()
+ * \fn void NDBDbus::pfmDoneProcessing()
  * \brief The signal that nickel emits when the content import process has completed.
  * 
  * The signal will be emitted following the content import triggered whenever 
  * the user unplugs from the computer, when \c rescan_books / \c rescan_books_full 
- * actions are triggered from NickelMenu, or when \l NDB::pfmRescanBooks() 
- * or \l NDB::pfmRescanBooksFull() methods are called from NDB.
+ * actions are triggered from NickelMenu, or when \l NDBDbus::pfmRescanBooks() 
+ * or \l NDBDbus::pfmRescanBooksFull() methods are called from NDBDbus.
  */
 
 /*!
- * \fn void NDB::pfmAboutToConnect()
+ * \fn void NDBDbus::pfmAboutToConnect()
  * \brief The signal that nickel emits when it is about to start the USB connection
  */
 
 /*!
- * \fn void NDB::wmTryingToConnect()
+ * \fn void NDBDbus::wmTryingToConnect()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDB::wmNetworkConnected()
+ * \fn void NDBDbus::wmNetworkConnected()
  * \brief This signal appears to be emitted when the network has successfully connected
  * I'm unsure if this is emitted when the WiFi connects, or when a valid IP address
  * is obtained.
  */
 
 /*!
- * \fn void NDB::wmNetworkDisconnected()
+ * \fn void NDBDbus::wmNetworkDisconnected()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDB::wmNetworkForgotten()
+ * \fn void NDBDbus::wmNetworkForgotten()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDB::wmNetworkFailedToConnect()
+ * \fn void NDBDbus::wmNetworkFailedToConnect()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDB::wmScanningStarted()
+ * \fn void NDBDbus::wmScanningStarted()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDB::wmScanningFinished()
+ * \fn void NDBDbus::wmScanningFinished()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDB::wmScanningAborted()
+ * \fn void NDBDbus::wmScanningAborted()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDB::wmWifiEnabled(bool enabled)
+ * \fn void NDBDbus::wmWifiEnabled(bool enabled)
  * \brief (todo: figure this out)
  * 
  * Is wifi \a enabled ?
  */
 
 /*!
- * \fn void NDB::wmLinkQualityForConnectedNetwork(double quality)
+ * \fn void NDBDbus::wmLinkQualityForConnectedNetwork(double quality)
  * \brief (todo: figure this out)
  * 
  * Shows the \a quality of the wifi signal
  */
 
 /*!
- * \fn void NDB::wmMacAddressAvailable(QString mac)
+ * \fn void NDBDbus::wmMacAddressAvailable(QString mac)
  * \brief (todo: figure this out)
  * 
  * \a mac address
  */
 
 /*!
- * \fn void NDB::ndbViewChanged(QString newView)
+ * \fn void NDBDbus::ndbViewChanged(QString newView)
  * \brief The signal that is emitted when the current view changes
  * 
- * This signal is only emitted if \l NDB::ndbCurrentView() has been called 
+ * This signal is only emitted if \l NDBDbus::ndbCurrentView() has been called 
  * at least once by an application. \a newView is the class name of the new view.
  * 
- * \sa NDB::ndbCurrentView()
+ * \sa NDBDbus::ndbCurrentView()
  */
 
 /*!
- * \fn void NDB::rvPageChanged(int pageNum)
+ * \fn void NDBDbus::rvPageChanged(int pageNum)
  * \brief The signal that is emitted when the current book changes page
  * 
- * This signal is only emitted if \l NDB::ndbCurrentView() has been called 
+ * This signal is only emitted if \l NDBDbus::ndbCurrentView() has been called 
  * at least once by an application. \a pageNum is kepub or epub page 
  * number of the new page.
  * 
- * \sa NDB::ndbCurrentView()
+ * \sa NDBDbus::ndbCurrentView()
  */
