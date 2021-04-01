@@ -3,7 +3,7 @@
 
 #include <NickelHook.h>
 
-#include "ndb.h"
+#include "NDBDbus.h"
 
 static const char ndb_ininstall_file[] = "/mnt/onboard/.adds/nickeldbus";
 static const char ndb_version_str[] = NH_VERSION;

@@ -7,7 +7,7 @@ override IFACE_DIR := src/interface
 
 override LIBRARY  := libndb.so
 # NDB sources
-override SOURCES  += src/ndb/nickeldbus.cc src/ndb/ndb.cc src/ndb/NDBCfmDlg.cc src/ndb/NDBTouchWidgets.cc src/ndb/util.cc $(IFACE_DIR)/ndb_adapter.cpp  
+override SOURCES  += src/ndb/nickeldbus.cc src/ndb/NDBDbus.cc src/ndb/NDBCfmDlg.cc src/ndb/NDBTouchWidgets.cc src/ndb/util.cc $(IFACE_DIR)/ndb_adapter.cpp  
 # NM sources
 override SOURCES  += NickelMenu/src/util.c NickelMenu/src/action.c NickelMenu/src/action_c.c NickelMenu/src/action_cc.cc NickelMenu/src/kfmon.c
 override CFLAGS   += -Wall -Wextra -Werror
@@ -18,7 +18,7 @@ override CXXFLAGS += -DNDB_DBUS_IFACE_NAME='"$(DBUS_IFACE_NAME)"'
 
 override PKGCONF  += Qt5DBus Qt5Widgets
 
-override MOCS 	  += src/ndb/ndb.h src/ndb/NDBCfmDlg.h $(IFACE_DIR)/ndb_adapter.h
+override MOCS 	  += src/ndb/NDBDbus.h src/ndb/NDBCfmDlg.h $(IFACE_DIR)/ndb_adapter.h
 
 override ADAPTER  := $(IFACE_DIR)/ndb_adapter.h
 override PROXY    := $(IFACE_DIR)/ndb_proxy.h
@@ -68,7 +68,7 @@ debug: all
 
 $(SOURCES): $(ADAPTER)
 
-$(DBUS_IFACE_XML): src/ndb/ndb.h | $(IFACE_DIR)
+$(DBUS_IFACE_XML): src/ndb/NDBDbus.h | $(IFACE_DIR)
 	qdbuscpp2xml -S -M -o $@ $<
 
 $(ADAPTER) &: $(DBUS_IFACE_XML)

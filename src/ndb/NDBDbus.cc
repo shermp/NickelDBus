@@ -11,7 +11,7 @@
 #include "../../NickelMenu/src/action.h"
 #include "../../NickelMenu/src/util.h"
 #include "util.h"
-#include "ndb.h"
+#include "NDBDbus.h"
 #include "../interface/ndb_adapter.h"
 
 typedef enum NDBCfmDlg::result CfmDlgResult;

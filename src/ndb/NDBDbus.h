@@ -1,5 +1,5 @@
-#ifndef NICKEL_DBUS_H
-#define NICKEL_DBUS_H
+#ifndef NDB_DBUS_H
+#define NDB_DBUS_H
 #include <QDialog>
 #include <QObject>
 #include <QString>
@@ -156,4 +156,4 @@ class NDBDbus : public QObject, protected QDBusContext {
         void dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
 };
 
-#endif
+#endif // NDB_DBUS_H
