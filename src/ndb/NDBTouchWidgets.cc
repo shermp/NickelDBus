@@ -241,6 +241,11 @@ namespace NDBTouchWidgets {
             return TouchTextEdit__textEdit(tte);
         }
 
+        /* 
+         * This is a lot of work just to get a pointer! I currently can't think
+         * of a better way to do it without keeping track of the KeyboardReceiver 
+         * separately, which I would rather not do.
+         */
         KeyboardReceiver* getKeyboardReciever(QWidget* lte) {
             NDB_DEBUG("getting receiver");
             auto tle = qobject_cast<TouchLineEdit*>(lte);
