@@ -662,7 +662,8 @@ void NDB::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& labe
  * \brief Add a text line edit to an advanced dialog
  * 
  * This adds a text line edit to an advanced dialog. The \a name of the line edit is used to retrieve the value later.
- * The user visible text is set by \a label. An optional \a placeholder may be set.
+ * The user visible label is set by \a label. Setting the optional parameter \a autoFormatCaps to \c false will disable 
+ * auto capitalization of the first letter in the line. It defaults to true.
  * 
  * \since v0.2.0
  */
@@ -671,16 +672,42 @@ void NDB::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& labe
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
 }
 
+/*!
+ * \brief Add a multiline text edit field to an advanced dialog
+ * 
+ * This adds a text line edit to an advanced dialog. The \a name of the line edit is used to retrieve the value later.
+ * The user visible label is set by \a label. Setting the optional parameter \a autoFormatCaps to \c false will disable 
+ * auto capitalization of the first letter in the line. It defaults to true.
+ * 
+ * \since v0.2.0
+ */
 void NDB::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label, autoFormatCaps) == NDBCfmDlg::Ok));
 }
 
+/*!
+ * \brief Add a date picker to an advanced dialog
+ * 
+ * This adds a date picker to an advanced dialog. The \a name of the date picker is used to retrieve the date later.
+ * The user visible label is set by \a label. The picker will display the current date.
+ * 
+ * \since v0.2.0
+ */
 void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, QDate::currentDate()) == NDBCfmDlg::Ok));
 }
 
+/*!
+ * \brief Add a date picker to an advanced dialog
+ * 
+ * This adds a date picker to an advanced dialog. The \a name of the date picker is used to retrieve the date later.
+ * The user visible label is set by \a label. You can use \a init to set the initial date. \a init must 
+ * use the format \c yyyy-mm-dd.
+ * 
+ * \since v0.2.0
+ */
 void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label, QString const& init) {
     NDB_DBUS_USB_ASSERT((void) 0);
     auto d = QDate::fromString(init, Qt::ISODate);
@@ -688,11 +715,28 @@ void NDB::dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& la
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDatePicker(name, label, d) == NDBCfmDlg::Ok));
 }
 
+/*!
+ * \brief Add a time picker to an advanced dialog
+ * 
+ * This adds a time picker to an advanced dialog. The \a name of the time picker is used to retrieve the time later.
+ * The user visible label is set by \a label.
+ * 
+ * \since v0.2.0
+ */
 void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label) {
     NDB_DBUS_USB_ASSERT((void) 0);
     NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTimePicker(name, label, QTime::currentTime()) == NDBCfmDlg::Ok));
 }
 
+/*!
+ * \brief Add a time picker to an advanced dialog
+ * 
+ * This adds a time picker to an advanced dialog. The \a name of the time picker is used to retrieve the time later.
+ * The user visible label is set by \a label. You can use \a init to set the initial time. \a init must 
+ * use the format \c hh:ss in 24-hr time.
+ * 
+ * \since v0.2.0
+ */
 void NDB::dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label, QString const& init) {
     NDB_DBUS_USB_ASSERT((void) 0);
     auto t = QTime::fromString(init, "HH:mm");
