@@ -27,7 +27,7 @@ namespace NDB {
 // Shorthand for the common nickel symbol resolve assertion
 #define NDB_DBUS_SYM_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, "%s: required symbol(s) not resolved", __func__)
 
-#define NDB_RESOLVE_SYMBOL(name, fn) ndbResolveSymbol(libnickel, name, fn)
+#define NDB_RESOLVE_SYMBOL(name, fn) resolveSymbol(libnickel, name, fn)
 
 #ifdef DEBUG
 #define NDB_DEBUG(fmt, ...) nh_log("[debug] %s:%d:%s() " fmt, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
@@ -37,8 +37,8 @@ namespace NDB {
 
 #define ARRAY_LEN(arr) (sizeof((arr)) / sizeof ((arr)[0]))
 
-void ndbResolveSymbol(void* libnickel, const char *name, void **fn);
-void ndbResolveSymbolRTLD(const char *name, void **fn);
+void resolveSymbol(void* libnickel, const char *name, void **fn);
+void resolveSymbolRTLD(const char *name, void **fn);
 
 } // namespace NDB
 

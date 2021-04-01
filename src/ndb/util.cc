@@ -4,13 +4,13 @@
 
 namespace NDB {
 
-void ndbResolveSymbol(void* libnickel, const char *name, void **fn) {
+void resolveSymbol(void* libnickel, const char *name, void **fn) {
     if (!(*fn = dlsym(libnickel, name))) {
         nh_log("info... could not load %s", name);
     }
 }
 
-void ndbResolveSymbolRTLD(const char *name, void **fn) {
+void resolveSymbolRTLD(const char *name, void **fn) {
     if (!(*fn = dlsym(RTLD_DEFAULT, name))) {
         nh_log("info... could not load %s", name);
     }

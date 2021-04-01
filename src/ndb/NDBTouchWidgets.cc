@@ -8,14 +8,14 @@
 #define NDB_TW_INIT_SYM(name, symbol) if(!(symbol) )
 
 #define NDB_TW_ASSERT_SYM(name, symbol) if (!(symbol)) { \
-    ndbResolveSymbolRTLD((name), nh_symoutptr((symbol))); \
+    resolveSymbolRTLD((name), nh_symoutptr((symbol))); \
     if (!(symbol)) { return false; } \
 }
 
 #define NDB_TW_ASSERT_MULTI_SYM(name, symbol, name2, symbol2) if (!(symbol) || !(symbol2)) { \
-    ndbResolveSymbolRTLD((name), nh_symoutptr((symbol))); \
+    resolveSymbolRTLD((name), nh_symoutptr((symbol))); \
     if (!(symbol)) { \
-        ndbResolveSymbolRTLD((name2), nh_symoutptr((symbol2))); \
+        resolveSymbolRTLD((name2), nh_symoutptr((symbol2))); \
             if (!(symbol2)) { return false; } \
     } \
 }

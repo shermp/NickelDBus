@@ -7,7 +7,7 @@ namespace NDB {
 NDBDevice::NDBDevice() {
     initResult = Ok;
     Device *(*Device__getCurrentDevice)();
-    ndbResolveSymbolRTLD("_ZN6Device16getCurrentDeviceEv", nh_symoutptr(Device__getCurrentDevice));
+    resolveSymbolRTLD("_ZN6Device16getCurrentDeviceEv", nh_symoutptr(Device__getCurrentDevice));
     if (!Device__getCurrentDevice) {
         initResult = SymbolError;
         return;
@@ -22,7 +22,7 @@ template<typename T>
 T NDBDevice::callDeviceMethod(const char* symbol) {
     T t = T();
     T (*method)(Device*);
-    ndbResolveSymbolRTLD(symbol, nh_symoutptr(method));
+    resolveSymbolRTLD(symbol, nh_symoutptr(method));
     if (method) {
         return method(device);
     } else {
@@ -34,7 +34,7 @@ template <typename T, typename... A>
 T NDBDevice::callDeviceMethodArgs(const char* symbol, A... args) {
     T t = T();
     T (*method)(Device*, A...);
-    ndbResolveSymbolRTLD(name, nh_symoutptr(method));
+    resolveSymbolRTLD(name, nh_symoutptr(method));
     if (method) {
         return method(device, args...);
     } else {
