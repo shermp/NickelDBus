@@ -11,6 +11,8 @@ namespace NDB {
     #define NH_VERSION "dev"
 #endif
 
+#define NDB_ASSERT(ret, cond, fmt, ...) if (!(cond)) { nh_log(fmt, ##__VA_ARGS__); return (ret); }
+
 // like NDB_ASSERT, but sends an appropriate d-bus error on the bus before returning
 // Note: make sure you are including <QtDBus> and <QDBusContext> for this to work!
 #define NDB_DBUS_ASSERT(ret, dbus_err, cond, fmt, ...) if (!(cond)) { \
