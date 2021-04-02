@@ -404,31 +404,21 @@ void NDBCfmDlg::onLineTextEditTapped() {
     auto tte = qobject_cast<TouchTextEdit*>(sender);
     NDB_DEBUG("sender is TouchLineEdit: %s", (tle) ? "yes" : "no");
     NDB_DEBUG("sender is TouchTextEdit: %s", (tte) ? "yes" : "no");
-    if (!tle && !tte) {
-        nh_log("onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
-        return;
-    }
+
+    NDB_ASSERT((void) 0, (!tle && !tte), "onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
     
     NDB_DEBUG("getting KeyboardReceiver");
     auto kr = getKeyboardReciever((qobject_cast<QWidget*>(sender)));
-    if (!kr) {
-        nh_log("onLineTextEditTapped: can't get keyboard receiver");
-        return;
-    }
+    NDB_ASSERT((void) 0, kr, "onLineTextEditTapped: can't get keyboard receiver");
     
     NDB_DEBUG("getting KeyboardFrame");
     auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
-    if (!kf) {
-        nh_log("onLineTextEditTapped: can't get keyboard frame");
-        return;
-    }
+    NDB_ASSERT((void) 0, kf, "onLineTextEditTapped: can't get keyboard frame");
     
     NDB_DEBUG("getting SearchKeyboardController");
     auto skbc = createKeyboard(kf, 1, QLocale(QLocale::English));
-    if (!skbc) {
-        nh_log("onLineTextEditTapped: can't get SearchKeyboardController");
-        return;
-    }
+    NDB_ASSERT((void) 0, skbc, "onLineTextEditTapped: can't get SearchKeyboardController");
+    
     NDB_DEBUG("setting receiver");
     setReceiver(skbc, kr);
     if (tte) {
