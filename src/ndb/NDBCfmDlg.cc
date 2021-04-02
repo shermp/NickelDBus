@@ -223,14 +223,6 @@ enum Result NDBCfmDlg::closeDialog() {
     return Ok;
 }
 
-// enum NDBCfmDlg::result NDBCfmDlg::addWidget(QWidget* w) {
-//     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
-//     DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
-//     DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__addWidget, "could not find addWidget symbol");
-//     symbols.ConfirmationDialog__addWidget(dlg, w);
-//     return Ok;
-// }
-
 enum Result NDBCfmDlg::updateBody(QString const& body) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
