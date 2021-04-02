@@ -254,7 +254,7 @@ namespace NDBTouchWidgets {
             auto tte = qobject_cast<TouchTextEdit*>(lte);
             QObjectList c;
             if (tte) {
-                auto qte = TouchTextEdit__textEdit(tte);
+                QTextEdit *qte = TouchTextEdit__textEdit(tte);
                 c = qte->children();
             } else if (tle) {
                 c = tle->children();
@@ -264,7 +264,7 @@ namespace NDBTouchWidgets {
             }
             NDB_DEBUG("there are %d children", c.size());
             for (int i = 0; i < c.size(); ++i) {
-                auto o = c.at(i);
+                QObject *o = c.at(i);
                 NDB_DEBUG("className at %d is '%s'", i, o->metaObject()->className());
                 if (o->metaObject()->className() == QString("KeyboardReceiver")) {
                     NDB_DEBUG("KeyboardReceiver found at position %d", i);

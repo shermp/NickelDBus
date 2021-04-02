@@ -373,7 +373,7 @@ enum Result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label,
 enum Result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     using namespace NDBTouchWidgets::NDBKeyboard;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    auto tle = createLineEdit(dlg, autoFormatCaps);
+    TouchLineEdit *tle = createLineEdit(dlg, autoFormatCaps);
     DLG_ASSERT(NullError, tle, "unable to create TextLineEdit");
     DLG_ASSERT(ConnError, 
                 QObject::connect(tle, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
@@ -386,7 +386,7 @@ enum Result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label,
 enum Result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
     using namespace NDBTouchWidgets::NDBKeyboard;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    auto tte = createTextEdit(dlg, autoFormatCaps);
+    TouchTextEdit *tte = createTextEdit(dlg, autoFormatCaps);
     DLG_ASSERT(NullError, tte, "unable to create TouchTextEdit");
     DLG_ASSERT(ConnError, 
                 QObject::connect(tte, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
@@ -408,15 +408,15 @@ void NDBCfmDlg::onLineTextEditTapped() {
     NDB_ASSERT((void) 0, (!tle && !tte), "onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
     
     NDB_DEBUG("getting KeyboardReceiver");
-    auto kr = getKeyboardReciever((qobject_cast<QWidget*>(sender)));
+    KeyboardReceiver *kr = getKeyboardReciever((qobject_cast<QWidget*>(sender)));
     NDB_ASSERT((void) 0, kr, "onLineTextEditTapped: can't get keyboard receiver");
     
     NDB_DEBUG("getting KeyboardFrame");
-    auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
+    KeyboardFrame *kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
     NDB_ASSERT((void) 0, kf, "onLineTextEditTapped: can't get keyboard frame");
     
     NDB_DEBUG("getting SearchKeyboardController");
-    auto skbc = createKeyboard(kf, 1, QLocale(QLocale::English));
+    SearchKeyboardController *skbc = createKeyboard(kf, 1, QLocale(QLocale::English));
     NDB_ASSERT((void) 0, skbc, "onLineTextEditTapped: can't get SearchKeyboardController");
     
     NDB_DEBUG("setting receiver");
@@ -433,7 +433,7 @@ void NDBCfmDlg::onLineTextEditTapped() {
 }
 
 void NDBCfmDlg::onCommitRequested() {
-    auto kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
+    KeyboardFrame *kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
     if (!kf) { return; }
     kf->hide();
 }
@@ -441,7 +441,7 @@ void NDBCfmDlg::onCommitRequested() {
 enum Result NDBCfmDlg::advAddDatePicker(QString const& name, QString const& label, QDate init) {
     using namespace NDBTouchWidgets::NDBDateTime;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    auto d = create(dlg, init);
+    N3DatePicker *d = create(dlg, init);
     DLG_ASSERT(NullError, d, "unable to create N3DatePicker");
     DLG_SET_OBJ_NAME(d, name);
     addWidgetToFrame(label, d);
@@ -451,7 +451,7 @@ enum Result NDBCfmDlg::advAddDatePicker(QString const& name, QString const& labe
 enum Result NDBCfmDlg::advAddTimePicker(QString const& name, QString const& label, QTime init) {
     using namespace NDBTouchWidgets::NDBDateTime;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    auto t = create(dlg, init);
+    N3TimePicker *t = create(dlg, init);
     DLG_ASSERT(NullError, t, "unable to create N3TimePicker");
     DLG_SET_OBJ_NAME(t, name);
     addWidgetToFrame(label, t);
