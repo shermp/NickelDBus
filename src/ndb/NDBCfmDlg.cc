@@ -397,7 +397,7 @@ void NDBCfmDlg::onLineTextEditTapped() {
     NDB_DEBUG("sender is TouchLineEdit: %s", (tle) ? "yes" : "no");
     NDB_DEBUG("sender is TouchTextEdit: %s", (tte) ? "yes" : "no");
 
-    NDB_ASSERT((void) 0, (!tle && !tte), "onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
+    NDB_ASSERT((void) 0, (tle || tte), "onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
     
     NDB_DEBUG("getting KeyboardReceiver");
     KeyboardReceiver *kr = getKeyboardReciever((qobject_cast<QWidget*>(sender)));
