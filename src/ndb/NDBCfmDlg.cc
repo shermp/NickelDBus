@@ -459,31 +459,38 @@ enum Result NDBCfmDlg::advGetJSON(QString& json) {
     //nh_log("advGetJSON: Found %d widgets", widgets.size());
     QVariantMap qvm;
     for (int i = 0; i < widgets.size(); ++i) {
-        QString className = widgets[i]->metaObject()->className();
-        QString name = widgets[i]->objectName().remove(QRegularExpression("ndb_"));
+        QWidget *w = widgets.at(i);
+        QString className = w->metaObject()->className();
+        QString name = w->objectName().remove(QRegularExpression("ndb_"));
         //nh_log("advGetJSON: Widget %d has className '%s' and name '%s'", i, className.toUtf8().constData(), name.toUtf8().constData());
         if (className == "TouchCheckBox") {
-            TouchCheckBox *cb = qobject_cast<TouchCheckBox*>(widgets[i]);
+            auto cb = qobject_cast<TouchCheckBox*>(w);
             qvm[name] = QVariant(cb->isChecked());
-        } else if (className == "TouchSlider") {
-            TouchSlider *sl = qobject_cast<TouchSlider*>(widgets[i]);
+        } 
+        else if (className == "TouchSlider") {
+            auto sl = qobject_cast<TouchSlider*>(w);
             qvm[name] = QVariant(sl->value());
-        } else if (className == "TouchDropDown" || className == "BlockTouchDropDown") {
-            TouchDropDown *dd = qobject_cast<TouchDropDown*>(widgets[i]);
+        } 
+        else if (className == "TouchDropDown" || className == "BlockTouchDropDown") {
+            auto dd = qobject_cast<TouchDropDown*>(w);
             qvm[name] = NDBTouchDropDown::currentData(dd);
-        } else if (className == "TouchLineEdit") {
-            TouchLineEdit *t = qobject_cast<TouchLineEdit*>(widgets[i]);
+        } 
+        else if (className == "TouchLineEdit") {
+            auto t = qobject_cast<TouchLineEdit*>(w);
             DLG_ASSERT(NullError, t, "unable to get TouchLineEdit");
             qvm[name] = QVariant(t->text());
-        } else if (className == "TouchTextEdit") {
-            TouchTextEdit *t = qobject_cast<TouchTextEdit*>(widgets[i]);
+        } 
+        else if (className == "TouchTextEdit") {
+            auto t = qobject_cast<TouchTextEdit*>(w);
             DLG_ASSERT(NullError, t, "unable to get TouchTextEdit");
             qvm[name] = QVariant(NDBKeyboard::textEdit(t)->toPlainText());
-        } else if (className == "N3DatePicker") {
-            N3DatePicker *d = qobject_cast<N3DatePicker*>(widgets[i]);
+        } 
+        else if (className == "N3DatePicker") {
+            auto d = qobject_cast<N3DatePicker*>(w);
             qvm[name] = QVariant(NDBDateTime::getDate(d));
-        } else if (className == "N3TimePicker") {
-            N3TimePicker *t = qobject_cast<N3TimePicker*>(widgets[i]);
+        } 
+        else if (className == "N3TimePicker") {
+            auto t = qobject_cast<N3TimePicker*>(w);
             qvm[name] = QVariant(NDBDateTime::getTime(t));
         }
     }
