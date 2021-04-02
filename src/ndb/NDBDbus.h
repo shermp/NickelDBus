@@ -90,7 +90,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         void dlgConfirmAdvancedAddLayout(QString const& layout);
         void dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked);
         void dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val);
-        void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
+        void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items);
         void dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps = true);
         void dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps = true);
         void dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label);

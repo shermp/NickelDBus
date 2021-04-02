@@ -652,9 +652,9 @@ void NDBDbus::dlgConfirmAdvancedAddSlider(QString const& name, QString const& la
  * 
  * \since v0.2.0
  */
-void NDBDbus::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval) {
+void NDBDbus::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items, allowAdditionAndRemoval) == Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddDropDown(name, label, items) == Ok));
 }
 
 /*!

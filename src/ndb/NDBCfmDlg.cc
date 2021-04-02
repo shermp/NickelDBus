@@ -356,7 +356,7 @@ enum Result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, i
     return Ok;
 }
 
-enum Result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval __attribute__((unused))) {
+enum Result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items) {
     using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
     TouchDropDown *td = NDBTouchDropDown::create(nullptr, true);

@@ -51,7 +51,7 @@ class NDBCfmDlg : public QObject {
         //enum result advUpdateCheckbox(QString const& name, bool checked);
         enum Result advAddSlider(QString const& name, QString const& label, int min, int max, int val);
         //enum result advUpdateSlider(QString const& name, int val);
-        enum Result advAddDropDown(QString const& name, QString const& label, QStringList items, bool allowAdditionAndRemoval);
+        enum Result advAddDropDown(QString const& name, QString const& label, QStringList items);
         //enum result advAddLineEdit(QString const& name, QString const& label, QString const& placeholder);
         enum Result advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps);
         enum Result advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps);
