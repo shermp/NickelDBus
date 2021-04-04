@@ -1,4 +1,5 @@
 #include <Qt>
+#include <QFile>
 #include <QLocale>
 #include <QRegularExpression>
 #include <QList>
@@ -43,8 +44,20 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
     }
     resolveSymbolRTLD("_ZNK27N3ConfirmationTextEditField8textEditEv", nh_symoutptr(symbols.N3ConfirmationTextEditField__textEdit));
     resolveSymbolRTLD("_ZNK18ConfirmationDialog13keyboardFrameEv", nh_symoutptr(symbols.ConfirmationDialog__keyboardFrame));
+}
 
-    styleSheet = QString(R"(
+NDBCfmDlg::~NDBCfmDlg() {
+}
+
+void NDBCfmDlg::setStyleSheets() {
+    QFile sf("/usr/local/nickeldbus/ndb_stylesheet.qss");
+    if (sf.open(QIODevice::ReadOnly)) {
+        NDB_DEBUG("using external stylesheet");
+        dlgStyleSheet = QString::fromUtf8(sf.readAll());
+        sf.close();
+    } else {
+        NDB_DEBUG("using internal stylesheet");
+        dlgStyleSheet = QString(R"(
         * {
             font-family: Avenir, sans-serif;
             font-style: normal;
@@ -70,7 +83,6 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
 
         *[qApp_deviceIsTrilogy=true] {
             font-size: 23px;
-
         }
         *[qApp_deviceIsPhoenix=true] {
             font-size: 26px;
@@ -92,8 +104,6 @@ NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
         }
     )");
 }
-
-NDBCfmDlg::~NDBCfmDlg() {
 }
 
 void NDBCfmDlg::connectStdSignals() {
@@ -148,6 +158,7 @@ enum Result NDBCfmDlg::createDialog(
             "could not find text edit symbols"
         );
     }
+    setStyleSheets();
     switch (dlgType) {
     case TypeStd:
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
@@ -206,7 +217,7 @@ enum Result NDBCfmDlg::showDialog() {
             advMainLayout->addLayout(advActiveLayout);
         }
 
-        advContent->setStyleSheet(styleSheet);
+        advContent->setStyleSheet(dlgStyleSheet);
         symbols.ConfirmationDialog__setContent(dlg, advContent);
         break;
     default:

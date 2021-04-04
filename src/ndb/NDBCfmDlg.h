@@ -62,7 +62,7 @@ class NDBCfmDlg : public QObject {
         void onLineTextEditTapped();
         void onCommitRequested();
     private:
-        QString styleSheet;
+        QString dlgStyleSheet;
         struct {
             ConfirmationDialog *(*ConfirmationDialogFactory_getConfirmationDialog)(QWidget*);
             ConfirmationDialog *(*ConfirmationDialogFactory_showTextEditDialog)(QString const& title);
@@ -94,6 +94,7 @@ class NDBCfmDlg : public QObject {
         QPointer<QLayout> advActiveLayout;
         void connectStdSignals();
         void addWidgetToFrame(QString const& label, QWidget* widget);
+        void setStyleSheets();
 };
 
 } // namespace NDB

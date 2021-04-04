@@ -26,6 +26,7 @@ override PROXY    := $(IFACE_DIR)/ndb_proxy.h
 override KOBOROOT += res/$(DBUS_IFACE_CFG):/etc/dbus-1/system.d/$(DBUS_IFACE_CFG)
 override KOBOROOT += src/cli/qndb:/usr/bin/qndb
 override KOBOROOT += $(UNINSTALL_FILE):/mnt/onboard/.adds/nickeldbus
+override KOBOROOT += res/ndb_stylesheet.qss:/usr/local/nickeldbus/ndb_stylesheet.qss
 
 override UNINSTALL_FILE := res/ndb_version
 

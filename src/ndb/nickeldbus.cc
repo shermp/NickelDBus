@@ -34,6 +34,8 @@ static int ndb_init() {
 static bool ndb_uninstall() {
     nh_delete_file("/usr/bin/qndb");
     nh_delete_file("/etc/dbus-1/system.d/com-github-shermp-nickeldbus.conf");
+    nh_delete_file("/usr/local/nickeldbus/ndb_stylesheet.qss");
+    nh_delete_dir("/usr/local/nickeldbus");
     return true;
 }
 
