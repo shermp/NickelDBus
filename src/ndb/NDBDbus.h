@@ -81,6 +81,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         // Modal basic dialog
         void dlgConfirmModalMessage(QString const& title, QString const& body);
         void dlgConfirmChangeBody(QString const& body);
+        void dlgConfirmSetProgress(int min, int max, int val, QString const& format = "");
         void dlgConfirmClose();
         // Line edit dialog
         void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);

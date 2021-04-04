@@ -27,12 +27,15 @@ compile_commands.json
 /src/ndb/NDBDbus.o
 /src/ndb/NDBCfmDlg.o
 /src/ndb/NDBTouchWidgets.o
+/src/ndb/NDBWidgets.o
 /src/ndb/util.o
 /NickelMenu/src/action_cc.o
 /src/interface/ndb_adapter.o
 /src/ndb/NDBDbus.moc
 /src/ndb/NDBCfmDlg.moc
+/src/ndb/NDBWidgets.moc
 /src/interface/ndb_adapter.moc
 /src/ndb/NDBDbus.moc.o
 /src/ndb/NDBCfmDlg.moc.o
+/src/ndb/NDBWidgets.moc.o
 /src/interface/ndb_adapter.moc.o

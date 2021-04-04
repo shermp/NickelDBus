@@ -7,11 +7,13 @@
 #include <QTextEdit>
 #include <QWidget>
 #include <QPointer>
+#include <QProgressBar>
 #include <QCheckBox>
 #include <QLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include "NDBTouchWidgets.h"
+#include "NDBWidgets.h"
 #include "ndb.h"
 
 typedef QDialog ConfirmationDialog;
@@ -43,6 +45,7 @@ class NDBCfmDlg : public QObject {
         enum Result showDialog();
         enum Result closeDialog();
         enum Result updateBody(QString const& body);
+        enum Result setProgress(int min, int max, int val, QString const& format = "");
         void setPassword(bool isPassword);
         QString getText();
         void setText(QString const& text);
@@ -86,6 +89,7 @@ class NDBCfmDlg : public QObject {
             TouchLineEdit *(*N3ConfirmationTextEditField__textEdit)(N3ConfirmationTextEditField* _this);
         } symbols;
         enum dialogType currActiveType;
+        QPointer<NDBProgressBar> prog;
         QPointer<TouchLineEdit> tle;
         QPointer<N3ConfirmationTextEditField> tef;
         N3ConfirmationTextEditField* createTextEditField();

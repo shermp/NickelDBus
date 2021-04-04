@@ -494,6 +494,25 @@ void NDBDbus::dlgConfirmChangeBody(QString const& body) {
 }
 
 /*!
+ * \brief Display a progress bar on the currently open dialog
+ * 
+ * Displays a progress bar with a range from \a min to \a max, and sets the
+ * current value to \a val. If any one of \a min \a max or \a val are set
+ * to \c -1, the progress bar will be hidden.
+ * 
+ * If set, \a format determines how the label will be displayed. It uses
+ * the same placeholders as a QProgressBar. The placeholders are \c %p for
+ * percentage value, \c %v for current step, \c %m for last step. The default
+ * if not set is \c %p%.
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmSetProgress(int min, int max, int val, QString const& format) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setProgress(min, max, val, format) == Ok));
+}
+
+/*!
  * \brief Close the currently opened dialog
  * 
  * Closes the currently open dialog. Will return an

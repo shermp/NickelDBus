@@ -58,52 +58,52 @@ void NDBCfmDlg::setStyleSheets() {
     } else {
         NDB_DEBUG("using internal stylesheet");
         dlgStyleSheet = QString(R"(
-        * {
-            font-family: Avenir, sans-serif;
-            font-style: normal;
-            padding: 0px;
-            margin: 0px;
-        }
-        *[localeName="ja"] {
-            font-family: Sans-SerifJP, sans-serif;
-            font-style: normal;
-        }
-        *[localeName="zh"] {
-            font-family: Sans-SerifZH-Simplified, sans-serif;
-            font-style: normal;
-        }
-        *[localeName="zh-HK"] {
-            font-family: Sans-SerifZH-Traditional, sans-serif;
-            font-style: normal;
-        }
-        *[localeName="zh-TW"] {
-            font-family: Sans-SerifZH-Traditional, sans-serif;
-            font-style: normal;
-        }
+            * {
+                font-family: Avenir, sans-serif;
+                font-style: normal;
+                padding: 0px;
+                margin: 0px;
+            }
+            *[localeName="ja"] {
+                font-family: Sans-SerifJP, sans-serif;
+                font-style: normal;
+            }
+            *[localeName="zh"] {
+                font-family: Sans-SerifZH-Simplified, sans-serif;
+                font-style: normal;
+            }
+            *[localeName="zh-HK"] {
+                font-family: Sans-SerifZH-Traditional, sans-serif;
+                font-style: normal;
+            }
+            *[localeName="zh-TW"] {
+                font-family: Sans-SerifZH-Traditional, sans-serif;
+                font-style: normal;
+            }
 
-        *[qApp_deviceIsTrilogy=true] {
-            font-size: 23px;
-        }
-        *[qApp_deviceIsPhoenix=true] {
-            font-size: 26px;
-        }
-        *[qApp_deviceIsDragon=true] {
-            font-size: 32px;
-        }
-        *[qApp_deviceIsAlyssum=true] {
-            font-size: 35px;
-        }
-        *[qApp_deviceIsNova=true] {
-            font-size: 35px;
-        }
-        *[qApp_deviceIsStorm=true] {
-            font-size: 44px;
-        }
-        *[qApp_deviceIsDaylight=true] {
-            font-size: 42px;
-        }
-    )");
-}
+            *[qApp_deviceIsTrilogy=true] {
+                font-size: 23px;
+            }
+            *[qApp_deviceIsPhoenix=true] {
+                font-size: 26px;
+            }
+            *[qApp_deviceIsDragon=true] {
+                font-size: 32px;
+            }
+            *[qApp_deviceIsAlyssum=true] {
+                font-size: 35px;
+            }
+            *[qApp_deviceIsNova=true] {
+                font-size: 35px;
+            }
+            *[qApp_deviceIsStorm=true] {
+                font-size: 44px;
+            }
+            *[qApp_deviceIsDaylight=true] {
+                font-size: 42px;
+            }
+        )");
+    }
 }
 
 void NDBCfmDlg::connectStdSignals() {
@@ -239,6 +239,36 @@ enum Result NDBCfmDlg::updateBody(QString const& body) {
     DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
     DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__setText, "could not find setText symbol");
     symbols.ConfirmationDialog__setText(dlg, body);
+    return Ok;
+}
+
+enum Result NDBCfmDlg::setProgress(int min, int max, int val, QString const& format) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
+    DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__addWidget, "could not find addWidget symbol");
+    bool added = true;
+    if (min < 0 || max < 0 || val < 0) {
+        if (prog) {
+            prog->hide();
+        }
+        return Ok;
+    } else if (prog) {
+        prog->show();
+    }
+    if (!prog) {
+        prog = new NDBProgressBar();
+        prog->setStyleSheet(dlgStyleSheet);
+        added = false;
+    }
+    prog->setMinimum(min);
+    prog->setMaximum(max);
+    prog->setValue(val);
+    if (!format.isEmpty()) {
+        prog->setFormat(format);
+    }
+    if (!added) {
+        symbols.ConfirmationDialog__addWidget(dlg, prog);
+    }
     return Ok;
 }
 
