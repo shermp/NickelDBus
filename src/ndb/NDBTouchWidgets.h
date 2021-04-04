@@ -91,6 +91,8 @@ namespace NDBTouchWidgets {
         SearchKeyboardController* createKeyboard(KeyboardFrame* _this, KeyboardScript script, QLocale const& loc);
         void setReceiver(SearchKeyboardController* _this, KeyboardReceiver* receiver);
         void setMultilineEntry(SearchKeyboardController* _this, bool enabled);
+        void setText(TouchLineEdit* tle, QString const& text);
+        void setText(TouchTextEdit* tte, QString const& text);
     }
 }
 

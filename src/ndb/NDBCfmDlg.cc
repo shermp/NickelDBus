@@ -403,11 +403,14 @@ enum Result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label,
     return Ok;
 }
 
-enum Result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
-    using namespace NDBTouchWidgets::NDBKeyboard;
+enum Result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label, QString const& initText, bool autoFormatCaps) {
+    using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    TouchLineEdit *tle = createLineEdit(dlg, autoFormatCaps);
+    TouchLineEdit *tle = NDBKeyboard::createLineEdit(dlg, autoFormatCaps);
     DLG_ASSERT(NullError, tle, "unable to create TextLineEdit");
+    if (!initText.isEmpty()) {
+        NDBKeyboard::setText(tle, initText);
+    }
     DLG_ASSERT(ConnError, 
                 QObject::connect(tle, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
                 "unable to connect TouchLineEdit::tapped() to onLineTextEditTapped()");
@@ -416,11 +419,14 @@ enum Result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label,
     return Ok;
 }
 
-enum Result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
-    using namespace NDBTouchWidgets::NDBKeyboard;
+enum Result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label, QString const& initText, bool autoFormatCaps) {
+    using namespace NDBTouchWidgets;
     DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    TouchTextEdit *tte = createTextEdit(dlg, autoFormatCaps);
+    TouchTextEdit *tte = NDBKeyboard::createTextEdit(dlg, autoFormatCaps);
     DLG_ASSERT(NullError, tte, "unable to create TouchTextEdit");
+    if (!initText.isEmpty()) {
+        NDBTouchWidgets::NDBKeyboard::setText(tte, initText);
+    }
     DLG_ASSERT(ConnError, 
                 QObject::connect(tte, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
                 "unable to connect TouchTextEdit::tapped() to onLineTextEditTapped()");

@@ -286,6 +286,14 @@ namespace NDBTouchWidgets {
         void setMultilineEntry(SearchKeyboardController* _this, bool enabled) {
             return SearchKeyboardController__setMultiLineEntry(_this, enabled);
         }
+
+        void setText(TouchLineEdit* tle, QString const& text) {
+            tle->setText(text);
+        }
+
+        void setText(TouchTextEdit* tte, QString const& text) {
+            TouchTextEdit__textEdit(tte)->setText(text);
+        }
     }
 }
 

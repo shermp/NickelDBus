@@ -685,9 +685,9 @@ void NDBDbus::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& 
  * 
  * \since v0.2.0
  */
-void NDBDbus::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps) {
+void NDBDbus::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps, QString const& initText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label, autoFormatCaps) == Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddLineEdit(name, label, initText, autoFormatCaps) == Ok));
 }
 
 /*!
@@ -699,9 +699,9 @@ void NDBDbus::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& 
  * 
  * \since v0.2.0
  */
-void NDBDbus::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps) {
+void NDBDbus::dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps, QString const& initText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label, autoFormatCaps) == Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->advAddTextEdit(name, label, initText, autoFormatCaps) == Ok));
 }
 
 /*!
