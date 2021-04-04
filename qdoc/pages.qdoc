@@ -5,7 +5,7 @@
     
     \startpage NickelDBus
 
-    \nextpage {NDB}{API Documentation}
+    \nextpage {NDB::NDBDbus}{API Documentation}
 
     \title NickelDBus
 
@@ -123,7 +123,7 @@
 
     \section3 API Documentation
 
-    The API is documented \l {NDB}{here}. It is Qt based documentation, but it should
+    The API is documented \l {NDB::NDBDbus}{here}. It is Qt based documentation, but it should
     be easy to determine what's needed for other languages or CLI tools.
 
     \section2 Compiling NickelDBus

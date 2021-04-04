@@ -14,9 +14,14 @@
 #include "NDBDbus.h"
 #include "../interface/ndb_adapter.h"
 
+/*!
+ * \namespace NDB
+ * 
+ * \brief Contains classes and methods for NickelDBus
+ */
 namespace NDB {
 /*!
- * \class NDBDbus
+ * \class NDB::NDBDbus
  * \inmodule NickelDBus
  * \brief The NDBDbus class registers a service on d-bus of Kobo e-readers.
  * 
@@ -666,8 +671,7 @@ void NDBDbus::dlgConfirmAdvancedAddSlider(QString const& name, QString const& la
  * \brief Add a slider to an advanced dialog
  * 
  * This adds a dropdown to an advanced dialog. The \a name of the the slider is used to dropdown the value later.
- * The user visible text is set by \a label. The dropdown list is populated by \a items. You can enable addition
- * and removal of items using \a allowAdditionAndRemoval.
+ * The user visible text is set by \a label. The dropdown list is populated by \a items.
  * 
  * \since v0.2.0
  */
@@ -681,7 +685,8 @@ void NDBDbus::dlgConfirmAdvancedAddDropdown(QString const& name, QString const& 
  * 
  * This adds a text line edit to an advanced dialog. The \a name of the line edit is used to retrieve the value later.
  * The user visible label is set by \a label. Setting the optional parameter \a autoFormatCaps to \c false will disable 
- * auto capitalization of the first letter in the line. It defaults to true.
+ * auto capitalization of the first letter in the line. It defaults to true. You can set the initial text of the field
+ * to \a initText.
  * 
  * \since v0.2.0
  */
@@ -695,7 +700,8 @@ void NDBDbus::dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& 
  * 
  * This adds a text line edit to an advanced dialog. The \a name of the line edit is used to retrieve the value later.
  * The user visible label is set by \a label. Setting the optional parameter \a autoFormatCaps to \c false will disable 
- * auto capitalization of the first letter in the line. It defaults to true.
+ * auto capitalization of the first letter in the line. It defaults to true. You can set the initial text of the field
+ * to \a initText.
  * 
  * \since v0.2.0
  */
@@ -1036,14 +1042,14 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
 /* Signal Documentation */
 
 /*!
- * \fn void NDBDbus::dlgConfirmResult(int result)
+ * \fn void NDB::NDBDbus::dlgConfirmResult(int result)
  * \brief The signal that is emitted when a confirmation dialog is dismissed
  * 
  * When emitted, \a result will be \c 1 for ACCEPT or \c 0 for REJECT
  */
 
 /*!
- * \fn void NDBDbus::dlgConfirmTextInput(QString input)
+ * \fn void NDB::NDBDbus::dlgConfirmTextInput(QString input)
  * \brief The signal that is emitted when text is entered by user
  * 
  * When emitted \a input will be the text the user inputted. This signal is
@@ -1054,7 +1060,7 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
  */
 
 /*!
- * \fn void NDBDbus::dlgConfirmAdvancedJSON(QString json)
+ * \fn void NDB::NDBDbus::dlgConfirmAdvancedJSON(QString json)
  * \brief The signal that is emitted when the user accepts an advanced confirmation dialog
  * 
  * When emitted, \a json will be a JSON object with the keys set to the widget names, and
@@ -1064,102 +1070,102 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
  */
 
 /*!
- * \fn void NDBDbus::pfmDoneProcessing()
+ * \fn void NDB::NDBDbus::pfmDoneProcessing()
  * \brief The signal that nickel emits when the content import process has completed.
  * 
  * The signal will be emitted following the content import triggered whenever 
  * the user unplugs from the computer, when \c rescan_books / \c rescan_books_full 
- * actions are triggered from NickelMenu, or when \l NDBDbus::pfmRescanBooks() 
- * or \l NDBDbus::pfmRescanBooksFull() methods are called from NDBDbus.
+ * actions are triggered from NickelMenu, or when \l NDB::NDBDbus::pfmRescanBooks() 
+ * or \l NDB::NDBDbus::pfmRescanBooksFull() methods are called from NDBDbus.
  */
 
 /*!
- * \fn void NDBDbus::pfmAboutToConnect()
+ * \fn void NDB::NDBDbus::pfmAboutToConnect()
  * \brief The signal that nickel emits when it is about to start the USB connection
  */
 
 /*!
- * \fn void NDBDbus::wmTryingToConnect()
+ * \fn void NDB::NDBDbus::wmTryingToConnect()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDBDbus::wmNetworkConnected()
+ * \fn void NDB::NDBDbus::wmNetworkConnected()
  * \brief This signal appears to be emitted when the network has successfully connected
  * I'm unsure if this is emitted when the WiFi connects, or when a valid IP address
  * is obtained.
  */
 
 /*!
- * \fn void NDBDbus::wmNetworkDisconnected()
+ * \fn void NDB::NDBDbus::wmNetworkDisconnected()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDBDbus::wmNetworkForgotten()
+ * \fn void NDB::NDBDbus::wmNetworkForgotten()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDBDbus::wmNetworkFailedToConnect()
+ * \fn void NDB::NDBDbus::wmNetworkFailedToConnect()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDBDbus::wmScanningStarted()
+ * \fn void NDB::NDBDbus::wmScanningStarted()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDBDbus::wmScanningFinished()
+ * \fn void NDB::NDBDbus::wmScanningFinished()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDBDbus::wmScanningAborted()
+ * \fn void NDB::NDBDbus::wmScanningAborted()
  * \brief (todo: figure this out)
  */
 
 /*!
- * \fn void NDBDbus::wmWifiEnabled(bool enabled)
+ * \fn void NDB::NDBDbus::wmWifiEnabled(bool enabled)
  * \brief (todo: figure this out)
  * 
  * Is wifi \a enabled ?
  */
 
 /*!
- * \fn void NDBDbus::wmLinkQualityForConnectedNetwork(double quality)
+ * \fn void NDB::NDBDbus::wmLinkQualityForConnectedNetwork(double quality)
  * \brief (todo: figure this out)
  * 
  * Shows the \a quality of the wifi signal
  */
 
 /*!
- * \fn void NDBDbus::wmMacAddressAvailable(QString mac)
+ * \fn void NDB::NDBDbus::wmMacAddressAvailable(QString mac)
  * \brief (todo: figure this out)
  * 
  * \a mac address
  */
 
 /*!
- * \fn void NDBDbus::ndbViewChanged(QString newView)
+ * \fn void NDB::NDBDbus::ndbViewChanged(QString newView)
  * \brief The signal that is emitted when the current view changes
  * 
- * This signal is only emitted if \l NDBDbus::ndbCurrentView() has been called 
+ * This signal is only emitted if \l NDB::NDBDbus::ndbCurrentView() has been called 
  * at least once by an application. \a newView is the class name of the new view.
  * 
- * \sa NDBDbus::ndbCurrentView()
+ * \sa NDB::NDBDbus::ndbCurrentView()
  */
 
 /*!
- * \fn void NDBDbus::rvPageChanged(int pageNum)
+ * \fn void NDB::NDBDbus::rvPageChanged(int pageNum)
  * \brief The signal that is emitted when the current book changes page
  * 
- * This signal is only emitted if \l NDBDbus::ndbCurrentView() has been called 
+ * This signal is only emitted if \l NDB::NDBDbus::ndbCurrentView() has been called 
  * at least once by an application. \a pageNum is kepub or epub page 
  * number of the new page.
  * 
- * \sa NDBDbus::ndbCurrentView()
+ * \sa NDB::NDBDbus::ndbCurrentView()
  */
 
 } // namespace NDB

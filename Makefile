@@ -34,7 +34,7 @@ override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS
 
 override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) qdoc/html/
 
-.PHONY: debug cli clean-cli gitignore-cli doc dbuscfg interface uninstall-file
+.PHONY: debug cli clean-cli gitignore-cli doc internal-doc dbuscfg interface uninstall-file
 
 interface: $(ADAPTER) $(PROXY)
 
@@ -54,9 +54,16 @@ clean: clean-cli
 
 gitignore: gitignore-cli
 
-doc:
+internal-doc:
 	cd qdoc/config && qdoc NickelDBus.qdocconf
-	sed -i 's/This function was introduced in +Qt/This function was introduced in NickelDBus/g' qdoc/html/ndb.html
+	sed -i 's/This function was introduced in  Qt/This function was introduced in NickelDBus/g' qdoc/html/ndb-ndbdbus.html
+doc: internal-doc
+	cd qdoc/html && \
+	rm ndb.html && \
+	rm ndb-ndbcfmdlg* && \
+	rm ndb-ndbdevice* && \
+	rm ndb-ndbprogressbar* && \
+	rm ndb-ndbtouchwidgets*
 
 uninstall-file:
 	echo "$(VERSION)" > $(UNINSTALL_FILE)

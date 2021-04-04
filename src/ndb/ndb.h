@@ -2,7 +2,6 @@
 #define NDB_H
 
 namespace NDB {
-
     enum Result{
         Ok, 
         NotImplemented, 
@@ -13,7 +12,7 @@ namespace NDB {
         ParamError, 
         ConnError
     };
-    
+
 }
 
 #endif // NDB_H
