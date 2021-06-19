@@ -26,7 +26,6 @@ compile_commands.json
 /src/ndb/nickeldbus.o
 /src/ndb/NDBDbus.o
 /src/ndb/NDBCfmDlg.o
-/src/ndb/NDBTouchWidgets.o
 /src/ndb/NDBWidgets.o
 /src/ndb/util.o
 /NickelMenu/src/action_cc.o

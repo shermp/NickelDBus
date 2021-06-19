@@ -1,11 +1,5 @@
 #include <Qt>
-#include <QFile>
 #include <QLocale>
-#include <QRegularExpression>
-#include <QList>
-#include <QVariant>
-#include <QJsonObject>
-#include <QJsonDocument>
 #include <NickelHook.h>
 #include "util.h"
 #include "NDBCfmDlg.h"
@@ -24,40 +18,7 @@ namespace NDB {
 NDBCfmDlg::NDBCfmDlg(QObject* parent) : QObject(parent) {
     initResult = Ok;
     currActiveType = TypeStd;
-    /* Resolve symbols */
-    // Confirmation Dialog
-    resolveSymbolRTLD("_ZN25ConfirmationDialogFactory21getConfirmationDialogEP7QWidget", nh_symoutptr(symbols.ConfirmationDialogFactory_getConfirmationDialog));
-    resolveSymbolRTLD("_ZN25ConfirmationDialogFactory18showTextEditDialogERK7QString", nh_symoutptr(symbols.ConfirmationDialogFactory_showTextEditDialog));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog8setTitleERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setTitle));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog7setTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setText));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setAcceptButtonText));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setRejectButtonText));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(symbols.ConfirmationDialog__showCloseButton));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb", nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog9addWidgetEP7QWidget", nh_symoutptr(symbols.ConfirmationDialog__addWidget));
-    resolveSymbolRTLD("_ZN18ConfirmationDialog10setContentEP7QWidget", nh_symoutptr(symbols.ConfirmationDialog__setContent));
-    // Keyboard stuff
-    resolveSymbolRTLD("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS));
-    if (!symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
-        // FW 4.6 has a slightly different constructor without the KeyboardScript stuff
-        resolveSymbolRTLD("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField));
-    }
-    resolveSymbolRTLD("_ZNK27N3ConfirmationTextEditField8textEditEv", nh_symoutptr(symbols.N3ConfirmationTextEditField__textEdit));
-    resolveSymbolRTLD("_ZNK18ConfirmationDialog13keyboardFrameEv", nh_symoutptr(symbols.ConfirmationDialog__keyboardFrame));
-}
-
-NDBCfmDlg::~NDBCfmDlg() {
-}
-
-void NDBCfmDlg::setStyleSheets() {
-    QFile sf("/usr/local/nickeldbus/ndb_stylesheet.qss");
-    if (sf.open(QIODevice::ReadOnly)) {
-        NDB_DEBUG("using external stylesheet");
-        dlgStyleSheet = QString::fromUtf8(sf.readAll());
-        sf.close();
-    } else {
-        NDB_DEBUG("using internal stylesheet");
-        dlgStyleSheet = QString(R"(
+    dlgStyleSheet = QString(R"(
             * {
                 font-family: Avenir, sans-serif;
                 font-style: normal;
@@ -103,7 +64,29 @@ void NDBCfmDlg::setStyleSheets() {
                 font-size: 42px;
             }
         )");
+    
+    /* Resolve symbols */
+    // Confirmation Dialog
+    resolveSymbolRTLD("_ZN25ConfirmationDialogFactory21getConfirmationDialogEP7QWidget", nh_symoutptr(symbols.ConfirmationDialogFactory_getConfirmationDialog));
+    resolveSymbolRTLD("_ZN25ConfirmationDialogFactory18showTextEditDialogERK7QString", nh_symoutptr(symbols.ConfirmationDialogFactory_showTextEditDialog));
+    resolveSymbolRTLD("_ZN18ConfirmationDialog8setTitleERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setTitle));
+    resolveSymbolRTLD("_ZN18ConfirmationDialog7setTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setText));
+    resolveSymbolRTLD("_ZN18ConfirmationDialog19setAcceptButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setAcceptButtonText));
+    resolveSymbolRTLD("_ZN18ConfirmationDialog19setRejectButtonTextERK7QString", nh_symoutptr(symbols.ConfirmationDialog__setRejectButtonText));
+    resolveSymbolRTLD("_ZN18ConfirmationDialog15showCloseButtonEb", nh_symoutptr(symbols.ConfirmationDialog__showCloseButton));
+    resolveSymbolRTLD("_ZN18ConfirmationDialog21setRejectOnOutsideTapEb", nh_symoutptr(symbols.ConfirmationDialog__setRejectOnOutsideTap));
+    resolveSymbolRTLD("_ZN18ConfirmationDialog9addWidgetEP7QWidget", nh_symoutptr(symbols.ConfirmationDialog__addWidget));
+
+    // Keyboard stuff
+    resolveSymbolRTLD("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog14KeyboardScript", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS));
+    if (!symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS) {
+        // FW 4.6 has a slightly different constructor without the KeyboardScript stuff
+        resolveSymbolRTLD("_ZN27N3ConfirmationTextEditFieldC1EP18ConfirmationDialog", nh_symoutptr(symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField));
     }
+    resolveSymbolRTLD("_ZNK27N3ConfirmationTextEditField8textEditEv", nh_symoutptr(symbols.N3ConfirmationTextEditField__textEdit));
+}
+
+NDBCfmDlg::~NDBCfmDlg() {
 }
 
 void NDBCfmDlg::connectStdSignals() {
@@ -149,7 +132,7 @@ enum Result NDBCfmDlg::createDialog(
         symbols.ConfirmationDialog__setRejectOnOutsideTap,
         "could not find one or more standard dialog symbols"
     );
-    if (dlgType == TypeLineEdit || dlgType == TypeAdvanced) {
+    if (dlgType == TypeLineEdit) {
         DLG_ASSERT(
             SymbolError,
             (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS ||
@@ -158,7 +141,6 @@ enum Result NDBCfmDlg::createDialog(
             "could not find text edit symbols"
         );
     }
-    setStyleSheets();
     switch (dlgType) {
     case TypeStd:
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
@@ -179,18 +161,6 @@ enum Result NDBCfmDlg::createDialog(
         }
         currActiveType = TypeLineEdit;
         break;
-    
-    case TypeAdvanced:
-        DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__setContent, "could not find setContent() symbol");
-        dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
-        DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
-        advContent = new QFrame;
-        advMainLayout = new QVBoxLayout;
-        advActiveLayout = nullptr;
-        advContent->setLayout(advMainLayout);
-
-        currActiveType = TypeAdvanced;
-        break;
 
     default:
         DLG_ASSERT(ParamError, false, "Incorrect dialog type passed");
@@ -210,19 +180,6 @@ enum Result NDBCfmDlg::createDialog(
 
 enum Result NDBCfmDlg::showDialog() {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
-    switch (currActiveType) {
-    case TypeAdvanced:
-        // Set the final layout
-        if (advActiveLayout) {
-            advMainLayout->addLayout(advActiveLayout);
-        }
-
-        advContent->setStyleSheet(dlgStyleSheet);
-        symbols.ConfirmationDialog__setContent(dlg, advContent);
-        break;
-    default:
-        break;
-    }
     connectStdSignals();
     dlg->open();
     return Ok;
@@ -301,254 +258,6 @@ void NDBCfmDlg::setText(QString const& text) {
     if (dlg && currActiveType == TypeLineEdit && tle) {
         tle->setPlaceholderText(text);
     }
-}
-
-void NDBCfmDlg::addWidgetToFrame(QString const& label, QWidget* widget) {
-    using namespace NDBTouchWidgets;
-    // If the user hasn't set a layout, default to vertical box
-    if (!advActiveLayout) {
-        advActiveLayout = new QVBoxLayout;
-    }
-    auto cb = qobject_cast<TouchCheckBox*>(widget);
-    auto vbl = qobject_cast<QVBoxLayout*>(advActiveLayout);
-    auto fl = qobject_cast<QFormLayout*>(advActiveLayout);
-    auto hbl = qobject_cast<QHBoxLayout*>(advActiveLayout);
-    if (vbl && cb) {
-        cb->setText(label);
-        vbl->addWidget(cb);
-        return;
-    }
-    TouchLabel *lbl = NDBTouchLabel::create(label, nullptr, 0);
-    if (vbl || hbl) {
-        advActiveLayout->addWidget(lbl);
-        advActiveLayout->addWidget(widget);
-    } else if (fl) {
-        fl->addRow(lbl, widget);
-    } else {
-        nh_log("both form and vertical layouts were null");
-    }
-    return;
-}
-
-enum Result NDBCfmDlg::advAddLayout(enum NDBCfmDlg::layoutType lt) {
-    if (advActiveLayout) {
-        advMainLayout->addLayout(advActiveLayout);
-    }
-    switch (lt) {
-    case HorLayout:
-        advActiveLayout = new QHBoxLayout;
-        break;
-    case VertLayout:
-        advActiveLayout = new QVBoxLayout;
-        break;
-    case FormLayout:
-        advActiveLayout = new QFormLayout;
-        break;
-    default:
-        advActiveLayout = nullptr;
-    }
-    DLG_ASSERT(NullError, advActiveLayout, "unabled to get new layout");
-    return Ok;
-}
-
-#define DLG_SET_OBJ_NAME(obj, name) (obj)->setObjectName(QString("ndb_%1").arg(name))
-
-enum Result NDBCfmDlg::advAddCheckbox(QString const& name, QString const& label, bool checked) {
-    using namespace NDBTouchWidgets;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    TouchCheckBox *cb = NDBTouchCheckBox::create(nullptr);
-    DLG_ASSERT(NullError, cb, "unable to create checkbox");
-    DLG_SET_OBJ_NAME(cb, name);
-    Qt::CheckState cs = (checked) ? Qt::Checked : Qt::Unchecked;
-    cb->setCheckState(cs);
-    addWidgetToFrame(label, cb);
-    return Ok;
-}
-
-enum Result NDBCfmDlg::advAddSlider(QString const& name, QString const& label, int min, int max, int val) {
-    using namespace NDBTouchWidgets;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    TouchSlider *sl = NDBTouchSlider::create(nullptr);
-    DLG_ASSERT(NullError, sl, "unable to create slider");
-    DLG_SET_OBJ_NAME(sl, name);
-    TouchLabel *minLabel = NDBTouchLabel::create(QString::number(min), nullptr, 0);
-    DLG_ASSERT(NullError, minLabel, "unable to create min label");
-    TouchLabel *maxLabel = NDBTouchLabel::create(QString::number(max), nullptr, 0);
-    DLG_ASSERT(NullError, maxLabel, "unable to create max label");
-    sl->setMaximum(max);
-    sl->setMinimum(min);
-    sl->setValue(val);
-    sl->setOrientation(Qt::Horizontal);
-    QFrame *f = new QFrame;
-    QGridLayout *slLayout = new QGridLayout(f);
-    slLayout->addWidget(minLabel, 0, 0);
-    slLayout->addWidget(sl, 0, 1, Qt::AlignCenter);
-    slLayout->addWidget(maxLabel, 0, 2, Qt::AlignRight);
-    slLayout->setColumnStretch(1, 2);
-    addWidgetToFrame(label, f);
-    return Ok;
-}
-
-enum Result NDBCfmDlg::advAddDropDown(QString const& name, QString const& label, QStringList items) {
-    using namespace NDBTouchWidgets;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    TouchDropDown *td = NDBTouchDropDown::create(nullptr, true);
-    DLG_ASSERT(NullError, td, "unable to create TouchDropDown");
-    DLG_SET_OBJ_NAME(td, name);
-    for (int i = 0; i < items.size(); ++i) {
-        NDBTouchDropDown::addItem(td, items[i], QVariant(items[i]), false);
-    }
-    NDBTouchDropDown::setCurrentIndex(td, 0);
-    addWidgetToFrame(label, td);
-    return Ok;
-}
-
-enum Result NDBCfmDlg::advAddLineEdit(QString const& name, QString const& label, QString const& initText, bool autoFormatCaps) {
-    using namespace NDBTouchWidgets;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    TouchLineEdit *tle = NDBKeyboard::createLineEdit(dlg, autoFormatCaps);
-    DLG_ASSERT(NullError, tle, "unable to create TextLineEdit");
-    if (!initText.isEmpty()) {
-        NDBKeyboard::setText(tle, initText);
-    }
-    DLG_ASSERT(ConnError, 
-                QObject::connect(tle, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
-                "unable to connect TouchLineEdit::tapped() to onLineTextEditTapped()");
-    DLG_SET_OBJ_NAME(tle, name);
-    addWidgetToFrame(label, tle);
-    return Ok;
-}
-
-enum Result NDBCfmDlg::advAddTextEdit(QString const& name, QString const& label, QString const& initText, bool autoFormatCaps) {
-    using namespace NDBTouchWidgets;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    TouchTextEdit *tte = NDBKeyboard::createTextEdit(dlg, autoFormatCaps);
-    DLG_ASSERT(NullError, tte, "unable to create TouchTextEdit");
-    if (!initText.isEmpty()) {
-        NDBTouchWidgets::NDBKeyboard::setText(tte, initText);
-    }
-    DLG_ASSERT(ConnError, 
-                QObject::connect(tte, SIGNAL(tapped()), this, SLOT(onLineTextEditTapped())), 
-                "unable to connect TouchTextEdit::tapped() to onLineTextEditTapped()");
-    DLG_SET_OBJ_NAME(tte, name);
-    addWidgetToFrame(label, tte);
-    return Ok;
-}
-
-void NDBCfmDlg::onLineTextEditTapped() {
-    using namespace NDBTouchWidgets::NDBKeyboard;
-    NDB_DEBUG("slot invoked");
-    auto sender = QObject::sender();
-    auto tle = qobject_cast<TouchLineEdit*>(sender);
-    auto tte = qobject_cast<TouchTextEdit*>(sender);
-    NDB_DEBUG("sender is TouchLineEdit: %s", (tle) ? "yes" : "no");
-    NDB_DEBUG("sender is TouchTextEdit: %s", (tte) ? "yes" : "no");
-
-    NDB_ASSERT((void) 0, (tle || tte), "onLineTextEditTapped: sender not TouchLineEdit or TouchTextEdit");
-    
-    NDB_DEBUG("getting KeyboardReceiver");
-    KeyboardReceiver *kr = getKeyboardReciever((qobject_cast<QWidget*>(sender)));
-    NDB_ASSERT((void) 0, kr, "onLineTextEditTapped: can't get keyboard receiver");
-    
-    NDB_DEBUG("getting KeyboardFrame");
-    KeyboardFrame *kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
-    NDB_ASSERT((void) 0, kf, "onLineTextEditTapped: can't get keyboard frame");
-    
-    NDB_DEBUG("getting SearchKeyboardController");
-    SearchKeyboardController *skbc = createKeyboard(kf, 1, QLocale(QLocale::English));
-    NDB_ASSERT((void) 0, skbc, "onLineTextEditTapped: can't get SearchKeyboardController");
-    
-    NDB_DEBUG("setting receiver");
-    setReceiver(skbc, kr);
-    if (tte) {
-        NDB_DEBUG("setting multiline entry");
-        setMultilineEntry(skbc, true);
-    }
-
-    NDB_DEBUG("connecting signal");
-    QObject::connect(skbc, SIGNAL(commitRequested()), this, SLOT(onCommitRequested()));
-    NDB_DEBUG("showing frame");
-    kf->show();
-}
-
-void NDBCfmDlg::onCommitRequested() {
-    KeyboardFrame *kf = symbols.ConfirmationDialog__keyboardFrame(dlg);
-    if (!kf) { return; }
-    kf->hide();
-}
-
-enum Result NDBCfmDlg::advAddDatePicker(QString const& name, QString const& label, QDate init) {
-    using namespace NDBTouchWidgets::NDBDateTime;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    N3DatePicker *d = create(dlg, init);
-    DLG_ASSERT(NullError, d, "unable to create N3DatePicker");
-    DLG_SET_OBJ_NAME(d, name);
-    addWidgetToFrame(label, d);
-    return Ok;
-}
-
-enum Result NDBCfmDlg::advAddTimePicker(QString const& name, QString const& label, QTime init) {
-    using namespace NDBTouchWidgets::NDBDateTime;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    N3TimePicker *t = create(dlg, init);
-    DLG_ASSERT(NullError, t, "unable to create N3TimePicker");
-    DLG_SET_OBJ_NAME(t, name);
-    addWidgetToFrame(label, t);
-    return Ok;
-}
-
-enum Result NDBCfmDlg::advGetJSON(QString& json) {
-    using namespace NDBTouchWidgets;
-    DLG_ASSERT(ForbiddenError, dlg, "dialog must exist");
-    // Get all widgets in the frame whose name begins with 'ndb_'
-    QRegularExpression re("ndb_.+");
-    QList<QWidget*> widgets = advContent->findChildren<QWidget*>(re);
-    //nh_log("advGetJSON: Found %d widgets", widgets.size());
-    QVariantMap qvm;
-    for (int i = 0; i < widgets.size(); ++i) {
-        QWidget *w = widgets.at(i);
-        QString className = w->metaObject()->className();
-        QString name = w->objectName().remove(QRegularExpression("ndb_"));
-        //nh_log("advGetJSON: Widget %d has className '%s' and name '%s'", i, className.toUtf8().constData(), name.toUtf8().constData());
-        if (className == "TouchCheckBox") {
-            auto cb = qobject_cast<TouchCheckBox*>(w);
-            qvm[name] = QVariant(cb->isChecked());
-        } 
-        else if (className == "TouchSlider") {
-            auto sl = qobject_cast<TouchSlider*>(w);
-            qvm[name] = QVariant(sl->value());
-        } 
-        else if (className == "TouchDropDown" || className == "BlockTouchDropDown") {
-            auto dd = qobject_cast<TouchDropDown*>(w);
-            qvm[name] = NDBTouchDropDown::currentData(dd);
-        } 
-        else if (className == "TouchLineEdit") {
-            auto t = qobject_cast<TouchLineEdit*>(w);
-            DLG_ASSERT(NullError, t, "unable to get TouchLineEdit");
-            qvm[name] = QVariant(t->text());
-        } 
-        else if (className == "TouchTextEdit") {
-            auto t = qobject_cast<TouchTextEdit*>(w);
-            DLG_ASSERT(NullError, t, "unable to get TouchTextEdit");
-            qvm[name] = QVariant(NDBKeyboard::textEdit(t)->toPlainText());
-        } 
-        else if (className == "N3DatePicker") {
-            auto d = qobject_cast<N3DatePicker*>(w);
-            qvm[name] = QVariant(NDBDateTime::getDate(d));
-        } 
-        else if (className == "N3TimePicker") {
-            auto t = qobject_cast<N3TimePicker*>(w);
-            qvm[name] = QVariant(NDBDateTime::getTime(t));
-        }
-    }
-    QJsonObject obj = QJsonObject::fromVariantMap(qvm);
-    //nh_log("QJsonObject is %s", (obj.isEmpty() ? "empty" : "not empty"));
-    QJsonDocument doc(obj);
-    //nh_log("QJsonDocument is %s", (doc.isNull() ? "invalid" : "valid"));
-    QByteArray docBA = doc.toJson(QJsonDocument::Compact);
-    //nh_log("JSON contents is: %s", docBA.constData());
-    json.append(QString().fromUtf8(docBA));
-    return Ok;
 }
 
 } // namespace NDB

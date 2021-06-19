@@ -86,19 +86,6 @@ class NDBDbus : public QObject, protected QDBusContext {
         // Line edit dialog
         void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);
         void dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
-        // Advanced Confirmation Dialog
-        void dlgConfirmAdvancedCreate(QString const& title, QString const& acceptText, QString const& rejectText);
-        void dlgConfirmAdvancedAddLayout(QString const& layout);
-        void dlgConfirmAdvancedAddCheckBox(QString const& name, QString const& label, bool checked);
-        void dlgConfirmAdvancedAddSlider(QString const& name, QString const& label, int min, int max, int val);
-        void dlgConfirmAdvancedAddDropdown(QString const& name, QString const& label, QStringList items);
-        void dlgConfirmAdvancedAddLineEdit(QString const& name, QString const& label, bool autoFormatCaps = true, QString const& initText = "");
-        void dlgConfirmAdvancedAddTextEdit(QString const& name, QString const& label, bool autoFormatCaps = true, QString const& initText = "");
-        void dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label);
-        void dlgConfirmAdvancedAddDatePicker(QString const& name, QString const& label, QString const& init);
-        void dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label);
-        void dlgConfirmAdvancedAddTimePicker(QString const& name, QString const& label, QString const& init);
-        void dlgConfirmAdvancedShow();
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -121,8 +108,6 @@ class NDBDbus : public QObject, protected QDBusContext {
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
         void handleStackedWidgetDestroyed();
-        void onAdvancedDlgAccepted();
-        void onAdvancedDlgRejected();
         void onDlgLineEditAccepted();
         void onDlgLineEditRejected();
     private:

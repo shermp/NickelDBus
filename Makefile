@@ -7,7 +7,7 @@ override IFACE_DIR := src/interface
 
 override LIBRARY  := libndb.so
 # NDB sources
-override SOURCES  += src/ndb/nickeldbus.cc src/ndb/NDBDbus.cc src/ndb/NDBCfmDlg.cc src/ndb/NDBTouchWidgets.cc src/ndb/NDBWidgets.cc src/ndb/util.cc $(IFACE_DIR)/ndb_adapter.cpp  
+override SOURCES  += src/ndb/nickeldbus.cc src/ndb/NDBDbus.cc src/ndb/NDBCfmDlg.cc src/ndb/NDBWidgets.cc src/ndb/util.cc $(IFACE_DIR)/ndb_adapter.cpp  
 # NM sources
 override SOURCES  += NickelMenu/src/util.c NickelMenu/src/action.c NickelMenu/src/action_c.c NickelMenu/src/action_cc.cc NickelMenu/src/kfmon.c
 override CFLAGS   += -Wall -Wextra -Werror
@@ -26,7 +26,6 @@ override PROXY    := $(IFACE_DIR)/ndb_proxy.h
 override KOBOROOT += res/$(DBUS_IFACE_CFG):/etc/dbus-1/system.d/$(DBUS_IFACE_CFG)
 override KOBOROOT += src/cli/qndb:/usr/bin/qndb
 override KOBOROOT += $(UNINSTALL_FILE):/mnt/onboard/.adds/nickeldbus
-override KOBOROOT += res/ndb_stylesheet.qss:/usr/local/nickeldbus/ndb_stylesheet.qss
 
 override UNINSTALL_FILE := res/ndb_version
 
@@ -61,9 +60,7 @@ doc: internal-doc
 	cd qdoc/html && \
 	rm ndb.html && \
 	rm ndb-ndbcfmdlg* && \
-	rm ndb-ndbdevice* && \
-	rm ndb-ndbprogressbar* && \
-	rm ndb-ndbtouchwidgets*
+	rm ndb-ndbprogressbar*
 
 uninstall-file:
 	echo "$(VERSION)" > $(UNINSTALL_FILE)
