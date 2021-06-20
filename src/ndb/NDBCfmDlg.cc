@@ -112,14 +112,7 @@ N3ConfirmationTextEditField* NDBCfmDlg::createTextEditField() {
     return t;
 }
 
-enum Result NDBCfmDlg::createDialog(
-    enum dialogType dlgType,
-    QString const& title, 
-    QString const& body, 
-    QString const& acceptText, 
-    QString const& rejectText, 
-    bool tapOutsideClose
-) {
+enum Result NDBCfmDlg::createDialog(enum dialogType dlgType) {
     DLG_ASSERT(ForbiddenError, !dlg, "dialog already open");
     DLG_ASSERT(
         SymbolError, 
@@ -129,7 +122,8 @@ enum Result NDBCfmDlg::createDialog(
         symbols.ConfirmationDialog__setText && 
         symbols.ConfirmationDialog__setAcceptButtonText && 
         symbols.ConfirmationDialog__setRejectButtonText && 
-        symbols.ConfirmationDialog__setRejectOnOutsideTap,
+        symbols.ConfirmationDialog__setRejectOnOutsideTap && 
+        symbols.ConfirmationDialog__showCloseButton,
         "could not find one or more standard dialog symbols"
     );
     if (dlgType == TypeLineEdit) {
@@ -141,6 +135,7 @@ enum Result NDBCfmDlg::createDialog(
             "could not find text edit symbols"
         );
     }
+
     switch (dlgType) {
     case TypeStd:
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
@@ -149,8 +144,9 @@ enum Result NDBCfmDlg::createDialog(
         break;
 
     case TypeLineEdit:
-        dlg = symbols.ConfirmationDialogFactory_showTextEditDialog(title);
+        dlg = symbols.ConfirmationDialogFactory_showTextEditDialog("");
         DLG_ASSERT(NullError, dlg, "could not get line edit dialog");
+        dlg->hide();
         tef = createTextEditField();
         DLG_ASSERT(NullError, tef, "error getting text edit field");
         tle = symbols.N3ConfirmationTextEditField__textEdit(tef);
@@ -166,13 +162,6 @@ enum Result NDBCfmDlg::createDialog(
         DLG_ASSERT(ParamError, false, "Incorrect dialog type passed");
         break;
     }
-
-    symbols.ConfirmationDialog__setTitle(dlg, title);
-    symbols.ConfirmationDialog__setText(dlg, body);
-    symbols.ConfirmationDialog__setRejectOnOutsideTap(dlg, tapOutsideClose);
-
-    if (!acceptText.isEmpty()) { symbols.ConfirmationDialog__setAcceptButtonText(dlg, acceptText); }
-    if (!rejectText.isEmpty()) { symbols.ConfirmationDialog__setRejectButtonText(dlg, rejectText); }
 
     dlg->setModal(true);
     return Ok;
@@ -191,11 +180,40 @@ enum Result NDBCfmDlg::closeDialog() {
     return Ok;
 }
 
-enum Result NDBCfmDlg::updateBody(QString const& body) {
+enum Result NDBCfmDlg::setTitle(QString const& title) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    symbols.ConfirmationDialog__setTitle(dlg, title);
+    return Ok;
+}
+
+enum Result NDBCfmDlg::setBody(QString const& body) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
     DLG_ASSERT(ForbiddenError, currActiveType == TypeStd, "not standard dialog");
-    DLG_ASSERT(SymbolError, symbols.ConfirmationDialog__setText, "could not find setText symbol");
     symbols.ConfirmationDialog__setText(dlg, body);
+    return Ok;
+}
+
+enum Result NDBCfmDlg::setAccept(QString const& acceptText) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    symbols.ConfirmationDialog__setAcceptButtonText(dlg, acceptText);
+    return Ok;
+}
+
+enum Result NDBCfmDlg::setReject(QString const& rejectText) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    symbols.ConfirmationDialog__setRejectButtonText(dlg, rejectText);
+    return Ok;
+}
+
+enum Result NDBCfmDlg::setModal(bool modal) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    symbols.ConfirmationDialog__setRejectOnOutsideTap(dlg, modal);
+    return Ok;
+}
+
+enum Result NDBCfmDlg::showClose(bool show) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    symbols.ConfirmationDialog__showCloseButton(dlg, show);
     return Ok;
 }
 
@@ -229,35 +247,38 @@ enum Result NDBCfmDlg::setProgress(int min, int max, int val, QString const& for
     return Ok;
 }
 
-void NDBCfmDlg::setPassword(bool isPassword) {
-    if (dlg && currActiveType == TypeLineEdit && tef) {
-        TouchCheckBox* tcb = tef->findChild<TouchCheckBox*>(QString("showPassword"));
-        if (tcb) {
-            if (isPassword) {
-                tcb->setChecked(false);
-                tcb->show();
-            }
-            else {
-                tcb->setChecked(true);
-                tcb->hide();
-            }
+enum Result NDBCfmDlg::setLEPassword(bool isPassword) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    DLG_ASSERT(ForbiddenError, currActiveType == TypeLineEdit, "not LineEdit dialog");
+    DLG_ASSERT(NullError, tef, "TextEditField is null");
+
+    TouchCheckBox* tcb = tef->findChild<TouchCheckBox*>(QString("showPassword"));
+    if (tcb) {
+        if (isPassword) {
+            tcb->setChecked(false);
+            tcb->show();
+        }
+        else {
+            tcb->setChecked(true);
+            tcb->hide();
         }
     }
+    return Ok;
+}
+enum Result NDBCfmDlg::setLEPlaceholder(QString const& placeholder) {
+    DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
+    DLG_ASSERT(ForbiddenError, currActiveType == TypeLineEdit, "not LineEdit dialog");
+    DLG_ASSERT(NullError, tle, "TouchLineEdit is null");
+    tle->setPlaceholderText(placeholder);
+    return Ok;
 }
 
-QString NDBCfmDlg::getText() {
-    QString ret;
-    DLG_ASSERT(ret, dlg, "dialog not active");
-    if (currActiveType == TypeLineEdit && tle) {
-        ret = tle->text();
-    }
-    return ret;
-}
-
-void NDBCfmDlg::setText(QString const& text) {
-    if (dlg && currActiveType == TypeLineEdit && tle) {
-        tle->setPlaceholderText(text);
-    }
+QString NDBCfmDlg::getLEText() {
+    QString res;
+    DLG_ASSERT(res, dlg, "dialog not open");
+    DLG_ASSERT(res, currActiveType == TypeLineEdit, "not LineEdit dialog");
+    DLG_ASSERT(res, tle, "TouchLineEdit is null");
+    return tle->text();
 }
 
 } // namespace NDB

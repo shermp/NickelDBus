@@ -27,21 +27,19 @@ class NDBCfmDlg : public QObject {
         ~NDBCfmDlg();
         QString errString;
         QPointer<ConfirmationDialog> dlg;
-        enum Result createDialog(
-            enum dialogType dlgType,
-            QString const& title, 
-            QString const& body, 
-            QString const& acceptText, 
-            QString const& rejectText, 
-            bool tapOutsideClose
-        );
+        enum Result createDialog(enum dialogType dlgType);
+        enum Result setTitle(const QString& title);
+        enum Result setBody(QString const& body);
+        enum Result setAccept(QString const& acceptText);
+        enum Result setReject(QString const& rejectText);
+        enum Result setModal(bool modal);
+        enum Result showClose(bool show);
+        enum Result setProgress(int min, int max, int val, QString const& format = "");
+        enum Result setLEPassword(bool isPassword);
+        enum Result setLEPlaceholder(QString const& placeholder);
+        QString getLEText();
         enum Result showDialog();
         enum Result closeDialog();
-        enum Result updateBody(QString const& body);
-        enum Result setProgress(int min, int max, int val, QString const& format = "");
-        void setPassword(bool isPassword);
-        QString getText();
-        void setText(QString const& text);
 
     private:
         struct {

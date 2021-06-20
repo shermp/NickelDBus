@@ -78,14 +78,19 @@ class NDBDbus : public QObject, protected QDBusContext {
         void dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText);
         void dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText);
         void dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
-        // Modal basic dialog
-        void dlgConfirmModalMessage(QString const& title, QString const& body);
-        void dlgConfirmChangeBody(QString const& body);
+        // Flexi dialogs
+        void dlgConfirmCreate(bool createLineEdit = false);
+        void dlgConfirmSetTitle(QString const& title);
+        void dlgConfirmSetBody(QString const& body);
+        void dlgConfirmSetAccept(QString const& acceptText);
+        void dlgConfirmSetReject(QString const& rejectText);
+        void dlgConfirmSetModal(bool modal);
+        void dlgConfirmShowClose(bool show);
         void dlgConfirmSetProgress(int min, int max, int val, QString const& format = "");
+        void dlgConfirmSetLEPassword(bool password);
+        void dlgConfirmSetLEPlaceholder(QString const& placeholder);
+        void dlgConfirmShow();
         void dlgConfirmClose();
-        // Line edit dialog
-        void dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword);
-        void dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -141,6 +146,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         void pwrAction(const char *action);
         void rvConnectSignals(QWidget* rv);
         void dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
+        enum Result dlgConfirmCreatePreset(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
 };
 
 } // namespace NDB

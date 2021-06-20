@@ -402,6 +402,22 @@ QString NDBDbus::ndbFirmwareVersion() {
 #define NDB_DLG_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, (cfmDlg->errString.toUtf8().constData()))
 
 /*!
+ * \internal
+ * \brief Utility method to create one of the preset dialogs
+ */
+enum Result NDBDbus::dlgConfirmCreatePreset(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
+    enum Result res;
+    NDB_ASSERT_RES(res, cfmDlg->createDialog(NDBCfmDlg::TypeStd));
+    if (!title.isEmpty()) { NDB_ASSERT_RES(res, cfmDlg->setTitle(title)); }
+    if (!body.isEmpty()) { NDB_ASSERT_RES(res, cfmDlg->setBody(body)); }
+    if (!rejectText.isEmpty()) { NDB_ASSERT_RES(res, cfmDlg->setReject(rejectText)); }
+    if (!acceptText.isEmpty()) { NDB_ASSERT_RES(res, cfmDlg->setAccept(acceptText)); }
+    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
+    NDB_ASSERT_RES(res, cfmDlg->showDialog());
+    return Ok;
+}
+
+/*!
  * \brief Show a confirmation dialog with no buttons (except close)
  * 
  * Create a dialog box with \a title and \a body. This dialog only has a close
@@ -411,9 +427,7 @@ QString NDBDbus::ndbFirmwareVersion() {
  */
 void NDBDbus::dlgConfirmNoBtn(QString const& title, QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", true) == Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
-    cfmDlg->showDialog();
+    NDB_DLG_ASSERT((void) 0, (dlgConfirmCreatePreset(title, body, "", "") == Ok));
 }
 
 /*!
@@ -427,9 +441,7 @@ void NDBDbus::dlgConfirmNoBtn(QString const& title, QString const& body) {
  */
 void NDBDbus::dlgConfirmAccept(QString const& title, QString const& body, QString const& acceptText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, "", true) == Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
-    cfmDlg->showDialog();
+    NDB_DLG_ASSERT((void) 0, (dlgConfirmCreatePreset(title, body, acceptText, "") == Ok));
 }
 
 /*!
@@ -443,9 +455,7 @@ void NDBDbus::dlgConfirmAccept(QString const& title, QString const& body, QStrin
  */
 void NDBDbus::dlgConfirmReject(QString const& title, QString const& body, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", rejectText, true) == Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
-    cfmDlg->showDialog();
+    NDB_DLG_ASSERT((void) 0, (dlgConfirmCreatePreset(title, body, "", rejectText) == Ok));
 }
 
 /*!
@@ -460,41 +470,120 @@ void NDBDbus::dlgConfirmReject(QString const& title, QString const& body, QStrin
  */
 void NDBDbus::dlgConfirmAcceptReject(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, acceptText, rejectText, true) == Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
-    cfmDlg->showDialog();
+    NDB_DLG_ASSERT((void) 0, (dlgConfirmCreatePreset(title, body, acceptText, rejectText) == Ok));
 }
 
 /*!
- * \brief Show confirmation dialog without buttons that can only be closed with close button, or programatically
+ * \brief Create a flexible confirmation dialog
  * 
- * Create a dialog box with \a title and \a body. This dialog has a close
- * button for safety, but is expected to be closed by \l dlgConfirmClose()
+ * Create (but not show) a flexible confirmation dialog. If \a createLineEdit is
+ * \c true a LineEdit dialog will be created, otherwise a standard dialog is created.
  * 
- * No signal is emitted when the dialog is closed
+ * The caller can invoke \l dlgConfirmSetTitle(), \l dlgConfirmSetBody(),
+ * \l dlgConfirmSetAccept(), \l dlgConfirmSetReject(), \l dlgConfirmSetModal(),
+ * \l dlgConfirmShowClose(), \l dlgConfirmSetProgress() to customise the appearance and
+ * behaviour of the dialog. If the dialog is a LineEdit, \l dlgConfirmSetLEPassword() and
+ * \l dlgConfirmSetLEPlaceholder() can also be called.
+ * 
+ * Show the dialog by calling \l dlgConfirmShow(). It can be closed by calling 
+ * \l dlgConfirmClose() in addition to the user closing it.
+ * 
+ * \l dlgConfirmResult() signal is emitted when the dialog is closed.
+ *
+ * For a LineEdit dialog, if the dialog is closed by tapping the 'accept' button, the 
+ * \l dlgConfirmTextInput() signal will emit the contents of the text edit field 
+ * (which may be an empty string), and \l dlgConfirmResult() will emit \c 1. 
+ * Otherwise, \l dlgConfirmResult() will emit the result of \c 0 and \l dlgConfirmTextInput()
+ * will emit an empty string.
  * 
  * \since v0.2.0
  */
-void NDBDbus::dlgConfirmModalMessage(QString const& title, QString const& body) {
+void NDBDbus::dlgConfirmCreate(bool createLineEdit) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeStd, title, body, "", "", false) == Ok));
-    QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
-    cfmDlg->showDialog();
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(createLineEdit ? NDBCfmDlg::TypeLineEdit : NDBCfmDlg::TypeStd) == Ok));
+    if (createLineEdit) {
+        QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDBDbus::onDlgLineEditAccepted);
+        QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDBDbus::onDlgLineEditRejected);
+    } else {
+        QObject::connect(cfmDlg->dlg, &QDialog::finished, this, &NDBDbus::dlgConfirmResult);
+    }
 }
 
 /*!
- * \brief Change body text of currently displayed dialog
- * 
- * Set the body text of the currently displayed dialog to \a body
- * replacing the existing body text.
- * 
- * There will be an error if the user has closed the dialog.
+ * \brief Set title of an existing confirmation dialog
+ *
+ * The confirmation dialog will have the title set to \a title
  * 
  * \since v0.2.0
- */ 
-void NDBDbus::dlgConfirmChangeBody(QString const& body) {
+ */
+void NDBDbus::dlgConfirmSetTitle(QString const& title) {
     NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->updateBody(body) == Ok));
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setTitle(title) == Ok));
+}
+
+/*!
+ * \brief Set body text of an existing confirmation dialog
+ *
+ * The confirmation dialog will have the body text set to \a body
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmSetBody(QString const& body) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setBody(body) == Ok));
+}
+
+/*!
+ * \brief Set the accept button of an existing confirmation dialog
+ *
+ * The accept button will be enabled, and its label will be set
+ * to \a acceptText
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmSetAccept(QString const& acceptText) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setAccept(acceptText) == Ok));
+}
+
+/*!
+ * \brief Set the reject button of an existing confirmation dialog
+ *
+ * The reject button will be enabled, and its label will be set
+ * to \a rejectText
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmSetReject(QString const& rejectText) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setReject(rejectText) == Ok));
+}
+
+/*!
+ * \brief Set whether the confirmation dialog will be modal
+ *
+ * If \a modal is \c true the user will not be able to exit
+ * the dialog by tapping outside it.
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmSetModal(bool modal) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setModal(modal) == Ok));
+}
+
+/*!
+ * \brief Set whether the confirmation dialog will have a close button
+ *
+ * If \a show is \c false the show button will not be displayed.
+ * Note, if the dialog is modal, and accept and reject buttons are
+ * not set, the user will have no means of closing the dialog.
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmShowClose(bool show) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->showClose(show) == Ok));
 }
 
 /*!
@@ -517,6 +606,41 @@ void NDBDbus::dlgConfirmSetProgress(int min, int max, int val, QString const& fo
 }
 
 /*!
+ * \brief Sets whether the current line edit dialog is a password dialog
+ *
+ * If \a password is \c true the dialog will have a 'show password' checkbox, and
+ * input text will be masked if that checkbox is not checked.
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmSetLEPassword(bool password) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setLEPassword(password) == Ok));
+}
+
+/*!
+ * \brief Add placeholder text to a line edit dialog
+ *
+ * Set the line edit placeholder to \a placeholder
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmSetLEPlaceholder(QString const& placeholder) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->setLEPlaceholder(placeholder) == Ok));
+}
+
+/*!
+ * \brief Display the current dialog
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::dlgConfirmShow() {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DLG_ASSERT((void) 0, (cfmDlg->showDialog() == Ok));
+}
+
+/*!
  * \brief Close the currently opened dialog
  * 
  * Closes the currently open dialog. Will return an
@@ -534,7 +658,7 @@ void NDBDbus::dlgConfirmClose() {
  * \brief slot for handling a line edit dialog that is accepted.
 */
 void NDBDbus::onDlgLineEditAccepted() {
-    emit dlgConfirmTextInput(cfmDlg->getText());
+    emit dlgConfirmTextInput(cfmDlg->getLEText());
     emit dlgConfirmResult(QDialog::Accepted);
 }
 
@@ -545,50 +669,6 @@ void NDBDbus::onDlgLineEditAccepted() {
 void NDBDbus::onDlgLineEditRejected() {
     emit dlgConfirmTextInput("");
     emit dlgConfirmResult(QDialog::Rejected);
-}
-
-void NDBDbus::dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
-    NDB_DBUS_USB_ASSERT((void) 0);
-    NDB_DLG_ASSERT((void) 0, (cfmDlg->createDialog(NDBCfmDlg::TypeLineEdit, title, "", acceptText, rejectText, true) == Ok));
-    cfmDlg->setText(setText);
-    cfmDlg->setPassword(isPassword);
-    QObject::connect(cfmDlg->dlg, &QDialog::accepted, this, &NDBDbus::onDlgLineEditAccepted);
-    QObject::connect(cfmDlg->dlg, &QDialog::rejected, this, &NDBDbus::onDlgLineEditRejected);
-    cfmDlg->showDialog();
-}
-
-/*!
- * \brief Create dialog with single line text input
- * 
- * The dialog box will have a \a title, \a acceptText and \a rejectText buttons 
- * and a single line text entry field. If \a isPassword is \c {true}, the
- * text entry field will have its entry characters masked.
- * 
- * If the dialog is closed by tapping the 'accept' button, the 
- * \l dlgConfirmTextInput() signal will emit the contents of the text edit field 
- * (which may be an empty string), and \l dlgConfirmResult() will emit \c 1. 
- * Otherwise, \l dlgConfirmResult() will emit the result of \c 0 and \l dlgConfirmTextInput()
- * will emit an empty string.
- * 
- * \since v0.2.0
- */
-void NDBDbus::dlgConfirmLineEdit(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword) {
-    dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, "");
-}
-
-/*!
- * \brief Create dialog with single line text input with placeholder text
- * 
- * This is the same as \l dlgConfirmLineEdit() with the addition that placeholder
- * text will be added to the text entry field. This placeholder text is set to \a setText
- * 
- * The parameters \a title, \a acceptText, \a rejectText and \a isPassword are all the
- * same as \l dlgConfirmLineEdit()
- * 
- * \since v0.2.0
- */
-void NDBDbus::dlgConfirmLineEditPlaceholder(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText) {
-    dlgConfirmLineEditFull(title, acceptText, rejectText, isPassword, setText);
 }
 
 /*!
