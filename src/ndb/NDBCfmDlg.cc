@@ -207,7 +207,7 @@ enum Result NDBCfmDlg::setReject(QString const& rejectText) {
 
 enum Result NDBCfmDlg::setModal(bool modal) {
     DLG_ASSERT(ForbiddenError, dlg, "dialog not open");
-    symbols.ConfirmationDialog__setRejectOnOutsideTap(dlg, modal);
+    symbols.ConfirmationDialog__setRejectOnOutsideTap(dlg, !modal);
     return Ok;
 }
 
