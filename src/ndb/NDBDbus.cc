@@ -83,6 +83,12 @@ NDBDbus::NDBDbus(QObject* parent) : QObject(parent), QDBusContext() {
         initSucceeded = false;
         return;
     }
+    volContent = new NDBVolContent(this);
+    if (!volContent || volContent->initResult != Ok) {
+        nh_log("failed to create VolContent object");
+        initSucceeded = false;
+        return;
+    }
     // // Setup the N3 Dialog object
     // n3Dlg = new NDBN3Dlg(this);
     // if (!n3Dlg || n3Dlg->initResult == NDBN3Dlg::InitError) {
@@ -397,6 +403,22 @@ QString NDBDbus::ndbFirmwareVersion() {
         fwVersion = fwRegex.cap(2);
     }
     return fwVersion;
+}
+
+QStringList NDBDbus::ndbBookList() {
+    return volContent->getBookList();
+}
+
+QString NDBDbus::ndbMetaData(QString const& cID) {
+    auto md = volContent->getDbValues(cID);
+    NDB_DBUS_ASSERT("", QDBusError::InternalError, !md.isEmpty(), "metadata map is empty");
+    QJsonObject obj = QJsonObject::fromVariantMap(md);
+    QJsonDocument doc(obj);
+    NDB_DEBUG("QJsonDocument is %s", (doc.isNull() ? "invalid" : "valid"));
+    QByteArray docBA = doc.toJson(QJsonDocument::Indented);
+    NDB_DEBUG("JSON contents is: %s", docBA.constData());
+    QString ret;
+    return ret.fromUtf8(docBA);
 }
 
 #define NDB_DLG_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, (cfmDlg->errString.toUtf8().constData()))
