@@ -7,16 +7,9 @@
 namespace NDB {
 NDBVolContent::NDBVolContent(QObject* parent) : QObject(parent) {
     initResult = Ok;
-    VolumeManager *(*VolumeManager__sharedInstance)();
-    resolveSymbolRTLD("_ZN13VolumeManager14sharedInstanceEv", nh_symoutptr(VolumeManager__sharedInstance));
-    if (!VolumeManager__sharedInstance) {
+    resolveSymbolRTLD("_ZN13VolumeManager14sharedInstanceEv", nh_symoutptr(symbols.VolumeManager__sharedInstance));
+    if (!symbols.VolumeManager__sharedInstance) {
         initResult = SymbolError;
-        return;
-    }
-    vm = VolumeManager__sharedInstance();
-    if (!vm) {
-        nh_log("could not get shared VolumeManager");
-        initResult = NullError;
         return;
     }
     Device *(*Device__getCurrentDevice)();
@@ -31,7 +24,7 @@ NDBVolContent::NDBVolContent(QObject* parent) : QObject(parent) {
         initResult = NullError;
         return;
     }
-    QString *(*Device__getDbName)(Device* _this);
+    QString (*Device__getDbName)(Device* _this);
     resolveSymbolRTLD("_ZNK6Device9getDbNameEv", nh_symoutptr(Device__getDbName));
     if (!Device__getDbName) {
         initResult = SymbolError;
@@ -59,8 +52,8 @@ NDBVolContent::~NDBVolContent() {
 
 }
 
-Volume* NDBVolContent::getByID(QString const& id) {
-    return symbols.VolumeManager__getById(vm, id, *dbName);
+Volume* NDBVolContent::getByID(Volume* vol, QString const& id) {
+    return symbols.VolumeManager__getById(vol, id, dbName);
 }
 
 int NDBVolContent::isValid(Volume* v) {
@@ -73,29 +66,16 @@ QString NDBVolContent::getID(Volume* v) {
 
 }
 
-QMap<QString, QVariant> NDBVolContent::getContentDbValues(Content* content) {
-    NDB_DEBUG("calling Content::getDbValues");
-    QMap<QString, QVariant> qm = symbols.Content__getDbValues(content);
-    NDB_DEBUG("got result from Content::getDbValues");
-    return qm;
-}
-
-QMap<QString, QVariant> NDBVolContent::getVolumeDbValues(Volume* volume) {
-    NDB_DEBUG("calling Volume::getDbValues");
-    QMap<QString, QVariant> qm = symbols.Volume__getDbValues(volume);
-    NDB_DEBUG("got result from Volume::getDbValues");
-    return qm;
-}
-
-QMap<QString, QVariant> NDBVolContent::getDbValues(QString const& cID) {
-    Volume *v = getByID(cID);
+QVariantMap NDBVolContent::getDbValues(QString const& cID) {
+    char va[256];
+    Volume* v = getByID((Volume*)va, cID);
     if (!v) {
         NDB_DEBUG("Volume pointer NULL");
-        return QMap<QString, QVariant>();
+        return QVariantMap();
     }
-    QMap<QString, QVariant> volMap = getVolumeDbValues(v);
+    QVariantMap volMap = symbols.Volume__getDbValues(v);
     Content *c = v;
-    QMap<QString, QVariant> contentMap = getContentDbValues(c);
+    QVariantMap contentMap = symbols.Content__getDbValues(c);
     auto merged = contentMap;
     for (auto i = volMap.constBegin(); i != volMap.constEnd(); ++i) {
         merged.insert(i.key(), i.value());
@@ -107,7 +87,7 @@ QStringList NDBVolContent::getBookList() {
     using std::placeholders::_1;
     currBookList.clear();
     NDB_DEBUG("calling Volume::forEach()");
-    symbols.Volume__forEach(*dbName, std::bind(&NDBVolContent::forEachFunc, this, _1));
+    symbols.Volume__forEach(dbName, std::bind(&NDBVolContent::forEachFunc, this, _1));
     return currBookList;
 }
 
