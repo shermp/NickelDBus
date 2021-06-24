@@ -46,9 +46,11 @@ int NDBCli::getMethodIndex() {
 
 bool NDBCli::convertParam(int index, int typeID, void *param) {
     bool ok = false;
+
     if (typeID == QMetaType::Type::Int) {
         int *i = reinterpret_cast<int*> (param);
         *i = methodArgs.at(index).toInt(&ok); 
+
     } else if (typeID == QMetaType::Type::Bool) {
         bool *b = reinterpret_cast<bool*> (param);
         ok = true;
@@ -59,17 +61,12 @@ bool NDBCli::convertParam(int index, int typeID, void *param) {
         } else {
             ok = false;
         }
+
     } else if (typeID == QMetaType::Type::QString) {
         QString *s = reinterpret_cast<QString*> (param);
         s->append(methodArgs.at(index));
         ok = true;
-    } else if (typeID == QMetaType::Type::QStringList) {
-        QStringList *sl = reinterpret_cast<QStringList*> (param);
-        QStringList split = methodArgs.at(index).split(listDelim);
-        for (int i = 0; i < split.size(); ++i) {
-            sl->append(split[i]);
-        }
-        ok = true;
+
     } else {
         ok = false;
     }
@@ -233,10 +230,6 @@ void NDBCli::setMethodArgs(QStringList args) {
 
 void NDBCli::setSignalNames(QStringList names) {
     signalNames = names;
-}
-
-void NDBCli::setListDelim(QString const& delim) {
-    listDelim = delim[0];
 }
 
 void NDBCli::setTimeout(int t) {

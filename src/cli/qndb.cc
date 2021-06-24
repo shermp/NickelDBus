@@ -19,12 +19,10 @@ int main(int argc, char **argv) {
     QCommandLineOption signalOption(QStringList() << "s" << "signal", "Wait for signal, and prints its output, if any.", "signal name");
     QCommandLineOption timeoutOption(QStringList() << "t" << "timeout", "Signal timeout in milliseconds.", "timeout ms");
     QCommandLineOption methodOption(QStringList() << "m" << "method", "Method to invoke.", "method name");
-    QCommandLineOption delimOption(QStringList() << "d" << "delimiter", "Sets delimiter for list (default ',')", "delimiter character");
     QCommandLineOption apiOption(QStringList() << "a" << "api", "Print API usage");
     parser.addOption(signalOption);
     parser.addOption(timeoutOption);
     parser.addOption(methodOption);
-    parser.addOption(delimOption);
     parser.addOption(apiOption);
 
     parser.process(app);
@@ -50,10 +48,7 @@ int main(int argc, char **argv) {
         }
     }
     cli.setMethodArgs(parser.positionalArguments());
-    cli.setListDelim();
-    if (parser.isSet(delimOption) && !parser.value(delimOption).isEmpty()) {
-        cli.setListDelim(parser.value(delimOption));
-    }
+    
     QTimer::singleShot(0, &cli, SLOT(start()));
     return app.exec();
 }
