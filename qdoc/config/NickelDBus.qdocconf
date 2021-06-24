@@ -2,6 +2,10 @@
 # and there are some compatibility issues between old and new
 # practices. For that reason, any QDoc configuration file needs to
 # include compat.qdocconf.
+
+project = NickelDBus
+description = Monitor and control aspects of Kobo's Nickel application
+
 include(compat.qdocconf)
 
 HTML.stylesheets =  template/style/online.css
