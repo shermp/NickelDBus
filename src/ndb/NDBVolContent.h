@@ -26,6 +26,15 @@ class NDBVolContent : public QObject {
         int isValid(Volume* v);
         QString getID(Volume* v);
         QVariantMap getDbValues(QString const& cID);
+
+        void setAttribution(QString const& id, QString const& attribution);
+        void setDescription(QString const& id, QString const& description);
+        void setSeries(QString const& id, QString const& series);
+        void setSeriesID(QString const& id, QString const& seriesID);
+        void setSeriesNum(QString const& id, QString const& seriesNum);
+        void setSeriesNumFloat(QString const& id, double num);
+        void setSubtitle(QString const& id, QString const& subtitle);
+        void commitMetadata(QString const& id);
     private:
         struct {
             // Getting Volume's
@@ -37,11 +46,26 @@ class NDBVolContent : public QObject {
             QString (*Content__getID)(Content* c);
             QVariantMap (*Content__getDbValues)(Content* content);
             QVariantMap (*Volume__getDbValues)(Volume* volume);
+            int (*Volume__save)(Volume* _this, Device* device);
+            void (*Volume__setAttribute)(Volume* _this, QString const& key, QVariant const& val);
         } symbols;
+        struct {
+            QString* attribution;
+            QString* description;
+            QString* series;
+            QString* seriesID;
+            QString* seriesNum;
+            QString* seriesNumFloat;
+            QString* subtitle;
+        } attr;
         QStringList currBookList;
+        Device* device;
         void forEachFunc(Volume /*const&*/ *v);
         Volume* getByID(Volume* vol, QString const& id);
         QString dbName;
+
+        QMap<QString, QVariantMap> pending;
+        void addToPending(QString const& id, QString const& key, QVariant const& val);
 };
 } // namespace NDB
 #endif // NDB_VOLUME_H

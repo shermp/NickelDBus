@@ -69,9 +69,18 @@ class NDBDbus : public QObject, protected QDBusContext {
         QString ndbNickelWidgets();
         QString ndbCurrentView();
         QString ndbFirmwareVersion();
-        // Metadata
+        // Metadata retrieval
         QStringList ndbBookList();
         QString ndbMetaData(QString const& cID);
+        // Metadata setting
+        void ndbSetAttribution(QString const& id, QString const& attribution);
+        void ndbSetDescription(QString const& id, QString const& description);
+        void ndbSetSeries(QString const& id, QString const& series);
+        void ndbSetSeriesID(QString const& id, QString const& seriesID);
+        void ndbSetSeriesNum(QString const& id, QString const& seriesNum);
+        void ndbSetSeriesNumFloat(QString const& id, double num);
+        void ndbSetSubtitle(QString const& id, QString const& subtitle);
+        void ndbCommitMetadata(QString const& id);
         // misc
         bool ndbSignalConnected(QString const& signalName);
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
