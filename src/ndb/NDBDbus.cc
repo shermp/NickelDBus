@@ -421,6 +421,46 @@ QString NDBDbus::ndbMetaData(QString const& cID) {
     return ret.fromUtf8(docBA);
 }
 
+void NDBDbus::ndbSetAttribution(QString const& id, QString const& attribution) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->setAttribution(id, attribution);
+}
+
+void NDBDbus::ndbSetDescription(QString const& id, QString const& description) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->setDescription(id, description);
+}
+
+void NDBDbus::ndbSetSeries(QString const& id, QString const& series) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->setSeries(id, series);
+}
+
+void NDBDbus::ndbSetSeriesID(QString const& id, QString const& seriesID) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->setSeriesID(id, seriesID);
+}
+
+void NDBDbus::ndbSetSeriesNum(QString const& id, QString const& seriesNum) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->setSeriesNum(id, seriesNum);
+}
+
+void NDBDbus::ndbSetSeriesNumFloat(QString const& id, double num) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->setSeriesNumFloat(id, num);
+}
+
+void NDBDbus::ndbSetSubtitle(QString const& id, QString const& subtitle) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->setSubtitle(id, subtitle);
+}
+
+void NDBDbus::ndbCommitMetadata(QString const& id) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    volContent->commitMetadata(id);
+}
+
 #define NDB_DLG_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, (cfmDlg->errString.toUtf8().constData()))
 
 /*!
