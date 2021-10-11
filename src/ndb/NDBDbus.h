@@ -44,7 +44,6 @@ class NDBDbus : public QObject, protected QDBusContext {
     Q_SIGNALS:
         void dlgConfirmResult(int result);
         void dlgConfirmTextInput(QString input);
-        void dlgConfirmAdvancedJSON(QString json);
         // PlugworkFlowManager signals
         void pfmDoneProcessing();
         void pfmAboutToConnect();

@@ -168,7 +168,6 @@ int NDBCli::callMethodInvoke() {
 void NDBCli::connectSignals() {
     NDBCLI_SIG_CONNECT(dlgConfirmResult, handleSignalParam1);
     NDBCLI_SIG_CONNECT(dlgConfirmTextInput, handleSignalParam1);
-    NDBCLI_SIG_CONNECT(dlgConfirmAdvancedJSON, handleSignalParam1);
     NDBCLI_SIG_CONNECT(pfmAboutToConnect, handleSignalParam0);
     NDBCLI_SIG_CONNECT(pfmDoneProcessing, handleSignalParam0);
     NDBCLI_SIG_CONNECT(wmLinkQualityForConnectedNetwork, handleSignalParam1);

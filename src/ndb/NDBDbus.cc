@@ -926,16 +926,6 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
  */
 
 /*!
- * \fn void NDB::NDBDbus::dlgConfirmAdvancedJSON(QString json)
- * \brief The signal that is emitted when the user accepts an advanced confirmation dialog
- * 
- * When emitted, \a json will be a JSON object with the keys set to the widget names, and
- * the value will be set to the value of each widget at the time the accept button was pressed.
- * 
- * \since v0.2.0
- */
-
-/*!
  * \fn void NDB::NDBDbus::pfmDoneProcessing()
  * \brief The signal that nickel emits when the content import process has completed.
  * 
