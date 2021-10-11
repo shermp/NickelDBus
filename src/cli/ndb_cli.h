@@ -34,7 +34,6 @@ class NDBCli : public QObject {
         void timeoutTriggered();
     public Q_SLOTS:
         void start();
-        
         void handleTimeout();
     private:
         QString errString;

@@ -48,6 +48,7 @@ int main(int argc, char **argv) {
         }
     }
     cli.setMethodArgs(parser.positionalArguments());
+    
     QTimer::singleShot(0, &cli, SLOT(start()));
     return app.exec();
 }

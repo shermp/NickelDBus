@@ -7,7 +7,7 @@ override IFACE_DIR := src/interface
 
 override LIBRARY  := libndb.so
 # NDB sources
-override SOURCES  += src/ndb/nickeldbus.cc src/ndb/ndb.cc $(IFACE_DIR)/ndb_adapter.cpp 
+override SOURCES  += src/ndb/nickeldbus.cc src/ndb/NDBDbus.cc src/ndb/NDBCfmDlg.cc src/ndb/NDBWidgets.cc src/ndb/util.cc $(IFACE_DIR)/ndb_adapter.cpp  
 # NM sources
 override SOURCES  += NickelMenu/src/util.c NickelMenu/src/action.c NickelMenu/src/action_c.c NickelMenu/src/action_cc.cc NickelMenu/src/kfmon.c
 override CFLAGS   += -Wall -Wextra -Werror
@@ -18,7 +18,7 @@ override CXXFLAGS += -DNDB_DBUS_IFACE_NAME='"$(DBUS_IFACE_NAME)"'
 
 override PKGCONF  += Qt5DBus Qt5Widgets
 
-override MOCS 	  += src/ndb/ndb.h $(IFACE_DIR)/ndb_adapter.h
+override MOCS 	  += src/ndb/NDBDbus.h src/ndb/NDBCfmDlg.h src/ndb/NDBWidgets.h $(IFACE_DIR)/ndb_adapter.h
 
 override ADAPTER  := $(IFACE_DIR)/ndb_adapter.h
 override PROXY    := $(IFACE_DIR)/ndb_proxy.h
@@ -33,7 +33,7 @@ override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS
 
 override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) qdoc/html/
 
-.PHONY: cli clean-cli gitignore-cli doc dbuscfg interface uninstall-file
+.PHONY: debug cli clean-cli gitignore-cli doc internal-doc dbuscfg interface uninstall-file
 
 interface: $(ADAPTER) $(PROXY)
 
@@ -53,17 +53,27 @@ clean: clean-cli
 
 gitignore: gitignore-cli
 
-doc:
-	cd qdoc/config && qdoc ndb.qdocconf
+internal-doc:
+	cd qdoc/config && qdoc NickelDBus.qdocconf
+	sed -i 's/This function was introduced in  Qt/This function was introduced in NickelDBus/g' qdoc/html/ndb-ndbdbus.html
+doc: internal-doc
+	cd qdoc/html && \
+	rm ndb.html && \
+	rm ndb-ndbcfmdlg* && \
+	rm ndb-ndbprogressbar*
 
 uninstall-file:
 	echo "$(VERSION)" > $(UNINSTALL_FILE)
 
 all: uninstall-file
 
+debug: CFLAGS += -DDEBUG
+debug: CXXFLAGS += -DDEBUG
+debug: all
+
 $(SOURCES): $(ADAPTER)
 
-$(DBUS_IFACE_XML): src/ndb/ndb.h | $(IFACE_DIR)
+$(DBUS_IFACE_XML): src/ndb/NDBDbus.h | $(IFACE_DIR)
 	qdbuscpp2xml -S -M -o $@ $<
 
 $(ADAPTER) &: $(DBUS_IFACE_XML)

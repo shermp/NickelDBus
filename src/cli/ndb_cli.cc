@@ -46,9 +46,11 @@ int NDBCli::getMethodIndex() {
 
 bool NDBCli::convertParam(int index, int typeID, void *param) {
     bool ok = false;
+
     if (typeID == QMetaType::Type::Int) {
         int *i = reinterpret_cast<int*> (param);
         *i = methodArgs.at(index).toInt(&ok); 
+
     } else if (typeID == QMetaType::Type::Bool) {
         bool *b = reinterpret_cast<bool*> (param);
         ok = true;
@@ -59,10 +61,14 @@ bool NDBCli::convertParam(int index, int typeID, void *param) {
         } else {
             ok = false;
         }
+
     } else if (typeID == QMetaType::Type::QString) {
         QString *s = reinterpret_cast<QString*> (param);
         s->append(methodArgs.at(index));
         ok = true;
+
+    } else {
+        ok = false;
     }
     return ok;
 }
@@ -161,6 +167,7 @@ int NDBCli::callMethodInvoke() {
 
 void NDBCli::connectSignals() {
     NDBCLI_SIG_CONNECT(dlgConfirmResult, handleSignalParam1);
+    NDBCLI_SIG_CONNECT(dlgConfirmTextInput, handleSignalParam1);
     NDBCLI_SIG_CONNECT(pfmAboutToConnect, handleSignalParam0);
     NDBCLI_SIG_CONNECT(pfmDoneProcessing, handleSignalParam0);
     NDBCLI_SIG_CONNECT(wmLinkQualityForConnectedNetwork, handleSignalParam1);
