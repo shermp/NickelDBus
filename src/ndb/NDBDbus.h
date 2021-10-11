@@ -108,6 +108,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         // Power commands
         void pwrShutdown();
         void pwrReboot();
+        void pwrSleep();
     protected Q_SLOTS:
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();

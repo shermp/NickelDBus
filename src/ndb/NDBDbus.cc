@@ -889,6 +889,16 @@ void NDBDbus::pwrReboot() {
     return pwrAction("reboot");
 }
 
+/*!
+ * \brief Put Kobo to sleep
+ * 
+ * \since v0.2.0
+ */
+void NDBDbus::pwrSleep() {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    return pwrAction("sleep");
+}
+
 void NDBDbus::pwrAction(const char *action) {
     nm_action_result_t *res = nm_action_power(action);
     if (!res) {
