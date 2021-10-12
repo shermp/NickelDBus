@@ -76,10 +76,10 @@ $(SOURCES): $(ADAPTER)
 $(DBUS_IFACE_XML): src/ndb/NDBDbus.h | $(IFACE_DIR)
 	qdbuscpp2xml -S -M -o $@ $<
 
-$(ADAPTER) &: $(DBUS_IFACE_XML)
+$(ADAPTER) : $(DBUS_IFACE_XML)
 	cd $(IFACE_DIR) && qdbusxml2cpp -c NDBAdapter -a ndb_adapter $(<F)
 
-$(PROXY) &: $(DBUS_IFACE_XML)
+$(PROXY) : $(DBUS_IFACE_XML)
 	cd $(IFACE_DIR) && qdbusxml2cpp -c NDBProxy -p ndb_proxy $(<F)
 
 $(IFACE_DIR):
