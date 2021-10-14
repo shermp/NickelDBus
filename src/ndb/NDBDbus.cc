@@ -915,6 +915,31 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
     QObject::connect(rv, SIGNAL(pageChanged(int)), this, SIGNAL(rvPageChanged(int)), Qt::UniqueConnection);
 }
 
+/* Enum Documentation */
+
+/*!
+ * \enum NDB::Result
+ * 
+ * This enum stores the result status of a function or method
+ * 
+ * \value   Ok
+ *          The function returned successfully without errors
+ * \value   NotImplemented
+ *          The function has no implementation
+ * \value   InitError
+ *          There was an error initialising an object
+ * \value   SymbolError
+ *          There was an error resolving a Nickel symbol
+ * \value   NullError
+ *          An unexpected nullptr was encountered
+ * \value   ForbiddenError
+ *          A function was called when not allowed to do so
+ * \value   ParamError
+ *          There was an error with a function parameter
+ * \value   ConnError
+ *          There was a dbus connection error
+ */
+
 /* Signal Documentation */
 
 /*!
