@@ -496,7 +496,7 @@ void NDBDbus::dlgConfirmAcceptReject(QString const& title, QString const& body, 
  * Otherwise, \l dlgConfirmResult() will emit the result of \c 0 and \l dlgConfirmTextInput()
  * will emit an empty string.
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmCreate(bool createLineEdit) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -514,7 +514,7 @@ void NDBDbus::dlgConfirmCreate(bool createLineEdit) {
  *
  * The confirmation dialog will have the title set to \a title
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetTitle(QString const& title) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -526,7 +526,7 @@ void NDBDbus::dlgConfirmSetTitle(QString const& title) {
  *
  * The confirmation dialog will have the body text set to \a body
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetBody(QString const& body) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -539,7 +539,7 @@ void NDBDbus::dlgConfirmSetBody(QString const& body) {
  * The accept button will be enabled, and its label will be set
  * to \a acceptText
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetAccept(QString const& acceptText) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -552,7 +552,7 @@ void NDBDbus::dlgConfirmSetAccept(QString const& acceptText) {
  * The reject button will be enabled, and its label will be set
  * to \a rejectText
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetReject(QString const& rejectText) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -565,7 +565,7 @@ void NDBDbus::dlgConfirmSetReject(QString const& rejectText) {
  * If \a modal is \c true the user will not be able to exit
  * the dialog by tapping outside it.
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetModal(bool modal) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -579,7 +579,7 @@ void NDBDbus::dlgConfirmSetModal(bool modal) {
  * Note, if the dialog is modal, and accept and reject buttons are
  * not set, the user will have no means of closing the dialog.
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmShowClose(bool show) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -598,7 +598,7 @@ void NDBDbus::dlgConfirmShowClose(bool show) {
  * percentage value, \c %v for current step, \c %m for last step. The default
  * if not set is \c %p%.
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetProgress(int min, int max, int val, QString const& format) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -611,7 +611,7 @@ void NDBDbus::dlgConfirmSetProgress(int min, int max, int val, QString const& fo
  * If \a password is \c true the dialog will have a 'show password' checkbox, and
  * input text will be masked if that checkbox is not checked.
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetLEPassword(bool password) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -623,7 +623,7 @@ void NDBDbus::dlgConfirmSetLEPassword(bool password) {
  *
  * Set the line edit placeholder to \a placeholder
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmSetLEPlaceholder(QString const& placeholder) {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -633,7 +633,7 @@ void NDBDbus::dlgConfirmSetLEPlaceholder(QString const& placeholder) {
 /*!
  * \brief Display the current dialog
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmShow() {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -646,7 +646,7 @@ void NDBDbus::dlgConfirmShow() {
  * Closes the currently open dialog. Will return an
  * error if the dialog has already been closed by the user.
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::dlgConfirmClose() {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -892,7 +892,7 @@ void NDBDbus::pwrReboot() {
 /*!
  * \brief Put Kobo to sleep
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 void NDBDbus::pwrSleep() {
     NDB_DBUS_USB_ASSERT((void) 0);
@@ -957,7 +957,7 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
  * only emitted when the user taps the \c accept button is tapped. \a input 
  * may be an empty string.
  * 
- * \since v0.2.0
+ * \since 0.2.0
  */
 
 /*!
