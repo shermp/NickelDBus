@@ -12,9 +12,7 @@ jobs:
       with:
         submodules: recursive
     - name: Build
-      run: make clean && make && make cli
-    - name: KoboRoot with 'qndb'
-      run: make koboroot
+      run: make clean && make all cli koboroot
     - name: Build Documentation
       run: make doc
     - name: Upload KoboRoot with 'qndb'

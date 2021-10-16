@@ -14,9 +14,7 @@ jobs:
       with:
         submodules: recursive
     - name: Build
-      run: make clean && make && make cli
-    - name: Create KoboRoot.tgz archive
-      run: make koboroot
+      run: make clean && make all cli koboroot
     - name: Create release
       uses: softprops/action-gh-release@v1
       with:
