@@ -6,6 +6,11 @@
 
 #define DLG_ASSERT(ret, cond, str) if (!(cond)) {         \
     errString = QString("%1: %2").arg(__func__).arg(str); \
+    return (ret);                                         \
+}
+
+#define DLG_ASSERT_CLOSE(ret, cond, str) if (!(cond)) {   \
+    errString = QString("%1: %2").arg(__func__).arg(str); \
     if (dlg) {                                            \
         connectStdSignals();                              \
         closeDialog();                                    \
@@ -114,7 +119,7 @@ N3ConfirmationTextEditField* NDBCfmDlg::createTextEditField() {
 
 enum Result NDBCfmDlg::createDialog(enum dialogType dlgType) {
     DLG_ASSERT(ForbiddenError, !dlg, "dialog already open");
-    DLG_ASSERT(
+    DLG_ASSERT_CLOSE(
         SymbolError, 
         symbols.ConfirmationDialogFactory_getConfirmationDialog && 
         symbols.ConfirmationDialogFactory_showTextEditDialog &&
@@ -127,7 +132,7 @@ enum Result NDBCfmDlg::createDialog(enum dialogType dlgType) {
         "could not find one or more standard dialog symbols"
     );
     if (dlgType == TypeLineEdit) {
-        DLG_ASSERT(
+        DLG_ASSERT_CLOSE(
             SymbolError,
             (symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditFieldKS ||
              symbols.N3ConfirmationTextEditField__N3ConfirmationTextEditField) &&
@@ -139,18 +144,18 @@ enum Result NDBCfmDlg::createDialog(enum dialogType dlgType) {
     switch (dlgType) {
     case TypeStd:
         dlg = symbols.ConfirmationDialogFactory_getConfirmationDialog(nullptr);
-        DLG_ASSERT(NullError, dlg, "could not get confirmation dialog");
+        DLG_ASSERT_CLOSE(NullError, dlg, "could not get confirmation dialog");
         currActiveType = TypeStd;
         break;
 
     case TypeLineEdit:
         dlg = symbols.ConfirmationDialogFactory_showTextEditDialog("");
-        DLG_ASSERT(NullError, dlg, "could not get line edit dialog");
+        DLG_ASSERT_CLOSE(NullError, dlg, "could not get line edit dialog");
         dlg->hide();
         tef = createTextEditField();
-        DLG_ASSERT(NullError, tef, "error getting text edit field");
+        DLG_ASSERT_CLOSE(NullError, tef, "error getting text edit field");
         tle = symbols.N3ConfirmationTextEditField__textEdit(tef);
-        DLG_ASSERT(NullError, tle, "error getting TouchLineEdit");
+        DLG_ASSERT_CLOSE(NullError, tle, "error getting TouchLineEdit");
         // Make the 'Go' key accept the dialog.
         if (!QObject::connect(tef, SIGNAL(commitRequested()), dlg, SIGNAL(accepted()))) {
             nh_log("unable to connect N3ConfirmationTextEditField::commitRequested() to ConfirmationDialog::accepted()");
