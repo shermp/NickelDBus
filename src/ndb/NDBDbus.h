@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QTimer>
 #include "NDBCfmDlg.h"
+#include "NDBExtApp.h"
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
@@ -68,6 +69,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         QString ndbNickelWidgets();
         QString ndbCurrentView();
         QString ndbFirmwareVersion();
+        void ndbSetExtAppMode(bool enable);
         // misc
         bool ndbSignalConnected(QString const& signalName);
         void mwcToast(int toastDuration, QString const& msgMain, QString const& msgSub = QStringLiteral(""));
@@ -121,6 +123,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         QStackedWidget *stackedWidget = nullptr;
         QString fwVersion;
         NDBCfmDlg *cfmDlg;
+        ExtAppMode extApp;
         //NDBN3Dlg *n3Dlg;
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);

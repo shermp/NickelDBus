@@ -399,6 +399,14 @@ QString NDBDbus::ndbFirmwareVersion() {
     return fwVersion;
 }
 
+void NDBDbus::ndbSetExtAppMode(bool enabled) {
+    if (enabled) {
+        extApp.enableExtApp();
+    } else {
+        extApp.disableExtApp();
+    }
+}
+
 #define NDB_DLG_ASSERT(ret, cond) NDB_DBUS_ASSERT(ret, QDBusError::InternalError, cond, (cfmDlg->errString.toUtf8().constData()))
 
 /*!
