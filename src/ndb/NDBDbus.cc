@@ -405,8 +405,8 @@ QString NDBDbus::ndbFirmwareVersion() {
     return fwVersion;
 }
 
-QStringList NDBDbus::ndbBookList() {
-    return volContent->getBookList();
+QStringList NDBDbus::ndbBookList(bool downloaded, bool onlySideloaded) {
+    return volContent->getBookList(downloaded, onlySideloaded);
 }
 
 QString NDBDbus::ndbMetaData(QString const& cID) {

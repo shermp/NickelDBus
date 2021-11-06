@@ -70,7 +70,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         QString ndbCurrentView();
         QString ndbFirmwareVersion();
         // Metadata retrieval
-        QStringList ndbBookList();
+        QStringList ndbBookList(bool downloaded = true, bool onlySideloaded = false);
         QString ndbMetaData(QString const& cID);
         // Metadata setting
         void ndbSetAttribution(QString const& id, QString const& attribution);

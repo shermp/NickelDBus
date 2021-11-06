@@ -22,10 +22,10 @@ class NDBVolContent : public QObject {
         NDBVolContent(QObject* parent);
         ~NDBVolContent();
 
-        QStringList getBookList();
+        QStringList getBookList(bool downloaded = true, bool onlySideloaded = false);
         int isValid(Volume* v);
-        QString getID(Volume* v);
         QVariantMap getDbValues(QString const& cID);
+        QVariantMap getDbValues(Volume* v);
 
         void setAttribution(QString const& id, QString const& attribution);
         void setDescription(QString const& id, QString const& description);
@@ -42,8 +42,6 @@ class NDBVolContent : public QObject {
             Volume *(*VolumeManager__getById)(Volume* vol, QString const& id, QString const& dbName);
             void (*Volume__forEach)(QString const& dbName, std::function<void(Volume /*const&*/ *v)> f);
             int (*Volume__isValid)(Volume* _this);
-            // get metadata from Content and Volume objects
-            QString (*Content__getID)(Content* c);
             QVariantMap (*Content__getDbValues)(Content* content);
             QVariantMap (*Volume__getDbValues)(Volume* volume);
             int (*Volume__save)(Volume* _this, Device* device);
@@ -51,7 +49,11 @@ class NDBVolContent : public QObject {
         } symbols;
         struct {
             QString* attribution;
+            QString* contentID;
+            QString* contentType;
             QString* description;
+            QString* filesize;
+            QString* isDownloaded;
             QString* series;
             QString* seriesID;
             QString* seriesNum;
@@ -59,6 +61,10 @@ class NDBVolContent : public QObject {
             QString* subtitle;
         } attr;
         QStringList currBookList;
+        struct {
+            bool downloaded;
+            bool onlySideloaded;
+        } currBlSettings;
         Device* device;
         void forEachFunc(Volume /*const&*/ *v);
         Volume* getByID(Volume* vol, QString const& id);

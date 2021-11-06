@@ -33,14 +33,12 @@ NDBVolContent::NDBVolContent(QObject* parent) : QObject(parent) {
     dbName = Device__getDbName(device);
     resolveSymbolRTLD("_ZN13VolumeManager7getByIdERK7QStringS2_", nh_symoutptr(symbols.VolumeManager__getById));
     resolveSymbolRTLD("_ZNK6Volume7isValidEv", nh_symoutptr(symbols.Volume__isValid));
-    resolveSymbolRTLD("_ZNK7Content5getIdEv", nh_symoutptr(symbols.Content__getID));
     resolveSymbolRTLD("_ZNK7Content11getDbValuesEv", nh_symoutptr(symbols.Content__getDbValues));
     resolveSymbolRTLD("_ZNK6Volume11getDbValuesEv", nh_symoutptr(symbols.Volume__getDbValues));
     resolveSymbolRTLD("_ZN13VolumeManager7forEachERK7QStringRKSt8functionIFvRK6VolumeEE", nh_symoutptr(symbols.Volume__forEach));
     resolveSymbolRTLD("_ZN6Volume12setAttributeERK7QStringRK8QVariant", nh_symoutptr(symbols.Volume__setAttribute));
     resolveSymbolRTLD("_ZN6Volume4saveERK6Device", nh_symoutptr(symbols.Volume__save));
     if (!symbols.VolumeManager__getById || 
-        !symbols.Content__getID || 
         !symbols.Content__getDbValues ||
         !symbols.Volume__getDbValues ||
         !symbols.Volume__isValid ||
@@ -50,16 +48,21 @@ NDBVolContent::NDBVolContent(QObject* parent) : QObject(parent) {
         initResult = SymbolError;
         return;
     }
-    // Getting Volume/Content attribute/keys
+    // Getting/setting Volume/Content attribute/keys
     resolveSymbolRTLD("ATTRIBUTE_ATTRIBUTION", nh_symoutptr(attr.attribution));
+    resolveSymbolRTLD("ATTRIBUTE_CONTENT_ID", nh_symoutptr(attr.contentID));
+    resolveSymbolRTLD("ATTRIBUTE_CONTENT_TYPE", nh_symoutptr(attr.contentType));
     resolveSymbolRTLD("ATTRIBUTE_DESCRIPTION", nh_symoutptr(attr.description));
+    resolveSymbolRTLD("ATTRIBUTE_FILE_SIZE", nh_symoutptr(attr.filesize));
+    resolveSymbolRTLD("ATTRIBUTE_IS_DOWNLOADED", nh_symoutptr(attr.isDownloaded));
     resolveSymbolRTLD("ATTRIBUTE_SERIES", nh_symoutptr(attr.series));
-    resolveSymbolRTLD("ATTRIBUTE_SERIES_ID", nh_symoutptr(attr.seriesID));
+    resolveSymbolRTLD("ATTRIBUTE_SERIES_ID", nh_symoutptr(attr.seriesID)); // optional
     resolveSymbolRTLD("ATTRIBUTE_SERIES_NUMBER", nh_symoutptr(attr.seriesNum));
     resolveSymbolRTLD("ATTRIBUTE_SERIES_NUMBER_FLOAT", nh_symoutptr(attr.seriesNumFloat));
     resolveSymbolRTLD("ATTRIBUTE_SUBTITLE", nh_symoutptr(attr.subtitle));
-    if (!attr.attribution || !attr.description    || !attr.series || !attr.seriesID 
-     || !attr.seriesNum   || !attr.seriesNumFloat || !attr.subtitle) {
+    if (!attr.attribution  || !attr.contentID      || !attr.contentType    || !attr.description
+     || !attr.filesize     || !attr.isDownloaded   || !attr.series
+     || !attr.seriesNum    || !attr.seriesNumFloat || !attr.subtitle) {
          initResult = SymbolError;
          return;
      }
@@ -77,15 +80,13 @@ int NDBVolContent::isValid(Volume* v) {
     return symbols.Volume__isValid(v);
 }
 
-QString NDBVolContent::getID(Volume* v) {
-    NDB_DEBUG("calling Content::getId");
-    return symbols.Content__getID(v);
-
-}
-
 QVariantMap NDBVolContent::getDbValues(QString const& cID) {
     char va[256];
     Volume* v = getByID((Volume*)va, cID);
+    return getDbValues(v);
+}
+
+QVariantMap NDBVolContent::getDbValues(Volume* v) {
     if (!v) {
         NDB_DEBUG("Volume pointer NULL");
         return QVariantMap();
@@ -100,9 +101,11 @@ QVariantMap NDBVolContent::getDbValues(QString const& cID) {
     return merged;
 }
 
-QStringList NDBVolContent::getBookList() {
+QStringList NDBVolContent::getBookList(bool downloaded, bool onlySideloaded) {
     using std::placeholders::_1;
     currBookList.clear();
+    currBlSettings.downloaded = downloaded;
+    currBlSettings.onlySideloaded = onlySideloaded;
     NDB_DEBUG("calling Volume::forEach()");
     symbols.Volume__forEach(dbName, std::bind(&NDBVolContent::forEachFunc, this, _1));
     return currBookList;
@@ -110,10 +113,22 @@ QStringList NDBVolContent::getBookList() {
 
 void NDBVolContent::forEachFunc(Volume /*const&*/ *v) {
     NDB_DEBUG("entering NDBVolContent::forEachFunc");
+    bool addToList = true;
     if (symbols.Volume__isValid(v)) {
-        QString s = getID(v);
-        NDB_DEBUG("got id '%s' in forEachFunc", s.toUtf8().constData());
-        currBookList.append(s);
+        QVariantMap values = getDbValues(v);
+        QString cID = values[*attr.contentID].toString();
+        NDB_DEBUG("got id '%s' in forEachFunc", cID.toUtf8().constData());
+        bool isDownloaded = values[*attr.isDownloaded].toBool();
+        int filesize = values[*attr.filesize].toInt();
+        if (currBlSettings.downloaded && (!isDownloaded || filesize <= 0)) {
+            addToList = false;
+        }
+        if (currBlSettings.onlySideloaded && !cID.startsWith("file:///")) {
+            addToList = false;
+        }
+        if (addToList) {
+            currBookList.append(cID);
+        }
     }
 }
 
@@ -139,7 +154,9 @@ void NDBVolContent::setSeries(QString const& id, QString const& series) {
 }
 
 void NDBVolContent::setSeriesID(QString const& id, QString const& seriesID) {
-    addToPending(id, *attr.seriesID, QVariant(seriesID));
+    if (attr.seriesID) {
+        addToPending(id, *attr.seriesID, QVariant(seriesID));
+    }
 }
 
 void NDBVolContent::setSeriesNum(QString const& id, QString const& seriesNum) {
