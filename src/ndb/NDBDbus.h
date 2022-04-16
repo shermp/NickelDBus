@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QTimer>
 #include "NDBCfmDlg.h"
+#include "NDBMetadata.h"
 
 typedef void PlugManager;
 typedef QObject PlugWorkflowManager;
@@ -90,6 +91,10 @@ class NDBDbus : public QObject, protected QDBusContext {
         void dlgConfirmSetLEPlaceholder(QString const& placeholder);
         void dlgConfirmShow();
         void dlgConfirmClose();
+        // Metadata management
+        QStringList mdBookList(bool downloaded = true, bool onlySideloaded = false);
+        QString mdGetMetaData(QString const& cID, bool compact = true);
+        //void mdSetMetadata(QString const& cID, QString const& mdJSON);
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
@@ -122,6 +127,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         QStackedWidget *stackedWidget = nullptr;
         QString fwVersion;
         NDBCfmDlg *cfmDlg;
+        NDBMetadata *metadata;
         //NDBN3Dlg *n3Dlg;
         struct {
             bool *(*PlugManager__gadgetMode)(PlugManager*);
