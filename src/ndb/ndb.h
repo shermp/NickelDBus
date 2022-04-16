@@ -10,7 +10,9 @@ namespace NDB {
         NullError, 
         ForbiddenError, 
         ParamError, 
-        ConnError
+        ConnError,
+        TypeError,
+        VolumeError
     };
 
 }

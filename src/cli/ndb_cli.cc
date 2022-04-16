@@ -3,6 +3,7 @@
 #include <QMetaMethod>
 #include <QMetaType>
 #include <QTextStream>
+#include <QStringList>
 #include <QDebug>
 #include <QTimer>
 
@@ -80,7 +81,15 @@ int NDBCli::printMethodReply(void *reply) {
     r->waitForFinished();
     if (!r->isError()) {
         if (r->count() > 0) {
-            QTextStream(stdout) << r->value() << endl;
+            QVariant qv = r->argumentAt(0);
+            if (qv.type() == QVariant::Type::StringList) {
+                QStringList sl = qv.toStringList();
+                for (int i = 0; i < sl.size(); ++i) {
+                    QTextStream(stdout) << sl.at(i) << endl;
+                }
+            } else {
+                QTextStream(stdout) << qv.toString() << endl;
+            }
         }
         rv = 0;
     } else {
@@ -129,6 +138,7 @@ int NDBCli::callMethodInvoke() {
     // be used in the future).
     int voidPR = qRegisterMetaType<QDBusPendingReply<>>("QDBusPendingReply<>");
     int strPR = qRegisterMetaType<QDBusPendingReply<QString>>("QDBusPendingReply<QString>");
+    int strLstPR = qRegisterMetaType<QDBusPendingReply<QStringList>>("QDBusPendingReply<QStringList>");
     int boolPR = qRegisterMetaType<QDBusPendingReply<bool>>("QDBusPendingReply<bool>");
     int intPR = qRegisterMetaType<QDBusPendingReply<int>>("QDBusPendingReply<int>");
     int id = QMetaType::type(m.typeName());
@@ -157,6 +167,7 @@ int NDBCli::callMethodInvoke() {
     else if (id == strPR)  {printRV = printMethodReply<QString>(ret);}
     else if (id == boolPR) {printRV = printMethodReply<bool>(ret);}
     else if (id == intPR)  {printRV = printMethodReply<int>(ret);}
+    else if (id == strLstPR)  {printRV = printMethodReply<QStringList>(ret);}
     else {printRV = -1;}
     QMetaType::destroy(id, ret);
     return printRV;

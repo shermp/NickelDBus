@@ -1,9 +1,11 @@
 #include <dlfcn.h>
 #include <QApplication>
+#include <QByteArray>
 #include <QString>
 #include <QWidget>
 #include <QRegExp>
 #include <QStringList>
+#include <QJsonDocument>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
@@ -80,6 +82,13 @@ NDBDbus::NDBDbus(QObject* parent) : QObject(parent), QDBusContext() {
     cfmDlg = new NDBCfmDlg(this);
     if (!cfmDlg || cfmDlg->initResult == InitError) {
         nh_log("failed to create confirmation dialog object");
+        initSucceeded = false;
+        return;
+    }
+    // Setup the Metadata object
+    metadata = new NDBMetadata(this);
+    if (!metadata || metadata->initResult == InitError) {
+        nh_log("failed to create metadata object");
         initSucceeded = false;
         return;
     }
@@ -675,6 +684,22 @@ void NDBDbus::onDlgLineEditAccepted() {
 void NDBDbus::onDlgLineEditRejected() {
     emit dlgConfirmTextInput("");
     emit dlgConfirmResult(QDialog::Rejected);
+}
+
+// Metadata management
+QStringList NDBDbus::mdBookList(bool downloaded, bool onlySideloaded) {
+    return metadata->getBookList(downloaded, onlySideloaded);
+}
+
+QString NDBDbus::mdGetMetaData(QString const& cID, bool compact) {
+    QVariantMap md = metadata->getMetadata(cID);
+    if (md.empty()) {
+        return "{}";
+    }
+    QJsonDocument jd = QJsonDocument::fromVariant(md);
+    QByteArray ba = jd.toJson(compact ? QJsonDocument::JsonFormat::Compact 
+                                      : QJsonDocument::JsonFormat::Indented);
+    return QString(ba);
 }
 
 /*!
