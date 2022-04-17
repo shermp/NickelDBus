@@ -2,7 +2,7 @@
 #define NDB_METADA_H
 
 #include <QObject>
-#include <QHash>
+#include <QSet>
 #include <QStringList>
 #include <QVariantMap>
 
@@ -28,13 +28,13 @@ class NDBMetadata : public QObject {
         QStringList getBookList(bool downloaded, bool onlySideloaded);
 
     private:
-        QString dbName;
-        Device* device;
+        QString* dbName = nullptr;
+        Device* device = nullptr;
         struct {
             // Getting Volume's
             VolumeManager* (*VolumeManager__sharedInstance)();
             Volume*        (*VolumeManager__getById)(Volume* vol, QString const& id, QString const& dbName);
-            void           (*Volume__forEach)(QString const& dbName, std::function<void(Volume /*const&*/ *v)> const& f);
+            void           (*Volume__forEach)(QString const& dbName, std::function<void(Volume /*const&*/ *v)> f);
             int            (*Volume__isValid)(Volume* _this);
             QVariantMap    (*Content__getDbValues)(Content* content);
             QVariantMap    (*Volume__getDbValues)(Volume* volume);
@@ -42,43 +42,30 @@ class NDBMetadata : public QObject {
             void           (*Volume__setAttribute)(Volume* _this, QString const& key, QVariant const& val);
         } symbols;
 
-        struct {
-            QString attribution = "ATTRIBUTE_ATTRIBUTION";
-            QString contentID = "ATTRIBUTE_CONTENT_ID";
-            QString contentType = "ATTRIBUTE_CONTENT_ID";
-            QString description = "ATTRIBUTE_DESCRIPTION";
-            QString fileSize = "ATTRIBUTE_FILE_SIZE";
-            QString isDownloaded = "ATTRIBUTE_IS_DOWNLOADED";
-            QString series = "ATTRIBUTE_SERIES";
-            QString seriesID = "ATTRIBUTE_SERIES_ID";
-            QString seriesNum = "ATTRIBUTE_SERIES_NUMBER";
-            QString seriesNumFloat = "ATTRIBUTE_SERIES_NUMBER_FLOAT";
-            QString subtitle = "ATTRIBUTE_SUBTITLE";
-        } attr;
+        QString* ATTRIBUTION;
+        QString* CONTENT_ID;
+        QString* CONTENT_TYPE;
+        QString* DESCRIPTION;
+        QString* FILE_SIZE;
+        QString* IS_DOWNLOADED;
+        QString* SERIES;
+        QString* SERIES_ID;
+        QString* SERIES_NUMBER;
+        QString* SERIES_NUMBER_FLOAT;
+        QString* SUBTITLE;
 
-        QHash<QString, QString*> nickelAttr = {
-            {attr.attribution, nullptr},
-            {attr.contentID, nullptr},
-            {attr.contentType, nullptr},
-            {attr.description, nullptr},
-            {attr.fileSize, nullptr},
-            {attr.isDownloaded, nullptr},
-            {attr.series, nullptr},
-            {attr.seriesID, nullptr},
-            {attr.seriesNum, nullptr},
-            {attr.seriesNumFloat, nullptr},
-            {attr.subtitle, nullptr}
-        };
+        QSet<QString> availableAttr;
 
         struct {
             bool downloaded;
             bool onlySideloaded;
             QStringList list = {};
         } currBL;
+        
         Volume* getByID(Volume* vol, QString const& id);
         bool volIsValid(Volume* v);
         QVariantMap getMetadata(Volume* v);
-        //void forEachFunc(Volume /*const&*/ *v);
+        void forEachFunc(Volume /*const&*/ *v);
 };
 }
 

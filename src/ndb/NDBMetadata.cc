@@ -7,6 +7,10 @@
 
 #define VOLUME_SIZE 256 // Unsure of the exact value for this, 256 bytes seems large enough though
 
+#define NDB_RESOLVE_ATTR(attr, required) resolveSymbolRTLD("ATTRIBUTE_" #attr, nh_symoutptr(attr)); \
+    if ((required) && !(attr)) {nh_log("could not dlsym attribute %s", #attr); initResult = SymbolError; return;} \
+    if ((attr)) availableAttr.insert(*attr);
+
 namespace NDB {
 
 NDBMetadata::~NDBMetadata() {}
@@ -21,6 +25,7 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
     Device *(*Device__getCurrentDevice)();
     resolveSymbolRTLD("_ZN6Device16getCurrentDeviceEv", nh_symoutptr(Device__getCurrentDevice));
     if (!Device__getCurrentDevice) {
+        initResult = SymbolError;
         return;
     }
 
@@ -30,13 +35,20 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
         initResult = NullError;
         return;
     }
-    QString (*Device__getDbName)(Device* _this);
+    QString *(*Device__getDbName)(Device* _this);
     resolveSymbolRTLD("_ZNK6Device9getDbNameEv", nh_symoutptr(Device__getDbName));
     if (!Device__getDbName) {
         initResult = SymbolError;
         return;
     }
     dbName = Device__getDbName(device);
+    if (!dbName) {
+        nh_log("could not get DB name");
+        initResult = NullError;
+        return;
+    }
+    nh_log("DB name is %s", dbName->toUtf8().constData());
+
     resolveSymbolRTLD("_ZN13VolumeManager7getByIdERK7QStringS2_", nh_symoutptr(symbols.VolumeManager__getById));
     resolveSymbolRTLD("_ZNK6Volume7isValidEv", nh_symoutptr(symbols.Volume__isValid));
     resolveSymbolRTLD("_ZNK7Content11getDbValuesEv", nh_symoutptr(symbols.Content__getDbValues));
@@ -54,18 +66,18 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
         initResult = SymbolError;
         return;
     }
-    
-    auto i = nickelAttr.begin();
-    while (i != nickelAttr.end()) {
-        auto attr_name = i.key().toUtf8().constData();
-        resolveSymbolRTLD(attr_name, nh_symoutptr(i.value()));
-        if (i.value() == nullptr) {
-            nh_log("Attribute not found: %s", attr_name);
-            i = nickelAttr.erase(i);
-        } else {
-            ++i;
-        }
-    }
+    // Getting/setting Volume/Content attribute/keys
+    NDB_RESOLVE_ATTR(ATTRIBUTION, true);
+    NDB_RESOLVE_ATTR(CONTENT_ID, true);
+    NDB_RESOLVE_ATTR(CONTENT_TYPE, true);
+    NDB_RESOLVE_ATTR(DESCRIPTION, true);
+    NDB_RESOLVE_ATTR(FILE_SIZE, true);
+    NDB_RESOLVE_ATTR(IS_DOWNLOADED, true);
+    NDB_RESOLVE_ATTR(SERIES, true);
+    NDB_RESOLVE_ATTR(SERIES_ID, false);
+    NDB_RESOLVE_ATTR(SERIES_NUMBER, true);
+    NDB_RESOLVE_ATTR(SERIES_NUMBER_FLOAT, true);
+    NDB_RESOLVE_ATTR(SUBTITLE, true);
 }
 
 bool NDBMetadata::volIsValid(Volume* v) {
@@ -73,7 +85,7 @@ bool NDBMetadata::volIsValid(Volume* v) {
 }
 
 Volume* NDBMetadata::getByID(Volume* vol, QString const& id) {
-    return symbols.VolumeManager__getById(vol, id, dbName);
+    return symbols.VolumeManager__getById(vol, id, *dbName);
 }
 
 QVariantMap NDBMetadata::getMetadata(QString const& cID) {
@@ -98,52 +110,36 @@ QVariantMap NDBMetadata::getMetadata(Volume* v) {
 }
 
 QStringList NDBMetadata::getBookList(bool downloaded, bool onlySideloaded) {
-    QStringList bookList = {};
+    using std::placeholders::_1;
+    currBL.list.clear();
+    currBL.downloaded = downloaded;
+    currBL.onlySideloaded = onlySideloaded;
+    //NDB_DEBUG("DB name is %s", dbName.toUtf8().constData());
     NDB_DEBUG("calling Volume::forEach()");
-    std::function<void(Volume *v)> fe = [&](Volume *v){
-        NDB_DEBUG("Entering Lambda");
-        bool addToList = true;
-        if (volIsValid(v)) {
-            QVariantMap values = getMetadata(v);
-            QString cID = values[attr.contentID].toString();
-            NDB_DEBUG("got id '%s' in forEachFunc", cID.toUtf8().constData());
-            bool isDownloaded = values[attr.isDownloaded].toBool();
-            int filesize = values[attr.fileSize].toInt();
-            if (downloaded && (!isDownloaded || filesize <= 0)) {
-                addToList = false;
-            }
-            if (onlySideloaded && !cID.startsWith("file:///")) {
-                addToList = false;
-            }
-            if (addToList) {
-                bookList.append(cID);
-            }
-        }
-    };
-    symbols.Volume__forEach(dbName, fe);
-    return bookList;
+    symbols.Volume__forEach(*dbName, std::bind(&NDBMetadata::forEachFunc, this, _1));
+    return currBL.list;
 }
 
-// void NDBMetadata::forEachFunc(Volume /*const&*/ *v) {
-//     NDB_DEBUG("entering NDBVolContent::forEachFunc");
-//     bool addToList = true;
-//     if (volIsValid(v)) {
-//         QVariantMap values = getMetadata(v);
-//         QString cID = values[attr.contentID].toString();
-//         NDB_DEBUG("got id '%s' in forEachFunc", cID.toUtf8().constData());
-//         bool isDownloaded = values[attr.isDownloaded].toBool();
-//         int filesize = values[attr.fileSize].toInt();
-//         if (currBL.downloaded && (!isDownloaded || filesize <= 0)) {
-//             addToList = false;
-//         }
-//         if (currBL.onlySideloaded && !cID.startsWith("file:///")) {
-//             addToList = false;
-//         }
-//         if (addToList) {
-//             currBL.list.append(cID);
-//         }
-//     }
-// }
+void NDBMetadata::forEachFunc(Volume /*const&*/ *v) {
+    NDB_DEBUG("entering NDBMetadata::forEachFunc");
+    bool addToList = true;
+    if (symbols.Volume__isValid(v)) {
+        QVariantMap values = getMetadata(v);
+        QString cID = values[*CONTENT_ID].toString();
+        NDB_DEBUG("got id '%s' in forEachFunc", cID.toUtf8().constData());
+        bool isDownloaded = values[*IS_DOWNLOADED].toBool();
+        int filesize = values[*FILE_SIZE].toInt();
+        if (currBL.downloaded && (!isDownloaded || filesize <= 0)) {
+            addToList = false;
+        }
+        if (currBL.onlySideloaded && !cID.startsWith("file:///")) {
+            addToList = false;
+        }
+        if (addToList) {
+            currBL.list.append(cID);
+        }
+    }
+}
 
 Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
     char va[VOLUME_SIZE];
@@ -151,17 +147,17 @@ Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
     NDB_ASSERT(NullError, v, "Error getting Volume for %s", cID.toUtf8().constData());
     NDB_ASSERT(VolumeError, volIsValid(v), "Volume is not valid for %s", cID.toUtf8().constData());
     for (auto i = md.constBegin(); i != md.constEnd(); ++i) {
-        QString key = "ATTRIBUTE_" + i.key().toUpper();
+        const QString key = i.key();
         const QVariant val = i.value();
         // Skip keys that don't exist, and ContentID
-        if (!nickelAttr.contains(key) || key == attr.contentID) {
+        if (!availableAttr.contains(key) || key == *CONTENT_ID) {
             NDB_DEBUG("Skipping %s", key.toUtf8().constData());
             continue;
         }
         // Check metadata types match expected
         auto type = val.userType();
         bool validType = true;
-        if (key == attr.seriesNumFloat) {
+        if (key == *SERIES_NUMBER_FLOAT) {
             if (type != QMetaType::Double && type != QMetaType::Float) {
                 validType = false;
             }
