@@ -110,35 +110,27 @@ QVariantMap NDBMetadata::getMetadata(Volume* v) {
 }
 
 QStringList NDBMetadata::getBookList(bool downloaded, bool onlySideloaded) {
-    using std::placeholders::_1;
-    currBL.list.clear();
-    currBL.downloaded = downloaded;
-    currBL.onlySideloaded = onlySideloaded;
-    //NDB_DEBUG("DB name is %s", dbName.toUtf8().constData());
     NDB_DEBUG("calling Volume::forEach()");
-    symbols.Volume__forEach(*dbName, std::bind(&NDBMetadata::forEachFunc, this, _1));
-    return currBL.list;
-}
-
-void NDBMetadata::forEachFunc(Volume /*const&*/ *v) {
-    NDB_DEBUG("entering NDBMetadata::forEachFunc");
-    bool addToList = true;
-    if (symbols.Volume__isValid(v)) {
-        QVariantMap values = getMetadata(v);
-        QString cID = values[*CONTENT_ID].toString();
-        NDB_DEBUG("got id '%s' in forEachFunc", cID.toUtf8().constData());
-        bool isDownloaded = values[*IS_DOWNLOADED].toBool();
-        int filesize = values[*FILE_SIZE].toInt();
-        if (currBL.downloaded && (!isDownloaded || filesize <= 0)) {
-            addToList = false;
+    QStringList bookList = {};
+    symbols.Volume__forEach(*dbName, [&](Volume *v) {
+        bool addToList = true;
+        if (volIsValid(v)) {
+            QVariantMap values = getMetadata(v);
+            QString cID = values[*CONTENT_ID].toString();
+            bool isDownloaded = values[*IS_DOWNLOADED].toBool();
+            int filesize = values[*FILE_SIZE].toInt();
+            if (downloaded && (!isDownloaded || filesize <= 0)) {
+                addToList = false;
+            }
+            if (onlySideloaded && !cID.startsWith("file:///")) {
+                addToList = false;
+            }
+            if (addToList) {
+                bookList.append(cID);
+            }
         }
-        if (currBL.onlySideloaded && !cID.startsWith("file:///")) {
-            addToList = false;
-        }
-        if (addToList) {
-            currBL.list.append(cID);
-        }
-    }
+    });
+    return bookList;
 }
 
 Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {

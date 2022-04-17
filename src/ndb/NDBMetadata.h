@@ -55,17 +55,10 @@ class NDBMetadata : public QObject {
         QString* SUBTITLE;
 
         QSet<QString> availableAttr;
-
-        struct {
-            bool downloaded;
-            bool onlySideloaded;
-            QStringList list = {};
-        } currBL;
         
         Volume* getByID(Volume* vol, QString const& id);
         bool volIsValid(Volume* v);
         QVariantMap getMetadata(Volume* v);
-        void forEachFunc(Volume /*const&*/ *v);
 };
 }
 
