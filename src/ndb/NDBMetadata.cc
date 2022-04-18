@@ -153,6 +153,8 @@ Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
             if (type != QMetaType::Double && type != QMetaType::Float) {
                 validType = false;
             }
+        } else if (key == *FILE_SIZE && type != QMetaType::Int) {
+            validType = false;
         } else if (type != QMetaType::QString) {
             validType = false;
         }
