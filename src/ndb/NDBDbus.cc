@@ -691,7 +691,7 @@ QStringList NDBDbus::mdBookList(bool downloaded, bool onlySideloaded) {
     return metadata->getBookList(downloaded, onlySideloaded);
 }
 
-QString NDBDbus::mdGetMetaData(QString const& cID, bool compact) {
+QString NDBDbus::mdGetMetadata(QString const& cID, bool compact) {
     QVariantMap md = metadata->getMetadata(cID);
     if (md.empty()) {
         return "{}";
