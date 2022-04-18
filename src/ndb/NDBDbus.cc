@@ -6,6 +6,7 @@
 #include <QRegExp>
 #include <QStringList>
 #include <QJsonDocument>
+#include <QJsonParseError>
 #include <unistd.h>
 #include <string.h>
 #include <NickelHook.h>
@@ -705,6 +706,20 @@ QString NDBDbus::mdGetMetadata(QString const& cID, bool compact) {
     QByteArray ba = jd.toJson(compact ? QJsonDocument::JsonFormat::Compact 
                                       : QJsonDocument::JsonFormat::Indented);
     return QString(ba);
+}
+
+void NDBDbus::mdSetMetadata(QString const& cID, QString const& mdJSON) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    QJsonParseError pe;
+    QJsonDocument md = QJsonDocument::fromJson(mdJSON.toUtf8(), &pe);
+    NDB_DBUS_ASSERT((void) 0, 
+                    QDBusError::InvalidArgs, pe.error == QJsonParseError::NoError, 
+                    "error parsing JSON: %s", pe.errorString().toUtf8().constData());
+    QVariantMap qvm = md.toVariant().toMap();
+    NDB_DBUS_ASSERT((void) 0,
+                    QDBusError::InvalidArgs, !qvm.isEmpty(),
+                    "JSON is not object, or is empty object");
+    metadata->setMetadata(cID, qvm);
 }
 
 /*!

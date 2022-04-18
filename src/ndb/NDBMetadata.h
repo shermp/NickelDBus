@@ -27,6 +27,18 @@ class NDBMetadata : public QObject {
         Result setMetadata(QString const& cID, QVariantMap md);
         QStringList getBookList(bool downloaded, bool onlySideloaded);
 
+        QString* ATTRIBUTION;
+        QString* CONTENT_ID;
+        QString* CONTENT_TYPE;
+        QString* DESCRIPTION;
+        QString* FILE_SIZE;
+        QString* IS_DOWNLOADED;
+        QString* SERIES;
+        QString* SERIES_ID;
+        QString* SERIES_NUMBER;
+        QString* SERIES_NUMBER_FLOAT;
+        QString* SUBTITLE;
+
     private:
         QString* dbName = nullptr;
         Device* device = nullptr;
@@ -41,18 +53,6 @@ class NDBMetadata : public QObject {
             int            (*Volume__save)(Volume* _this, Device* device);
             void           (*Volume__setAttribute)(Volume* _this, QString const& key, QVariant const& val);
         } symbols;
-
-        QString* ATTRIBUTION;
-        QString* CONTENT_ID;
-        QString* CONTENT_TYPE;
-        QString* DESCRIPTION;
-        QString* FILE_SIZE;
-        QString* IS_DOWNLOADED;
-        QString* SERIES;
-        QString* SERIES_ID;
-        QString* SERIES_NUMBER;
-        QString* SERIES_NUMBER_FLOAT;
-        QString* SUBTITLE;
 
         QSet<QString> availableAttr;
         
