@@ -688,13 +688,18 @@ void NDBDbus::onDlgLineEditRejected() {
 
 // Metadata management
 QStringList NDBDbus::mdBookList(bool downloaded, bool onlySideloaded) {
+    NDB_DBUS_USB_ASSERT(QStringList());
     return metadata->getBookList(downloaded, onlySideloaded);
 }
 
 QString NDBDbus::mdGetMetadata(QString const& cID, bool compact) {
+    QString empty = "{}";
+    NDB_DBUS_USB_ASSERT(empty);
     QVariantMap md = metadata->getMetadata(cID);
     if (md.empty()) {
-        return "{}";
+        return empty;
+    } else if (md[*metadata->CONTENT_ID].isNull() || !md[*metadata->CONTENT_ID].isValid()) {
+        return empty;
     }
     QJsonDocument jd = QJsonDocument::fromVariant(md);
     QByteArray ba = jd.toJson(compact ? QJsonDocument::JsonFormat::Compact 
