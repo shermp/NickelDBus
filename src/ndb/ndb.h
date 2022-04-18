@@ -12,7 +12,8 @@ namespace NDB {
         ParamError, 
         ConnError,
         TypeError,
-        VolumeError
+        VolumeError,
+        MetadataError
     };
 
 }
