@@ -162,6 +162,7 @@ Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
         symbols.Volume__setAttribute(v, key, val);
     }
     int res = symbols.Volume__save(v, device);
+    NDB_ASSERT(MetadataError, res, "error saving metadata for id %s", cID.toUtf8().constData());
     NDB_DEBUG("Volume__save returned with val %d", res);
     return Ok;
 }
