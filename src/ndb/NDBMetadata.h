@@ -9,7 +9,7 @@
 #include "ndb.h"
 
 typedef void Content; // It doesn't appear to be a QObject
-typedef Content Volume; // Inherits Content
+typedef void Volume; // Inherits Content
 typedef QObject VolumeManager; // The VolumeManager is a QObject though
 typedef void Device;
 

@@ -5,7 +5,11 @@
 #include "util.h"
 #include "NDBMetadata.h"
 
-#define VOLUME_SIZE 256 // Unsure of the exact value for this, 256 bytes seems large enough though
+/* Volume/Content objects appear to be only 8 bytes. They
+   hold a pointer to a much larger ContentPrivate/VolumePrivate
+   object (VolumePrivate is at least 400 bytes).
+   Setting 16 bytes just to be safe here. */
+#define VOLUME_SIZE 16
 
 #define NDB_RESOLVE_ATTR(attr, required) resolveSymbolRTLD("ATTRIBUTE_" #attr, nh_symoutptr(attr)); \
     if ((required) && !(attr)) {nh_log("could not dlsym attribute %s", #attr); initResult = SymbolError; return;} \
