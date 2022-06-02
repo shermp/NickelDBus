@@ -1,6 +1,7 @@
 #ifndef NDB_METADA_H
 #define NDB_METADA_H
 
+#include <functional>
 #include <QObject>
 #include <QSet>
 #include <QStringList>
@@ -25,7 +26,9 @@ class NDBMetadata : public QObject {
 
         QVariantMap getMetadata(QString const& cID);
         Result setMetadata(QString const& cID, QVariantMap md);
-        QStringList getBookList(bool downloaded, bool onlySideloaded);
+        QStringList getBookListAll();
+        QStringList getBookListDownloaded();
+        QStringList getBookListSideloaded();
 
         QString* ATTRIBUTION;
         QString* CONTENT_ID;
@@ -59,6 +62,7 @@ class NDBMetadata : public QObject {
         Volume* getByID(Volume* vol, QString const& id);
         bool volIsValid(Volume* v);
         QVariantMap getMetadata(Volume* v);
+        QStringList getBookList(std::function<bool (Volume*)> filter);
 };
 }
 

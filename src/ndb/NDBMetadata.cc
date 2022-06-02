@@ -113,28 +113,38 @@ QVariantMap NDBMetadata::getMetadata(Volume* v) {
     return merged;
 }
 
-QStringList NDBMetadata::getBookList(bool downloaded, bool onlySideloaded) {
+QStringList NDBMetadata::getBookList(std::function<bool (Volume*)> filter) {
     NDB_DEBUG("calling Volume::forEach()");
     QStringList bookList = {};
     symbols.Volume__forEach(*dbName, [&](Volume *v) {
-        bool addToList = true;
-        if (volIsValid(v)) {
+        if (volIsValid(v) && filter(v)) {
             QVariantMap values = getMetadata(v);
             QString cID = values[*CONTENT_ID].toString();
-            bool isDownloaded = values[*IS_DOWNLOADED].toBool();
-            int filesize = values[*FILE_SIZE].toInt();
-            if (downloaded && (!isDownloaded || filesize <= 0)) {
-                addToList = false;
-            }
-            if (onlySideloaded && !cID.startsWith("file:///")) {
-                addToList = false;
-            }
-            if (addToList) {
-                bookList.append(cID);
-            }
+            bookList.append(cID);
         }
     });
     return bookList;
+}
+
+QStringList NDBMetadata::getBookListAll() {
+    return getBookList([]([[gnu::unused]] Volume* v){ return true; });
+}
+
+QStringList NDBMetadata::getBookListDownloaded() {
+    return getBookList([&](Volume* v) {
+        QVariantMap values = getMetadata(v);
+        bool isDownloaded = values[*IS_DOWNLOADED].toBool();
+        int filesize = values[*FILE_SIZE].toInt();
+        return isDownloaded && filesize > 0;
+    });
+}
+
+QStringList NDBMetadata::getBookListSideloaded() {
+    return getBookList([&](Volume* v) {
+        QVariantMap values = getMetadata(v);
+        QString cID = values[*CONTENT_ID].toString();
+        return cID.startsWith("file:///");
+    });
 }
 
 Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
