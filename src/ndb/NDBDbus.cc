@@ -688,9 +688,19 @@ void NDBDbus::onDlgLineEditRejected() {
 }
 
 // Metadata management
-QStringList NDBDbus::mdBookList(bool downloaded, bool onlySideloaded) {
+QStringList NDBDbus::mdBookListAll() {
     NDB_DBUS_USB_ASSERT(QStringList());
-    return metadata->getBookList(downloaded, onlySideloaded);
+    return metadata->getBookListAll();
+}
+
+QStringList NDBDbus::mdBookListDownloaded() {
+    NDB_DBUS_USB_ASSERT(QStringList());
+    return metadata->getBookListDownloaded();
+}
+
+QStringList NDBDbus::mdBookListSideloaded() {
+    NDB_DBUS_USB_ASSERT(QStringList());
+    return metadata->getBookListSideloaded();
 }
 
 QString NDBDbus::mdGetMetadata(QString const& cID, bool compact) {

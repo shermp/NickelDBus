@@ -101,7 +101,9 @@ class NDBDbus : public QObject, protected QDBusContext {
         void dlgConfirmShow();
         void dlgConfirmClose();
         // Metadata management
-        QStringList mdBookList(bool downloaded = true, bool onlySideloaded = false);
+        QStringList mdBookListAll();
+        QStringList mdBookListDownloaded();
+        QStringList mdBookListSideloaded();
         QString mdGetMetadata(QString const& cID, bool compact = true);
         void mdSetMetadata(QString const& cID, QString const& mdJSON);
         // PlugWorkFlowManager
