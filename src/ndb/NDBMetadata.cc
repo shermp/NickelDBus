@@ -11,9 +11,16 @@
    Setting 16 bytes just to be safe here. */
 #define VOLUME_SIZE 16
 
-#define NDB_RESOLVE_ATTR(attr, required) resolveSymbolRTLD("ATTRIBUTE_" #attr, nh_symoutptr(attr)); \
-    if ((required) && !(attr)) {nh_log("could not dlsym attribute %s", #attr); initResult = SymbolError; return;} \
-    if ((attr)) availableAttr.insert(*attr);
+#define NDB_RESOLVE_ATTR(attr, required)                       \
+    resolveSymbolRTLD("ATTRIBUTE_" #attr, nh_symoutptr(attr)); \
+    if ((required) && !(attr))                                 \
+    {                                                          \
+        nh_log("could not dlsym attribute %s", #attr);         \
+        initResult = SymbolError;                              \
+        return;                                                \
+    }                                                          \
+    if ((attr))                                                \
+        availableAttr.insert(*attr);
 
 namespace NDB {
 
