@@ -11,19 +11,7 @@
    Setting 16 bytes just to be safe here. */
 #define VOLUME_SIZE 16
 
-#define NDB_RESOLVE_ATTR(attr, required)                           \
-    resolveSymbolRTLD("ATTRIBUTE_" #attr, nh_symoutptr(tmp_attr)); \
-    if ((required) && !(tmp_attr))                                 \
-    {                                                              \
-        nh_log("could not dlsym attribute %s", #attr);             \
-        initResult = SymbolError;                                  \
-        return;                                                    \
-    }                                                              \
-    if ((tmp_attr))                                                \
-    {                                                              \
-        attr = *tmp_attr;                                          \
-        availableAttr.insert(attr);                                \
-    }
+#define NDB_RESOLVE_ATTR(attr, required) if (!resolve_attr(attr, "ATTRIBUTE_" #attr, required)) return
 
 namespace NDB {
 
@@ -81,7 +69,20 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
         return;
     }
 
-    QString *tmp_attr = nullptr;
+    auto resolve_attr = [&](QString& attr, const char* name, bool required) {
+        QString *tmp_attr = nullptr;
+        resolveSymbolRTLD(name, nh_symoutptr(tmp_attr));
+        if (required && !tmp_attr) {
+            nh_log("could not dlsym attribute %s", name);
+            initResult = SymbolError;
+            return false;
+        }
+        if (tmp_attr) {
+            attr = *tmp_attr;
+            availableAttr.insert(attr);
+        }
+        return true;
+    };
     // Getting/setting Volume/Content attribute/keys
     NDB_RESOLVE_ATTR(ATTRIBUTION, true);
     NDB_RESOLVE_ATTR(CONTENT_ID, true);
