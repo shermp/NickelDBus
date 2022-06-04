@@ -709,7 +709,7 @@ QString NDBDbus::mdGetMetadata(QString const& cID, bool compact) {
     QVariantMap md = metadata->getMetadata(cID);
     if (md.empty()) {
         return empty;
-    } else if (md[*metadata->CONTENT_ID].isNull() || !md[*metadata->CONTENT_ID].isValid()) {
+    } else if (md[metadata->CONTENT_ID].isNull() || !md[metadata->CONTENT_ID].isValid()) {
         return empty;
     }
     QJsonDocument jd = QJsonDocument::fromVariant(md);
