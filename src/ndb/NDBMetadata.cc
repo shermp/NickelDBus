@@ -11,16 +11,19 @@
    Setting 16 bytes just to be safe here. */
 #define VOLUME_SIZE 16
 
-#define NDB_RESOLVE_ATTR(attr, required)                       \
-    resolveSymbolRTLD("ATTRIBUTE_" #attr, nh_symoutptr(attr)); \
-    if ((required) && !(attr))                                 \
-    {                                                          \
-        nh_log("could not dlsym attribute %s", #attr);         \
-        initResult = SymbolError;                              \
-        return;                                                \
-    }                                                          \
-    if ((attr))                                                \
-        availableAttr.insert(*attr);
+#define NDB_RESOLVE_ATTR(attr, required)                           \
+    resolveSymbolRTLD("ATTRIBUTE_" #attr, nh_symoutptr(tmp_attr)); \
+    if ((required) && !(tmp_attr))                                 \
+    {                                                              \
+        nh_log("could not dlsym attribute %s", #attr);             \
+        initResult = SymbolError;                                  \
+        return;                                                    \
+    }                                                              \
+    if ((tmp_attr))                                                \
+    {                                                              \
+        attr = *tmp_attr;                                          \
+        availableAttr.insert(attr);                                \
+    }
 
 namespace NDB {
 
@@ -77,6 +80,8 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
         initResult = SymbolError;
         return;
     }
+
+    QString *tmp_attr = nullptr;
     // Getting/setting Volume/Content attribute/keys
     NDB_RESOLVE_ATTR(ATTRIBUTION, true);
     NDB_RESOLVE_ATTR(CONTENT_ID, true);
@@ -126,7 +131,7 @@ QStringList NDBMetadata::getBookList(std::function<bool (Volume*)> filter) {
     symbols.Volume__forEach(*dbName, [&](Volume *v) {
         if (volIsValid(v) && filter(v)) {
             QVariantMap values = getMetadata(v);
-            QString cID = values[*CONTENT_ID].toString();
+            QString cID = values[CONTENT_ID].toString();
             bookList.append(cID);
         }
     });
@@ -140,8 +145,8 @@ QStringList NDBMetadata::getBookListAll() {
 QStringList NDBMetadata::getBookListDownloaded() {
     return getBookList([&](Volume* v) {
         QVariantMap values = getMetadata(v);
-        bool isDownloaded = values[*IS_DOWNLOADED].toBool();
-        int filesize = values[*FILE_SIZE].toInt();
+        bool isDownloaded = values[IS_DOWNLOADED].toBool();
+        int filesize = values[FILE_SIZE].toInt();
         return isDownloaded && filesize > 0;
     });
 }
@@ -149,7 +154,7 @@ QStringList NDBMetadata::getBookListDownloaded() {
 QStringList NDBMetadata::getBookListSideloaded() {
     return getBookList([&](Volume* v) {
         QVariantMap values = getMetadata(v);
-        QString cID = values[*CONTENT_ID].toString();
+        QString cID = values[CONTENT_ID].toString();
         return cID.startsWith("file:///");
     });
 }
@@ -163,18 +168,18 @@ Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
         const QString key = i.key();
         const QVariant val = i.value();
         // Skip keys that don't exist, and ContentID
-        if (!availableAttr.contains(key) || key == *CONTENT_ID) {
+        if (!availableAttr.contains(key) || key == CONTENT_ID) {
             NDB_DEBUG("Skipping %s", key.toUtf8().constData());
             continue;
         }
         // Check metadata types match expected
         auto type = val.userType();
         bool validType = true;
-        if (key == *SERIES_NUMBER_FLOAT) {
+        if (key == SERIES_NUMBER_FLOAT) {
             if (type != QMetaType::Double && type != QMetaType::Float) {
                 validType = false;
             }
-        } else if (key == *FILE_SIZE && type != QMetaType::Int) {
+        } else if (key == FILE_SIZE && type != QMetaType::Int) {
             validType = false;
         } else if (type != QMetaType::QString) {
             validType = false;

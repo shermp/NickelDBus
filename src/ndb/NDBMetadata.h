@@ -30,17 +30,17 @@ class NDBMetadata : public QObject {
         QStringList getBookListDownloaded();
         QStringList getBookListSideloaded();
 
-        QString* ATTRIBUTION;
-        QString* CONTENT_ID;
-        QString* CONTENT_TYPE;
-        QString* DESCRIPTION;
-        QString* FILE_SIZE;
-        QString* IS_DOWNLOADED;
-        QString* SERIES;
-        QString* SERIES_ID;
-        QString* SERIES_NUMBER;
-        QString* SERIES_NUMBER_FLOAT;
-        QString* SUBTITLE;
+        QString ATTRIBUTION;
+        QString CONTENT_ID;
+        QString CONTENT_TYPE;
+        QString DESCRIPTION;
+        QString FILE_SIZE;
+        QString IS_DOWNLOADED;
+        QString SERIES;
+        QString SERIES_ID;
+        QString SERIES_NUMBER;
+        QString SERIES_NUMBER_FLOAT;
+        QString SUBTITLE;
 
     private:
         QString* dbName = nullptr;
