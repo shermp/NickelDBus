@@ -52,6 +52,7 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
     nh_log("DB name is %s", dbName->toUtf8().constData());
 
     resolveSymbolRTLD("_ZN13VolumeManager7getByIdERK7QStringS2_", nh_symoutptr(symbols.VolumeManager__getById));
+    resolveSymbolRTLD("_ZN6VolumeC1Ev", nh_symoutptr(symbols.Volume__Volume));
     resolveSymbolRTLD("_ZNK6Volume7isValidEv", nh_symoutptr(symbols.Volume__isValid));
     resolveSymbolRTLD("_ZNK7Content11getDbValuesEv", nh_symoutptr(symbols.Content__getDbValues));
     resolveSymbolRTLD("_ZNK6Volume11getDbValuesEv", nh_symoutptr(symbols.Volume__getDbValues));
@@ -60,6 +61,7 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
     resolveSymbolRTLD("_ZN6Volume4saveERK6Device", nh_symoutptr(symbols.Volume__save));
     if (!symbols.VolumeManager__getById || 
         !symbols.Content__getDbValues ||
+        !symbols.Volume__Volume ||
         !symbols.Volume__getDbValues ||
         !symbols.Volume__isValid ||
         !symbols.Volume__forEach ||
@@ -106,7 +108,8 @@ Volume* NDBMetadata::getByID(Volume* vol, QString const& id) {
 }
 
 QVariantMap NDBMetadata::getMetadata(QString const& cID) {
-    char va[VOLUME_SIZE];
+    uint8_t va[VOLUME_SIZE] = {0};
+    symbols.Volume__Volume(va);
     Volume* v = getByID((Volume*)va, cID);
     return getMetadata(v);
 }
@@ -161,7 +164,8 @@ QStringList NDBMetadata::getBookListSideloaded() {
 }
 
 Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
-    char va[VOLUME_SIZE];
+    uint8_t va[VOLUME_SIZE] = {0};
+    symbols.Volume__Volume(va);
     Volume* v = getByID((Volume*)va, cID);
     NDB_ASSERT(NullError, v, "Error getting Volume for %s", cID.toUtf8().constData());
     NDB_ASSERT(VolumeError, volIsValid(v), "Volume is not valid for %s", cID.toUtf8().constData());
