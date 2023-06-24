@@ -170,6 +170,9 @@ void NDBCli::connectSignals() {
     NDBCLI_SIG_CONNECT(dlgConfirmTextInput, handleSignalParam1);
     NDBCLI_SIG_CONNECT(pfmAboutToConnect, handleSignalParam0);
     NDBCLI_SIG_CONNECT(pfmDoneProcessing, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(fssFinished, handleSignalParam0);
+    NDBCLI_SIG_CONNECT(fssGotNumFilesToProcess, handleSignalParam1);
+    NDBCLI_SIG_CONNECT(fssParseProgress, handleSignalParam1);
     NDBCLI_SIG_CONNECT(wmLinkQualityForConnectedNetwork, handleSignalParam1);
     NDBCLI_SIG_CONNECT(wmMacAddressAvailable, handleSignalParam1);
     NDBCLI_SIG_CONNECT(wmNetworkConnected, handleSignalParam0);

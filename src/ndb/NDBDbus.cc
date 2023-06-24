@@ -96,6 +96,9 @@ NDBDbus::NDBDbus(QObject* parent) : QObject(parent), QDBusContext() {
     // Resolve the rest of the Nickel symbols up-front
     // PlugWorkFlowManager
     NDB_RESOLVE_SYMBOL("_ZN19PlugWorkflowManager14sharedInstanceEv", nh_symoutptr(nSym.PlugWorkflowManager_sharedInstance));
+    // N3FSSyncManager
+    NDB_RESOLVE_SYMBOL("_ZN15N3FSSyncManager14sharedInstanceEv", nh_symoutptr(nSym.N3FSSyncManager__sharedInstance));
+    NDB_RESOLVE_SYMBOL("_ZN15N3FSSyncManager4syncERK11QStringList", nh_symoutptr(nSym.N3FSSyncManager__sync));
     // WirelessManager
     NDB_RESOLVE_SYMBOL("_ZN15WirelessManager14sharedInstanceEv", nh_symoutptr(nSym.WirelesManager_sharedInstance));
     // Toast
@@ -711,6 +714,33 @@ void NDBDbus::pfmRescanBooks() {
 void NDBDbus::pfmRescanBooksFull() {
     NDB_DBUS_USB_ASSERT((void) 0);
     return ndbNickelMisc("rescan_books_full");
+}
+
+void NDBDbus::n3fssSyncOnboard() {
+    QStringList path("/mnt/onboard");
+    return n3fssSync(&path);
+}
+
+void NDBDbus::n3fssSyncSD() {
+    QStringList path("/mnt/sd");
+    return n3fssSync(&path);
+}
+
+void NDBDbus::n3fssSyncBoth() {
+    QStringList paths = QStringList() << "/mnt/onboard" << "/mnt/sd";
+    return n3fssSync(&paths);
+}
+
+void NDBDbus::n3fssSync(QStringList* paths) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, 
+            nSym.N3FSSyncManager__sharedInstance && nSym.N3FSSyncManager__sync, "no N3FSSyncManager symbols");
+    N3FSSyncManager* n3fssm = nSym.N3FSSyncManager__sharedInstance();
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, n3fssm, "could not get N3FSSyncManager::sharedInstance()");
+    QObject::connect(n3fssm, SIGNAL(finished()), this, SIGNAL(fssFinished()), Qt::UniqueConnection);
+    QObject::connect(n3fssm, SIGNAL(gotNumFilesToProcess(int)), this, SIGNAL(fssGotNumFilesToProcess(int)), Qt::UniqueConnection);
+    QObject::connect(n3fssm, SIGNAL(parseProgress(int)), this, SIGNAL(fssParseProgress(int)), Qt::UniqueConnection);
+    return nSym.N3FSSyncManager__sync(n3fssm, paths);
 }
 
 void NDBDbus::ndbNickelMisc(const char *action) {
