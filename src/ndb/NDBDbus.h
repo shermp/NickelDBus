@@ -19,6 +19,8 @@ typedef void MainWindowController;
 typedef QDialog ConfirmationDialog;
 typedef QWidget N3Dialog;
 typedef void Device;
+typedef QObject FSSyncManager;
+typedef FSSyncManager N3FSSyncManager;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
@@ -48,6 +50,10 @@ class NDBDbus : public QObject, protected QDBusContext {
         // PlugworkFlowManager signals
         void pfmDoneProcessing();
         void pfmAboutToConnect();
+        // FSSyncManager signals
+        void fssFinished();
+        void fssGotNumFilesToProcess(int num);
+        void fssParseProgress(int progress);
         // WirelessManager signals
         void wmTryingToConnect();
         void wmNetworkConnected();
@@ -94,6 +100,10 @@ class NDBDbus : public QObject, protected QDBusContext {
         // PlugWorkFlowManager
         void pfmRescanBooks();
         void pfmRescanBooksFull();
+        // N3FSSyncManager
+        void n3fssSyncOnboard();
+        void n3fssSyncSD();
+        void n3fssSyncBoth();
         // Wireless methods (WirelessFlowManager)
         void wfmConnectWireless();
         void wfmConnectWirelessSilently();
@@ -138,6 +148,8 @@ class NDBDbus : public QObject, protected QDBusContext {
             Device *(*Device__getCurrentDevice)();
             QByteArray (*Device__userAgent)(Device*);
             QSize (*Image__sizeForType)(Device*, QString const&);
+            N3FSSyncManager* (*N3FSSyncManager__sharedInstance)();
+            void (*N3FSSyncManager__sync)(N3FSSyncManager* _this, QStringList* paths);
         } nSym;
         QTimer *viewTimer;
         bool ndbInUSBMS();
@@ -152,6 +164,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         void rvConnectSignals(QWidget* rv);
         void dlgConfirmLineEditFull(QString const& title, QString const& acceptText, QString const& rejectText, bool isPassword, QString const& setText);
         enum Result dlgConfirmCreatePreset(QString const& title, QString const& body, QString const& acceptText, QString const& rejectText);
+        void n3fssSync(QStringList* paths);
 };
 
 } // namespace NDB
