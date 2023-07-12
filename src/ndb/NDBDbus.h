@@ -101,6 +101,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         void bwmOpenBrowser(bool modal = false, QString const& url = QString(), QString const& css = QString());
         // Nickel Settings
         void nsInvert(QString const& action);
+        void nsDarkMode(QString const& action);
         void nsLockscreen(QString const& action);
         void nsScreenshots(QString const& action);
         void nsForceWifi(QString const& action);

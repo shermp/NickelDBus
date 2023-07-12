@@ -822,6 +822,16 @@ void NDBDbus::nsInvert(QString const& action) {
 }
 
 /*!
+ * \brief Set Dark Mode
+ *
+ * Set \a action to \c {enable}, \c {disable} or \c {toggle} dark mode
+ */
+void NDBDbus::nsDarkMode(QString const& action) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    return ndbSettings(action, "dark_mode");
+}
+
+/*!
  * \brief Set UnlockEnabled
  * 
  * Set \a action to \c {enable}, \c {disable} or \c {toggle} UnlockEnabled.
