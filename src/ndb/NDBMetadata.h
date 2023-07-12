@@ -9,7 +9,6 @@
 
 #include "ndb.h"
 
-typedef void Content; // It doesn't appear to be a QObject
 typedef void Volume; // Inherits Content
 typedef QObject VolumeManager; // The VolumeManager is a QObject though
 typedef void Device;
@@ -52,7 +51,6 @@ class NDBMetadata : public QObject {
             void           (*Volume__Volume)(Volume* _this);
             void           (*Volume__forEach)(QString const& dbName, std::function<void(Volume /*const&*/ *v)> f);
             int            (*Volume__isValid)(Volume* _this);
-            QVariantMap    (*Content__getDbValues)(Content* content);
             QVariantMap    (*Volume__getDbValues)(Volume* volume);
             int            (*Volume__save)(Volume* _this, Device* device);
             void           (*Volume__setAttribute)(Volume* _this, QString const& key, QVariant const& val);

@@ -54,13 +54,11 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
     resolveSymbolRTLD("_ZN13VolumeManager7getByIdERK7QStringS2_", nh_symoutptr(symbols.VolumeManager__getById));
     resolveSymbolRTLD("_ZN6VolumeC1Ev", nh_symoutptr(symbols.Volume__Volume));
     resolveSymbolRTLD("_ZNK6Volume7isValidEv", nh_symoutptr(symbols.Volume__isValid));
-    resolveSymbolRTLD("_ZNK7Content11getDbValuesEv", nh_symoutptr(symbols.Content__getDbValues));
     resolveSymbolRTLD("_ZNK6Volume11getDbValuesEv", nh_symoutptr(symbols.Volume__getDbValues));
     resolveSymbolRTLD("_ZN13VolumeManager7forEachERK7QStringRKSt8functionIFvRK6VolumeEE", nh_symoutptr(symbols.Volume__forEach));
     resolveSymbolRTLD("_ZN6Volume12setAttributeERK7QStringRK8QVariant", nh_symoutptr(symbols.Volume__setAttribute));
     resolveSymbolRTLD("_ZN6Volume4saveERK6Device", nh_symoutptr(symbols.Volume__save));
     if (!symbols.VolumeManager__getById || 
-        !symbols.Content__getDbValues ||
         !symbols.Volume__Volume ||
         !symbols.Volume__getDbValues ||
         !symbols.Volume__isValid ||
@@ -119,14 +117,7 @@ QVariantMap NDBMetadata::getMetadata(Volume* v) {
         NDB_DEBUG("Volume pointer NULL");
         return QVariantMap();
     }
-    QVariantMap volMap = symbols.Volume__getDbValues(v);
-    Content *c = v;
-    QVariantMap contentMap = symbols.Content__getDbValues(c);
-    auto merged = contentMap;
-    for (auto i = volMap.constBegin(); i != volMap.constEnd(); ++i) {
-        merged.insert(i.key(), i.value());
-    }
-    return merged;
+    return symbols.Volume__getDbValues(v);
 }
 
 QStringList NDBMetadata::getBookList(std::function<bool (Volume*)> filter) {
