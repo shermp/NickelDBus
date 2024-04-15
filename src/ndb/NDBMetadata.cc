@@ -8,41 +8,26 @@
 #define NDB_RESOLVE_ATTR(attr, required) if (!resolve_attr(attr, "ATTRIBUTE_" #attr, required)) return
 
 namespace NDB {
-void (*Volume__Volume)(Volume* _this);
-
-NDBVolume::NDBVolume() {
-    initResult = SymbolError;
-    resolveSymbolRTLD("_ZTV6Volume", nh_symoutptr(Volume_vtable));
-    NDB_ASSERT_RET(Volume_vtable, "Volume vtable not found");
-    resolveSymbolRTLD("_ZTV7Content", nh_symoutptr(Content_vtable));
-    NDB_ASSERT_RET(Content_vtable, "Content vtable not found");
-    initResult = InitError;
-    Volume__Volume((Volume*)&vol);
-    NDB_ASSERT_RET(vol.vptr != nullptr && vol.vol_private != nullptr, "Volume not constructed correctly");
-    initResult = Ok;
-    return;
-}
 
 /* Volume contains a large heap allocated VolumePrivate member variable that needs to be cleaned up
    Thankfully it has a virtual destructor. */
 NDBVolume::~NDBVolume() {
     // Don't try and call the destructor if we never got a valid object
-    NDB_ASSERT_RET(initResult == Ok, "Volume was not initialised.");
-    NDB_ASSERT_RET(vol.vptr != nullptr && vol.vol_private != nullptr, "vptr or VolumePrivate not set on Volume.");
-    
+    NDB_ASSERT_RET(vptr != nullptr && vol_private != nullptr, "vptr or VolumePrivate not set on Volume.");
+    void *Volume_vtable = nullptr;
+    resolveSymbolRTLD("_ZTV6Volume", nh_symoutptr(Volume_vtable));
+    NDB_ASSERT_RET(Volume_vtable, "Volume vtable not found");
+
     // Shamelessly stolen from NickelMenu
     #define vtable_target(x) reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(x)+8)
-    nh_log("Value of Content vtable: %p", vtable_target(Content_vtable));
-    nh_log(" Value of Volume vtable: %p", vtable_target(Volume_vtable));
-    nh_log("  Value of current vptr: %p", vol.vptr);
-    NDB_ASSERT_RET(vol.vptr == vtable_target(Volume_vtable), "unexpected vtable layout (expected class to start with a pointer to 8 bytes into the vtable)");
+    NDB_DEBUG(" Value of Volume vtable: %p", vtable_target(Volume_vtable));
+    NDB_DEBUG("  Value of current vptr: %p", vptr);
+    NDB_ASSERT_RET(vptr == vtable_target(Volume_vtable), "unexpected vtable layout (expected class to start with a pointer to 8 bytes into the vtable)");
 
-    vol.vptr->volume_dstor(&vol);
-    nh_log("Virtual Volume Destructor invoked.");
+    vptr->volume_dstor(this);
+    NDB_DEBUG("Virtual Volume Destructor invoked.");
     return;
 }
-
-
 
 NDBMetadata::~NDBMetadata() {}
 
@@ -82,14 +67,12 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
 
     resolveSymbolRTLD("_ZN13VolumeManager7getByIdERK7QStringS2_", nh_symoutptr(symbols.VolumeManager__getById));
     resolveSymbolRTLD("_ZN13VolumeManager7forEachERK7QStringRKSt8functionIFvRK6VolumeEE", nh_symoutptr(symbols.VolumeManager__forEach));
-    resolveSymbolRTLD("_ZN6VolumeC1Ev", nh_symoutptr(Volume__Volume));
     resolveSymbolRTLD("_ZNK6Volume7isValidEv", nh_symoutptr(symbols.Volume__isValid));
     resolveSymbolRTLD("_ZNK6Volume11getDbValuesEv", nh_symoutptr(symbols.Volume__getDbValues));
     resolveSymbolRTLD("_ZN6Volume12setAttributeERK7QStringRK8QVariant", nh_symoutptr(symbols.Volume__setAttribute));
     resolveSymbolRTLD("_ZN6Volume4saveERK6Device", nh_symoutptr(symbols.Volume__save));
     if (!symbols.VolumeManager__getById || 
         !symbols.VolumeManager__forEach ||
-        !Volume__Volume ||
         !symbols.Volume__getDbValues ||
         !symbols.Volume__isValid ||
         !symbols.Volume__setAttribute ||
@@ -130,15 +113,15 @@ bool NDBMetadata::volIsValid(Volume* v) {
     return symbols.Volume__isValid(v) != 0;
 }
 
-Volume* NDBMetadata::getByID(Volume* vol, QString const& id) {
-    return symbols.VolumeManager__getById(vol, id, *dbName);
+NDBVolume NDBMetadata::getByID(QString const& id) {
+    return symbols.VolumeManager__getById(id, *dbName);
 }
 
 QVariantMap NDBMetadata::getMetadata(QString const& cID) {
-    NDBVolume vol;
-    NDB_ASSERT(QVariantMap(), vol.initResult == Ok, "Unable to construct Volume");
-    Volume* v = getByID(vol.getVolume(), cID);
-    return getMetadata(v);
+    // NDBVolume vol;
+    // NDB_ASSERT(QVariantMap(), vol.initResult == Ok, "Unable to construct Volume");
+    NDBVolume v = getByID(cID);
+    return getMetadata((Volume*)&v);
 }
 
 QVariantMap NDBMetadata::getMetadata(Volume* v) {
@@ -184,9 +167,10 @@ QStringList NDBMetadata::getBookListSideloaded() {
 }
 
 Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
-    NDBVolume vol;
-    Volume* v = getByID(vol.getVolume(), cID);
-    NDB_ASSERT(NullError, v, "Error getting Volume for %s", cID.toUtf8().constData());
+    //NDBVolume vol;
+    NDBVolume vol = getByID(cID);
+    Volume* v = (Volume*)&vol;
+    //NDB_ASSERT(NullError, v, "Error getting Volume for %s", cID.toUtf8().constData());
     NDB_ASSERT(VolumeError, volIsValid(v), "Volume is not valid for %s", cID.toUtf8().constData());
     for (auto i = md.constBegin(); i != md.constEnd(); ++i) {
         const QString key = i.key();

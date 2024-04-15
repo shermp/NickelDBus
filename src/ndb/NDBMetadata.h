@@ -27,21 +27,17 @@ struct VolVtable {
     dstor_ptr_t volume_dstor;
 };
 
-class NDBVolume {
-    public:
-        enum Result initResult;
-        Volume* getVolume() { return (Volume*)&vol; }
-        
-        NDBVolume();
-        ~NDBVolume();
-    private:
-        // Volume contains a vptr and a VolumePrivate ptr
-        struct {
-            VolVtable* vptr = nullptr;
-            void* vol_private = nullptr;
-        } vol;
-        void* Volume_vtable;
-        void* Content_vtable;
+struct NDBVolume {
+    VolVtable* vptr = nullptr;
+    void* vol_private = nullptr;
+
+    NDBVolume() {}
+    ~NDBVolume();
+};
+
+struct VVolume {
+    VolVtable* vptr = nullptr;
+    void* vol_private = nullptr;
 };
 
 class NDBMetadata : public QObject {
@@ -76,7 +72,7 @@ class NDBMetadata : public QObject {
         struct {
             // Getting Volume's
             VolumeManager* (*VolumeManager__sharedInstance)();
-            Volume*        (*VolumeManager__getById)(Volume* vol, QString const& id, QString const& dbName);
+            NDBVolume      (*VolumeManager__getById)(QString const& id, QString const& dbName);
             void           (*VolumeManager__forEach)(QString const& dbName, std::function<void(Volume /*const&*/ *v)> f);
             int            (*Volume__isValid)(Volume* _this);
             QVariantMap    (*Volume__getDbValues)(Volume* volume);
@@ -86,7 +82,7 @@ class NDBMetadata : public QObject {
 
         QSet<QString> availableAttr;
         
-        Volume* getByID(Volume* vol, QString const& id);
+        NDBVolume getByID(QString const& id);
         bool volIsValid(Volume* v);
         QVariantMap getMetadata(Volume* v);
         QStringList getBookList(std::function<bool (Volume*)> filter);
