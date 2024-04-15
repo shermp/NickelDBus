@@ -167,10 +167,8 @@ QStringList NDBMetadata::getBookListSideloaded() {
 }
 
 Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
-    //NDBVolume vol;
     NDBVolume vol = getByID(cID);
     Volume* v = (Volume*)&vol;
-    //NDB_ASSERT(NullError, v, "Error getting Volume for %s", cID.toUtf8().constData());
     NDB_ASSERT(VolumeError, volIsValid(v), "Volume is not valid for %s", cID.toUtf8().constData());
     for (auto i = md.constBegin(); i != md.constEnd(); ++i) {
         const QString key = i.key();
