@@ -12,6 +12,7 @@ namespace NDB {
 #endif
 
 #define NDB_ASSERT(ret, cond, fmt, ...) if (!(cond)) { nh_log(fmt, ##__VA_ARGS__); return (ret); }
+#define NDB_ASSERT_RET(cond, fmt, ...) if (!(cond)) { nh_log(fmt, ##__VA_ARGS__); return; }
 #define NDB_ASSERT_RES(res, func) (res) = (func); if ((res) != Ok) { return (res); }
 
 // like NDB_ASSERT, but sends an appropriate d-bus error on the bus before returning
