@@ -716,16 +716,49 @@ void NDBDbus::pfmRescanBooksFull() {
     return ndbNickelMisc("rescan_books_full");
 }
 
+/*!
+ * \brief Begins a filesystem sync to add/remove content from onboard storage
+ * 
+ * This is a more targeted option to add new content compared to \a pfmRescanBooks 
+ * and \a pfmRescanBooksFull. It is what the browser uses when downloading
+ * ebook files.
+ * 
+ * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
+ * to be added, \a fssParseProgress to specify the current progress, and the 
+ * \a fssFinished signal is emitted when complete.
+ */
 void NDBDbus::n3fssSyncOnboard() {
     QStringList path("/mnt/onboard");
     return n3fssSync(&path);
 }
 
+/*!
+ * \brief Begins a filesystem sync to add/remove content from sd storage
+ * 
+ * This is a more targeted option to add new content compared to \a pfmRescanBooks 
+ * and \a pfmRescanBooksFull. It is what the browser uses when downloading
+ * ebook files.
+ * 
+ * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
+ * to be added, \a fssParseProgress to specify the current progress, and the 
+ * \a fssFinished signal is emitted when complete.
+ */
 void NDBDbus::n3fssSyncSD() {
     QStringList path("/mnt/sd");
     return n3fssSync(&path);
 }
 
+/*!
+ * \brief Begins a filesystem sync to add/remove content from onboard and sd storage
+ * 
+ * This is a more targeted option to add new content compared to \a pfmRescanBooks 
+ * and \a pfmRescanBooksFull. It is what the browser uses when downloading
+ * ebook files.
+ * 
+ * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
+ * to be added, \a fssParseProgress to specify the current progress, and the 
+ * \a fssFinished signal is emitted when complete.
+ */
 void NDBDbus::n3fssSyncBoth() {
     QStringList paths = QStringList() << "/mnt/onboard" << "/mnt/sd";
     return n3fssSync(&paths);
