@@ -8,6 +8,7 @@
 #include <QtDBus>
 #include <QDBusContext>
 #include <QLabel>
+#include <QSize>
 #include <QTimer>
 #include "NDBCfmDlg.h"
 
@@ -110,6 +111,8 @@ class NDBDbus : public QObject, protected QDBusContext {
         void pwrShutdown();
         void pwrReboot();
         void pwrSleep();
+        // Image sizes
+        QString imgSizeForType(QString const& type);
     protected Q_SLOTS:
         void handleQSWCurrentChanged(int index);
         void handleQSWTimer();
@@ -134,6 +137,7 @@ class NDBDbus : public QObject, protected QDBusContext {
             QWidget* (*N3Dialog__content)(N3Dialog*);
             Device *(*Device__getCurrentDevice)();
             QByteArray (*Device__userAgent)(Device*);
+            QSize (*Image__sizeForType)(Device*, QString const&);
         } nSym;
         QTimer *viewTimer;
         bool ndbInUSBMS();

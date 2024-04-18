@@ -112,6 +112,8 @@ NDBDbus::NDBDbus(QObject* parent) : QObject(parent), QDBusContext() {
         // Older firmware versions use a slightly different mangled symbol name
         NDB_RESOLVE_SYMBOL("_ZN20MainWindowController11currentViewEv", nh_symoutptr(nSym.MainWindowController_currentView));
     }
+    // Image
+    NDB_RESOLVE_SYMBOL("_ZN5Image11sizeForTypeERK6DeviceRK7QString", nh_symoutptr(nSym.Image__sizeForType));
 }
 
 /*!
@@ -923,6 +925,28 @@ void NDBDbus::rvConnectSignals(QWidget* rv) {
     // Just connecting pageChanged(int) for now. Others may or may not 
     // come in the future.
     QObject::connect(rv, SIGNAL(pageChanged(int)), this, SIGNAL(rvPageChanged(int)), Qt::UniqueConnection);
+}
+
+/*!
+ * \brief Gets the image size for the device
+ * 
+ * Valid strings for \a type are \c N3_FULL , \c N3_LIBRARY_FULL , \c N3_LIBRARY_GRID
+ * 
+ * Returns a string in the form \c "width \c height"
+ * 
+ * \since 0.3.0
+ */
+QString NDBDbus::imgSizeForType(QString const& type) {
+    QString default_ret("-1 -1");
+    NDB_DBUS_USB_ASSERT(default_ret);
+    NDB_DBUS_SYM_ASSERT(default_ret, nSym.Image__sizeForType);
+    bool type_valid = (type == "N3_FULL" || type == "N3_LIBRARY_FULL" || type == "N3_LIBRARY_GRID");
+    NDB_DBUS_ASSERT(default_ret, QDBusError::InvalidArgs, type_valid, "invalid type name. Must be one of N3_FULL, N3_LIBRARY_FULL, N3_LIBRARY_GRID");
+    NDB_DBUS_SYM_ASSERT(default_ret, nSym.Device__getCurrentDevice);
+    Device *d = nSym.Device__getCurrentDevice();
+    NDB_DBUS_ASSERT(default_ret, QDBusError::InternalError, d, "unable to get current device");
+    QSize img_size = nSym.Image__sizeForType(d, type);
+    return QString("%1 %2").arg(img_size.width()).arg(img_size.height());
 }
 
 /* Enum Documentation */
