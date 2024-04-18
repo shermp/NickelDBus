@@ -719,13 +719,13 @@ void NDBDbus::pfmRescanBooksFull() {
 /*!
  * \brief Begins a filesystem sync to add/remove content from onboard storage
  * 
- * This is a more targeted option to add new content compared to \a pfmRescanBooks 
- * and \a pfmRescanBooksFull. It is what the browser uses when downloading
+ * This is a more targeted option to add new content compared to \l pfmRescanBooks 
+ * and \l pfmRescanBooksFull. It is what the browser uses when downloading
  * ebook files.
  * 
- * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
- * to be added, \a fssParseProgress to specify the current progress, and the 
- * \a fssFinished signal is emitted when complete.
+ * Emits \l fssGotNumFilesToProcess signal to specify the number of files 
+ * to be added, \l fssParseProgress to specify the current progress, and the 
+ * \l fssFinished signal is emitted when complete.
  * 
  * \since 0.3.0
  */
@@ -737,13 +737,13 @@ void NDBDbus::n3fssSyncOnboard() {
 /*!
  * \brief Begins a filesystem sync to add/remove content from sd storage
  * 
- * This is a more targeted option to add new content compared to \a pfmRescanBooks 
- * and \a pfmRescanBooksFull. It is what the browser uses when downloading
+ * This is a more targeted option to add new content compared to \l pfmRescanBooks 
+ * and \l pfmRescanBooksFull. It is what the browser uses when downloading
  * ebook files.
  * 
- * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
- * to be added, \a fssParseProgress to specify the current progress, and the 
- * \a fssFinished signal is emitted when complete.
+ * Emits \l fssGotNumFilesToProcess signal to specify the number of files 
+ * to be added, \l fssParseProgress to specify the current progress, and the 
+ * \l fssFinished signal is emitted when complete.
  * 
  * \since 0.3.0
  */
@@ -755,13 +755,13 @@ void NDBDbus::n3fssSyncSD() {
 /*!
  * \brief Begins a filesystem sync to add/remove content from onboard and sd storage
  * 
- * This is a more targeted option to add new content compared to \a pfmRescanBooks 
- * and \a pfmRescanBooksFull. It is what the browser uses when downloading
+ * This is a more targeted option to add new content compared to \l pfmRescanBooks 
+ * and \l pfmRescanBooksFull. It is what the browser uses when downloading
  * ebook files.
  * 
- * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
- * to be added, \a fssParseProgress to specify the current progress, and the 
- * \a fssFinished signal is emitted when complete.
+ * Emits \l fssGotNumFilesToProcess signal to specify the number of files 
+ * to be added, \l fssParseProgress to specify the current progress, and the 
+ * \l fssFinished signal is emitted when complete.
  * 
  * \since 0.3.0
  */
