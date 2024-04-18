@@ -726,6 +726,8 @@ void NDBDbus::pfmRescanBooksFull() {
  * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
  * to be added, \a fssParseProgress to specify the current progress, and the 
  * \a fssFinished signal is emitted when complete.
+ * 
+ * \since 0.3.0
  */
 void NDBDbus::n3fssSyncOnboard() {
     QStringList path("/mnt/onboard");
@@ -742,6 +744,8 @@ void NDBDbus::n3fssSyncOnboard() {
  * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
  * to be added, \a fssParseProgress to specify the current progress, and the 
  * \a fssFinished signal is emitted when complete.
+ * 
+ * \since 0.3.0
  */
 void NDBDbus::n3fssSyncSD() {
     QStringList path("/mnt/sd");
@@ -758,6 +762,8 @@ void NDBDbus::n3fssSyncSD() {
  * Emits \a fssGotNumFilesToProcess signal to specify the number of files 
  * to be added, \a fssParseProgress to specify the current progress, and the 
  * \a fssFinished signal is emitted when complete.
+ * 
+ * \since 0.3.0
  */
 void NDBDbus::n3fssSyncBoth() {
     QStringList paths = QStringList() << "/mnt/onboard" << "/mnt/sd";
