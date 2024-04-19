@@ -8,7 +8,7 @@ jobs:
     container: ghcr.io/pgaskin/nickeltc:1.0
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive
     - name: Build
@@ -16,12 +16,12 @@ jobs:
     - name: Build Documentation
       run: make doc
     - name: Upload KoboRoot with 'qndb'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: NickelDBus
         path: KoboRoot.tgz
     - name: Upload documentation
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Documentation
         path: ./qdoc/html

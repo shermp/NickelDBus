@@ -10,13 +10,13 @@ jobs:
     container: ghcr.io/pgaskin/nickeltc:1.0
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive
     - name: Build
       run: make clean && make all cli koboroot
     - name: Create release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         draft: true
         body: '<!-- replace this with the release notes -->'
