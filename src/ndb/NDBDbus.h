@@ -21,6 +21,8 @@ typedef QWidget N3Dialog;
 typedef void Device;
 typedef QObject FSSyncManager;
 typedef FSSyncManager N3FSSyncManager;
+typedef bool PermissionRequest;
+typedef QObject WirelessWatchdog;
 
 #ifndef NDB_DBUS_IFACE_NAME
     #define NDB_DBUS_IFACE_NAME "com.github.shermp.nickeldbus"
@@ -108,6 +110,8 @@ class NDBDbus : public QObject, protected QDBusContext {
         void wfmConnectWireless();
         void wfmConnectWirelessSilently();
         void wfmSetAirplaneMode(QString const& action);
+        // Wireless watchdog
+        void ndbWifiKeepalive(bool keepalive);
         // Web Browser (BrowserWorkflowManager)
         void bwmOpenBrowser(bool modal = false, QString const& url = QString(), QString const& css = QString());
         // Nickel Settings
@@ -129,6 +133,7 @@ class NDBDbus : public QObject, protected QDBusContext {
         void handleStackedWidgetDestroyed();
         void onDlgLineEditAccepted();
         void onDlgLineEditRejected();
+        void onWWAboutToKillWifi(PermissionRequest* allow);
     private:
         void *libnickel;
         QSet<QString> connectedSignals;
@@ -150,6 +155,7 @@ class NDBDbus : public QObject, protected QDBusContext {
             QSize (*Image__sizeForType)(Device*, QString const&);
             N3FSSyncManager* (*N3FSSyncManager__sharedInstance)();
             void (*N3FSSyncManager__sync)(N3FSSyncManager* _this, QStringList* paths);
+            WirelessWatchdog* (*WirelessWatchdog__sharedInstance)();
         } nSym;
         QTimer *viewTimer;
         bool ndbInUSBMS();
