@@ -117,6 +117,7 @@ NDBDbus::NDBDbus(QObject* parent) : QObject(parent), QDBusContext() {
     }
     // Image
     NDB_RESOLVE_SYMBOL("_ZN5Image11sizeForTypeERK6DeviceRK7QString", nh_symoutptr(nSym.Image__sizeForType));
+    NDB_RESOLVE_SYMBOL("_ZN16WirelessWatchdog14sharedInstanceEv", nh_symoutptr(nSym.WirelessWatchdog__sharedInstance));
 }
 
 /*!
@@ -838,6 +839,36 @@ void NDBDbus::ndbWireless(const char *act) {
         return;
     }
     nm_action_result_free(res);
+}
+
+void NDBDbus::onWWAboutToKillWifi(PermissionRequest* allow) {
+    if (allow != nullptr) {
+        NDB_DEBUG("WirelessWatchdog wants to kill Wifi. Denying request.");
+        *allow = false;
+    }
+    return;
+}
+
+/*!
+ * \brief Keep Wifi connection alive
+ *
+ * Prevents Nickel from killing the Wifi connection after a short amount of time.
+ * Set \a keepalive to \c true to enable the keepalive, and \c false to disable it.
+ * It is best to only keep Wifi enabled as long as necessary.
+ * 
+ * \since 0.3.0
+ */
+void NDBDbus::ndbWifiKeepalive(bool keepalive) {
+    NDB_DBUS_USB_ASSERT((void) 0);
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, nSym.WirelessWatchdog__sharedInstance, "no WirelessWatchdog::sharedInstance() symbol");
+    WirelessWatchdog *wd = nSym.WirelessWatchdog__sharedInstance();
+    NDB_DBUS_ASSERT((void) 0, QDBusError::InternalError, wd, "could not get WirelessWatchdog::sharedInstance()");
+    if (keepalive) {
+        QObject::connect(wd, SIGNAL(aboutToKillWifi(PermissionRequest*)), this, SLOT(onWWAboutToKillWifi(PermissionRequest*)), Qt::UniqueConnection);
+    } else {
+        QObject::disconnect(wd, SIGNAL(aboutToKillWifi(PermissionRequest*)), this, SLOT(onWWAboutToKillWifi(PermissionRequest*)));
+    }
+    return;
 }
 
 /*!
