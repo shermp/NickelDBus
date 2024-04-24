@@ -1,7 +1,5 @@
 # NickelDBus :: Monitor and control aspects of Kobo's Nickel application
 
-**WARNING: This might not work on the new Kobo Clara Colour/BW or Libra Colour!**
-
 A library to provide monitoring and control of the Nickel application over d-bus.
 
 Built with help from code from NickelMenu.
