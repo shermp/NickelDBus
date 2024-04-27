@@ -121,6 +121,8 @@ QVariantMap NDBMetadata::getMetadata(QString const& cID) {
     // NDBVolume vol;
     // NDB_ASSERT(QVariantMap(), vol.initResult == Ok, "Unable to construct Volume");
     NDBVolume v = getByID(cID);
+    NDB_DEBUG("Volume vptr = %p, VolumePrivate = %p", v.vptr, v.vol_private);
+    NDB_DEBUG("Volume is %svalid", volIsValid((Volume*)&v) ? "" : "not ");
     return getMetadata((Volume*)&v);
 }
 
