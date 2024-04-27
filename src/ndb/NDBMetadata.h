@@ -13,12 +13,6 @@ typedef void Volume; // Inherits Content
 typedef QObject VolumeManager; // The VolumeManager is a QObject though
 typedef void Device;
 
-/* Volume/Content objects appear to be only 8 bytes. They
-   hold a pointer to a much larger ContentPrivate/VolumePrivate
-   object (VolumePrivate is at least 400 bytes).
-   Setting 16 bytes just to be safe here. */
-#define VOLUME_SIZE 16
-
 namespace NDB {
 
 typedef void(*dstor_ptr_t)(void*);
