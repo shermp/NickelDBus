@@ -123,7 +123,7 @@ QVariantMap NDBMetadata::getMetadata(QString const& cID) {
     NDBVolume v = getByID(cID);
     NDB_DEBUG("Volume vptr = %p, VolumePrivate = %p", v.vptr, v.vol_private);
     NDB_DEBUG("Volume is %svalid", volIsValid((Volume*)&v) ? "" : "not ");
-    return getMetadata((Volume*)&v);
+    return getMetadata(reinterpret_cast<Volume*>(&v));
 }
 
 QVariantMap NDBMetadata::getMetadata(Volume* v) {
@@ -170,7 +170,7 @@ QStringList NDBMetadata::getBookListSideloaded() {
 
 Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
     NDBVolume vol = getByID(cID);
-    Volume* v = (Volume*)&vol;
+    Volume* v = reinterpret_cast<Volume*>(&vol);
     NDB_ASSERT(VolumeError, volIsValid(v), "Volume is not valid for %s", cID.toUtf8().constData());
     for (auto i = md.constBegin(); i != md.constEnd(); ++i) {
         const QString key = i.key();
