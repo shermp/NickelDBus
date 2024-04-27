@@ -110,7 +110,7 @@ NDBMetadata::NDBMetadata(QObject* parent) : QObject(parent) {
 }
 
 bool NDBMetadata::volIsValid(Volume* v) {
-    return symbols.Volume__isValid(v) != 0;
+    return symbols.Volume__isValid(v);
 }
 
 NDBVolume NDBMetadata::getByID(QString const& id) {

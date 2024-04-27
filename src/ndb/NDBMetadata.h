@@ -68,7 +68,7 @@ class NDBMetadata : public QObject {
             VolumeManager* (*VolumeManager__sharedInstance)();
             NDBVolume      (*VolumeManager__getById)(QString const& id, QString const& dbName);
             void           (*VolumeManager__forEach)(QString const& dbName, std::function<void(Volume /*const&*/ *v)> f);
-            int            (*Volume__isValid)(Volume* _this);
+            bool           (*Volume__isValid)(Volume* _this);
             QVariantMap    (*Volume__getDbValues)(Volume* volume);
             int            (*Volume__save)(Volume* _this, Device* device);
             void           (*Volume__setAttribute)(Volume* _this, QString const& key, QVariant const& val);
