@@ -29,7 +29,7 @@ override KOBOROOT += $(UNINSTALL_FILE):/mnt/onboard/.adds/nickeldbus
 
 override UNINSTALL_FILE := res/ndb_version
 
-override GENERATED += $(ADAPTER) $(ADAPTER:h=cpp) $(PROXY) $(PROXY:h=cpp) $(DBUS_IFACE_XML) $(UNINSTALL_FILE)
+override GENERATED += $(UNINSTALL_FILE)
 
 override GITIGNORE += $(PROXY:h=moc) $(PROXY:h=o) $(PROXY:h=moc.o) qdoc/html/
 

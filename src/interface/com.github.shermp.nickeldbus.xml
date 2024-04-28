@@ -1,0 +1,211 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="com.github.shermp.nickeldbus">
+    <signal name="dlgConfirmResult">
+      <arg name="result" type="i" direction="out"/>
+    </signal>
+    <signal name="dlgConfirmTextInput">
+      <arg name="input" type="s" direction="out"/>
+    </signal>
+    <signal name="pfmDoneProcessing">
+    </signal>
+    <signal name="pfmAboutToConnect">
+    </signal>
+    <signal name="fssFinished">
+    </signal>
+    <signal name="fssGotNumFilesToProcess">
+      <arg name="num" type="i" direction="out"/>
+    </signal>
+    <signal name="fssParseProgress">
+      <arg name="progress" type="i" direction="out"/>
+    </signal>
+    <signal name="wmTryingToConnect">
+    </signal>
+    <signal name="wmNetworkConnected">
+    </signal>
+    <signal name="wmNetworkDisconnected">
+    </signal>
+    <signal name="wmNetworkForgotten">
+    </signal>
+    <signal name="wmNetworkFailedToConnect">
+    </signal>
+    <signal name="wmScanningStarted">
+    </signal>
+    <signal name="wmScanningFinished">
+    </signal>
+    <signal name="wmScanningAborted">
+    </signal>
+    <signal name="wmWifiEnabled">
+      <arg name="enabled" type="b" direction="out"/>
+    </signal>
+    <signal name="wmLinkQualityForConnectedNetwork">
+      <arg name="quality" type="d" direction="out"/>
+    </signal>
+    <signal name="wmMacAddressAvailable">
+      <arg name="mac" type="s" direction="out"/>
+    </signal>
+    <signal name="ndbViewChanged">
+      <arg name="newView" type="s" direction="out"/>
+    </signal>
+    <signal name="rvPageChanged">
+      <arg name="pageNum" type="i" direction="out"/>
+    </signal>
+    <method name="ndbVersion">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="ndbNickelClassDetails">
+      <arg type="s" direction="out"/>
+      <arg name="staticMmetaobjectSymbol" type="s" direction="in"/>
+    </method>
+    <method name="ndbNickelWidgets">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="ndbCurrentView">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="ndbFirmwareVersion">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="ndbSignalConnected">
+      <arg type="b" direction="out"/>
+      <arg name="signalName" type="s" direction="in"/>
+    </method>
+    <method name="mwcToast">
+      <arg name="toastDuration" type="i" direction="in"/>
+      <arg name="msgMain" type="s" direction="in"/>
+      <arg name="msgSub" type="s" direction="in"/>
+    </method>
+    <method name="mwcToast">
+      <arg name="toastDuration" type="i" direction="in"/>
+      <arg name="msgMain" type="s" direction="in"/>
+    </method>
+    <method name="mwcHome">
+    </method>
+    <method name="dlgConfirmNoBtn">
+      <arg name="title" type="s" direction="in"/>
+      <arg name="body" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmAccept">
+      <arg name="title" type="s" direction="in"/>
+      <arg name="body" type="s" direction="in"/>
+      <arg name="acceptText" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmReject">
+      <arg name="title" type="s" direction="in"/>
+      <arg name="body" type="s" direction="in"/>
+      <arg name="rejectText" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmAcceptReject">
+      <arg name="title" type="s" direction="in"/>
+      <arg name="body" type="s" direction="in"/>
+      <arg name="acceptText" type="s" direction="in"/>
+      <arg name="rejectText" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmCreate">
+      <arg name="createLineEdit" type="b" direction="in"/>
+    </method>
+    <method name="dlgConfirmCreate">
+    </method>
+    <method name="dlgConfirmSetTitle">
+      <arg name="title" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetBody">
+      <arg name="body" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetAccept">
+      <arg name="acceptText" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetReject">
+      <arg name="rejectText" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetModal">
+      <arg name="modal" type="b" direction="in"/>
+    </method>
+    <method name="dlgConfirmShowClose">
+      <arg name="show" type="b" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetProgress">
+      <arg name="min" type="i" direction="in"/>
+      <arg name="max" type="i" direction="in"/>
+      <arg name="val" type="i" direction="in"/>
+      <arg name="format" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetProgress">
+      <arg name="min" type="i" direction="in"/>
+      <arg name="max" type="i" direction="in"/>
+      <arg name="val" type="i" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetLEPassword">
+      <arg name="password" type="b" direction="in"/>
+    </method>
+    <method name="dlgConfirmSetLEPlaceholder">
+      <arg name="placeholder" type="s" direction="in"/>
+    </method>
+    <method name="dlgConfirmShow">
+    </method>
+    <method name="dlgConfirmClose">
+    </method>
+    <method name="pfmRescanBooks">
+    </method>
+    <method name="pfmRescanBooksFull">
+    </method>
+    <method name="n3fssSyncOnboard">
+    </method>
+    <method name="n3fssSyncSD">
+    </method>
+    <method name="n3fssSyncBoth">
+    </method>
+    <method name="wfmConnectWireless">
+    </method>
+    <method name="wfmConnectWirelessSilently">
+    </method>
+    <method name="wfmSetAirplaneMode">
+      <arg name="action" type="s" direction="in"/>
+    </method>
+    <method name="ndbWifiKeepalive">
+      <arg name="keepalive" type="b" direction="in"/>
+    </method>
+    <method name="bwmOpenBrowser">
+      <arg name="modal" type="b" direction="in"/>
+      <arg name="url" type="s" direction="in"/>
+      <arg name="css" type="s" direction="in"/>
+    </method>
+    <method name="bwmOpenBrowser">
+      <arg name="modal" type="b" direction="in"/>
+      <arg name="url" type="s" direction="in"/>
+    </method>
+    <method name="bwmOpenBrowser">
+      <arg name="modal" type="b" direction="in"/>
+    </method>
+    <method name="bwmOpenBrowser">
+    </method>
+    <method name="nsInvert">
+      <arg name="action" type="s" direction="in"/>
+    </method>
+    <method name="nsDarkMode">
+      <arg name="action" type="s" direction="in"/>
+    </method>
+    <method name="nsLockscreen">
+      <arg name="action" type="s" direction="in"/>
+    </method>
+    <method name="nsScreenshots">
+      <arg name="action" type="s" direction="in"/>
+    </method>
+    <method name="nsForceWifi">
+      <arg name="action" type="s" direction="in"/>
+    </method>
+    <method name="nsAutoUSBGadget">
+      <arg name="action" type="s" direction="in"/>
+    </method>
+    <method name="pwrShutdown">
+    </method>
+    <method name="pwrReboot">
+    </method>
+    <method name="pwrSleep">
+    </method>
+    <method name="imgSizeForType">
+      <arg type="s" direction="out"/>
+      <arg name="type" type="s" direction="in"/>
+    </method>
+  </interface>
+</node>
