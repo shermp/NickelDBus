@@ -70,7 +70,7 @@ class NDBMetadata : public QObject {
             void           (*VolumeManager__forEach)(QString const& dbName, std::function<void(Volume /*const&*/ *v)> f);
             bool           (*Volume__isValid)(Volume* _this);
             QVariantMap    (*Volume__getDbValues)(Volume* volume);
-            int            (*Volume__save)(Volume* _this, Device* device);
+            bool           (*Volume__save)(Volume* _this, Device* device);
             void           (*Volume__setAttribute)(Volume* _this, QString const& key, QVariant const& val);
         } symbols;
 

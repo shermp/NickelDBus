@@ -195,9 +195,9 @@ Result NDBMetadata::setMetadata(QString const& cID, QVariantMap md) {
         NDB_ASSERT(TypeError, validType, "Unexpected type for key %s", key.toUtf8().constData());
         symbols.Volume__setAttribute(v, key, val);
     }
-    int res = symbols.Volume__save(v, device);
+    bool res = symbols.Volume__save(v, device);
     NDB_ASSERT(MetadataError, res, "error saving metadata for id %s", cID.toUtf8().constData());
-    NDB_DEBUG("Volume__save returned with val %d", res);
+    NDB_DEBUG("Volume__save returned with val '%s'", res ? "true" : "false");
     return Ok;
 }
 
